@@ -46,11 +46,12 @@ const BookingSchema = new Schema<IBooking>({
   adminCommission: Number,
   trainerEarning: Number,
 
-status: {
+  status: {
   type: String,
   enum: Object.values(BOOKING_STATUS),
   default: BOOKING_STATUS.PENDING      
 },
+
 
   payment: {
     method: String,
