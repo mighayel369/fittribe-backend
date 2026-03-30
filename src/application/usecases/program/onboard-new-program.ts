@@ -28,7 +28,6 @@ export class OnboardNewProgram implements IOnboardNewProgram {
       randomUUID(),    
       input.name,           
       input.description,        
-      Number(input.duration),  
       programPicUrl,
       true            
     );

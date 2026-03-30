@@ -20,7 +20,8 @@ interface Env {
   ADMIN_PERCENT:number;
   RAZORPAY_ID:string;
   RAZORPAY_SECRET:string;
-  ADMIN_WALLET:string
+  ADMIN_WALLET:string;
+  SESSION_DURATION:number;
 }
 
 const ensureEnv = (key: string): string => {
@@ -50,7 +51,8 @@ const getConfig = (): Env => {
     ADMIN_PERCENT:Number(ensureEnv("ADMIN_PERCENT")),
     RAZORPAY_ID:ensureEnv("RAZORPAY_KEYID"),
     RAZORPAY_SECRET:ensureEnv("RAZORPAY_KEYSECRET"),
-    ADMIN_WALLET:ensureEnv("ADMIN_WALLET")
+    ADMIN_WALLET:ensureEnv("ADMIN_WALLET"),
+    SESSION_DURATION:Number(ensureEnv("SESSION_DURATION"))
   };
 };
 

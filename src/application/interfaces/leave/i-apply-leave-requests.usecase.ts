@@ -1,5 +1,5 @@
-import { ApplyLeaveRequestDTO } from "application/dto/leave/apply-leave.dto";
+import { RequestLeaveDTO } from "application/dto/leave/request.leave.dto";
 
 export interface IApplyLeaveRequest{
-    execute(input:ApplyLeaveRequestDTO):Promise<void>
+    execute(input:RequestLeaveDTO):Promise<void>
 }

@@ -20,7 +20,7 @@ export class FetchTrainerAllPendingBookings
 
     return {
       data: data.map((d) => BookingMapper.toTrainerPendingResponseDTO(d)),
-      total: Math.ceil(totalCount/limit) 
+      total:totalCount
     };
   }
 }

@@ -25,6 +25,7 @@ export const BookingMapper = {
       doc.rescheduleRequest ? {
       newDate: doc.rescheduleRequest.newDate,
       newTimeSlot: doc.rescheduleRequest.newTimeSlot,
+      requestedBy:doc.rescheduleRequest.requestedBy,
       createdAt: (doc as any).updatedAt || new Date(),
     } : undefined,
       doc.rescheduleCount,

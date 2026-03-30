@@ -19,18 +19,3 @@ export class UserEntity {
     return !this.status;
   }
 }
-
-export type CreateParamUser = {
-  name: string;
-  email: string;
-  password: string;
-  role: string;
-};
-
-export interface UpdateUserProfileDTO {
-  name?: string;
-  phone?: string;
-  address?: string;
-  gender?: string;
-  age?: number;
-}

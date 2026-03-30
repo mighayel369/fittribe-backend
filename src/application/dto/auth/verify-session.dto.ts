@@ -1,3 +1,4 @@
+import { STATUS } from "utils/Constants";
 interface BaseSessionDTO {
     name: string;
     role: string;
@@ -8,5 +9,5 @@ interface BaseSessionDTO {
 export interface ClientSessionDTO extends BaseSessionDTO {}
 
 export interface TrainerSessionDTO extends BaseSessionDTO {
-    verified: "pending" | "approved" | "rejected";
+    verified: STATUS
 }

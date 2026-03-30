@@ -7,6 +7,7 @@ import {
   TrainerDashboardAppointmentResponseDTO
 } from "application/dto/dashboard/trainer-dashboard.dto";
 import { AdminDashbardResponseDTO } from "application/dto/dashboard/admin-dashboard.dto";
+import { minutesToTime } from "utils/generateTimeSlots";
 
 export class DashboardMapper {
 
@@ -83,7 +84,10 @@ static toTrainerMonthlyPerformanceDTO(data:{month:string,sessionCount:number}): 
       },
       performanceData: analytics.performanceData || [],
       bookingStatus: analytics.bookingStatus || [],
-      peakHoursData: analytics.peakHoursData || [],
+      peakHoursData: (analytics.peakHoursData || []).map((curr: any) => ({
+      time: minutesToTime(curr.time), 
+      count: curr.count
+    })),
       topTrainers: (trainerPerformance || []).map(t => ({
         month: t.month || "Current",
         name: t.name,

@@ -1,5 +1,5 @@
 import mongoose, { Schema, Document } from "mongoose";
-import { BOOKING_STATUS } from "utils/Constants";
+import { BOOKING_STATUS, UserRole } from "utils/Constants";
 export interface IBooking extends Document {
   bookingId:string
   user: string;
@@ -7,7 +7,7 @@ export interface IBooking extends Document {
   program: string;
 
   date: Date;
-  timeSlot: string;
+  timeSlot: number;
   duration: number;
 
   totalAmount: number;
@@ -23,8 +23,8 @@ export interface IBooking extends Document {
 
   rescheduleRequest?: {
     newDate: Date;
-    newTimeSlot: string;
-    requestedBy: "user" | "trainer";
+    newTimeSlot: number;
+    requestedBy: UserRole
     reason?: string;
   };
   rescheduleCount?:number
@@ -39,7 +39,7 @@ const BookingSchema = new Schema<IBooking>({
   program: { type: String, required: true },
 
   date: Date,
-  timeSlot: String,
+  timeSlot: Number,
   duration: Number,
 
   totalAmount: Number,
@@ -59,7 +59,8 @@ const BookingSchema = new Schema<IBooking>({
   },
   rescheduleRequest: {
     newDate: Date,
-    newTimeSlot: String,
+    newTimeSlot: Number,
+    requestedBy:{type:String,enum:Object.values(UserRole)}
   },
   rescheduleCount:Number,
   sessionRating:Number,

@@ -1,15 +1,16 @@
 
 import { BookingEntity } from "domain/entities/BookingEntity";
-import { BookingResponseDTO,TrainserBookingResponseDTO,TrainerPendingBookingDTO,TrainerRescheduleRequestDTO } from "application/dto/booking/fetch-all-bookings.dto";
-import { TrainerBookingDetailsResponseDTO,UserBookingDetailsResponseDTO } from "application/dto/booking/fetch-booking-details.dto";
+import { BookingResponseDTO, TrainserBookingResponseDTO, TrainerPendingBookingDTO, TrainerRescheduleRequestDTO } from "application/dto/booking/fetch-all-bookings.dto";
+import { TrainerBookingDetailsResponseDTO, UserBookingDetailsResponseDTO } from "application/dto/booking/fetch-booking-details.dto";
 import { randomUUID } from "crypto";
 import { BOOKING_STATUS } from "utils/Constants";
 import config from "config";
+import { BookSessionWithTrainerRequestDTO, OnlineBookingRequestDTO } from "application/dto/booking/book-trainer.dto.";
+import { VerifyOnlinePaymentRequestDTO } from "application/dto/payment/verify-online-payment.dto";
 import { razorpayPayment } from "domain/services/types/razorpayPayment.type";
 import { UserEntity } from "domain/entities/UserEntity";
 import { TrainerEntity } from "domain/entities/TrainerEntity";
-import { BookSessionWithTrainerRequestDTO,OnlineBookingRequestDTO } from "application/dto/booking/book-trainer.dto.";
-import { VerifyOnlinePaymentRequestDTO } from "application/dto/payment/verify-online-payment.dto";
+import { minutesToTime, timeToMin } from "utils/generateTimeSlots";
 export class BookingMapper {
 
   static toPaymentVerificationDTO(input: OnlineBookingRequestDTO): VerifyOnlinePaymentRequestDTO {
@@ -30,25 +31,25 @@ export class BookingMapper {
       price: input.price
     };
   }
-    static toUserBookingsResponseDTO(entity:BookingEntity):BookingResponseDTO{
-        return {
-            bookingId:entity.bookingId,
-            bookedDate:entity.date.toISOString(),
-            trainerName:entity.trainer.name,
-            bookedProgram:entity.program,
-            bookedTime:entity.timeSlot,
-            bookingStatus:entity.status,
-            sessionAmount:entity.totalAmount
-        }
+  static toUserBookingsResponseDTO(entity: BookingEntity): BookingResponseDTO {
+    return {
+      bookingId: entity.bookingId,
+      bookedDate: entity.date.toISOString(),
+      trainerName: entity.trainer.name,
+      bookedProgram: entity.program,
+      bookedTime: minutesToTime(entity.timeSlot),
+      bookingStatus: entity.status,
+      sessionAmount: entity.totalAmount
     }
-    static toTrainerBookingsResponseDTO(entity: BookingEntity): TrainserBookingResponseDTO {
+  }
+  static toTrainerBookingsResponseDTO(entity: BookingEntity): TrainserBookingResponseDTO {
     return {
       bookingId: entity.bookingId,
       clientName: entity.user.name,
       clientEmail: entity.user.email,
       bookedProgram: entity.program,
       bookedDate: entity.date.toISOString(),
-      bookedTime: entity.timeSlot,
+      bookedTime: minutesToTime(entity.timeSlot),
       bookingStatus: entity.status,
       sessionAmount: entity.totalAmount,
     };
@@ -66,73 +67,76 @@ export class BookingMapper {
     return {
       ...this.toTrainerBookingsResponseDTO(entity),
       requestedNewDate: entity.rescheduleRequest?.newDate.toISOString() || "",
-      requestedNewTime: entity.rescheduleRequest?.newTimeSlot || "",
+      requestedNewTime: minutesToTime(entity.rescheduleRequest?.newTimeSlot||0),
+      requestedBy: entity.rescheduleRequest?.requestedBy || ""
     };
   }
 
   static toTrainerBookingDetailsDTO(entity: BookingEntity): TrainerBookingDetailsResponseDTO {
     return {
-        bookingId: entity.bookingId,
-        clientName: entity.user.name,
-        clientEmail: entity.user.email,
-        clientPhone: entity.user.phone||'',
-        clientProfilePic: entity.user.profilePic||'',
-        
-        bookedProgram: entity.program,
-        bookedDate: entity.date,
-        bookedTime: entity.timeSlot,
-        sessionDuration: entity.duration,
-        
-        bookingStatus: entity.status,
-        totalAmount: entity.totalAmount,
-        trainerEarning: entity.trainerEarning,
-        paymentStatus: entity.payment.status,
-        paymentMethod: entity.payment.method,
+      bookingId: entity.bookingId,
+      clientName: entity.user.name,
+      clientEmail: entity.user.email,
+      clientPhone: entity.user.phone || '',
+      clientProfilePic: entity.user.profilePic || '',
 
-        rescheduleRequest: entity.rescheduleRequest ? {
-            newDate: entity.rescheduleRequest.newDate,
-            newTimeSlot: entity.rescheduleRequest.newTimeSlot,
-            requestedAt: entity.rescheduleRequest.createdAt
-        } : undefined,
-        rejectReason:entity.rejectReason
+      bookedProgram: entity.program,
+      bookedDate: entity.date,
+      bookedTime: minutesToTime(entity.timeSlot),
+      sessionDuration: entity.duration,
+
+      bookingStatus: entity.status,
+      totalAmount: entity.totalAmount,
+      trainerEarning: entity.trainerEarning,
+      paymentStatus: entity.payment.status,
+      paymentMethod: entity.payment.method,
+
+      rescheduleRequest: entity.rescheduleRequest ? {
+        newDate: entity.rescheduleRequest.newDate,
+        newTimeSlot: minutesToTime(entity.rescheduleRequest.newTimeSlot),
+        requestedBy: entity.rescheduleRequest.requestedBy,
+        requestedAt: entity.rescheduleRequest.createdAt
+      } : undefined,
+      rejectReason: entity.rejectReason
     };
-}
+  }
 
-static toUserBookingDetailsDTO(entity: BookingEntity): UserBookingDetailsResponseDTO {
-  return {
-    bookingId: entity.bookingId,
-    bookedProgram: entity.program, 
-    bookedDate: entity.date instanceof Date 
-      ? entity.date.toISOString() 
-      : entity.date,
-    bookedTime: entity.timeSlot,
-    sessionDuration: entity.duration || 60,
-    bookingStatus: entity.status,
+  static toUserBookingDetailsDTO(entity: BookingEntity): UserBookingDetailsResponseDTO {
+    return {
+      bookingId: entity.bookingId,
+      bookedProgram: entity.program,
+      bookedDate: entity.date instanceof Date
+        ? entity.date.toISOString()
+        : entity.date,
+      bookedTime: minutesToTime(entity.timeSlot),
+      sessionDuration: entity.duration || 60,
+      bookingStatus: entity.status,
 
-    trainerId: entity.trainer.trainerId,
-    trainerName: entity.trainer.name || "Professional Trainer",
-    trainerProfilePic: entity.trainer.profilePic || "",
-    trainerExperience: entity.trainer.experience || 0,
-    trainerGender: entity.trainer.gender || "Not Specified",
+      trainerId: entity.trainer.trainerId,
+      trainerName: entity.trainer.name || "Professional Trainer",
+      trainerProfilePic: entity.trainer.profilePic || "",
+      trainerExperience: entity.trainer.experience || 0,
+      trainerGender: entity.trainer.gender || "Not Specified",
 
-    totalAmount: entity.totalAmount,
-    payment: {
-      method: entity.payment?.method || "online",
-      status: entity.payment?.status || "hold",
-    },
-    rescheduleRequest: entity.rescheduleRequest 
-      ? {
+      totalAmount: entity.totalAmount,
+      payment: {
+        method: entity.payment?.method || "online",
+        status: entity.payment?.status || "hold",
+      },
+      rescheduleRequest: entity.rescheduleRequest
+        ? {
           newDate: entity.rescheduleRequest.newDate.toISOString(),
-          newTimeSlot: entity.rescheduleRequest.newTimeSlot,
-          status: entity.status, 
+          newTimeSlot: minutesToTime(entity.rescheduleRequest.newTimeSlot),
+          requestedBy: entity.rescheduleRequest.requestedBy,
+          status: entity.status,
         }
-      : undefined,
-    rejectReason: entity.rejectReason
-  };
-}
+        : undefined,
+      rejectReason: entity.rejectReason
+    };
+  }
 
-    static toBookingEntity(data: BookSessionWithTrainerRequestDTO): BookingEntity {
-      console.log('booking data',data)
+  static toBookingEntity(data: BookSessionWithTrainerRequestDTO): BookingEntity {
+    console.log('booking data', data)
     const totalAmount = data.price;
     const adminPercent = config.ADMIN_PERCENT || 0.1;
     const adminCommission = totalAmount * adminPercent;
@@ -143,8 +147,8 @@ static toUserBookingDetailsDTO(entity: BookingEntity): UserBookingDetailsRespons
       data.trainerId,
       data.program,
       new Date(data.date),
-      data.time,
-      60, 
+      timeToMin(data.time),
+      config.SESSION_DURATION,
       totalAmount,
       adminCommission,
       trainerEarning,

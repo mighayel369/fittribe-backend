@@ -6,16 +6,20 @@ import { UpdateTrainerProfileRequestDTO } from "application/dto/trainer/update-t
 import { TrainerEntity } from "domain/entities/TrainerEntity";
 import { ERROR_MESSAGES } from "utils/ErrorMessage";
 import { ITrainerRepo } from "domain/repositories/ITrainerRepo";
-import { ProgramEntity } from "domain/entities/ProgramEntity";
+import { NotificationMapper } from "application/mappers/notification-mapper";
+import { INotificationRepo } from "domain/repositories/INotifctionRepo";
+import { INotificationService } from "domain/services/i-notification.service";
 @injectable()
 export class UpdateTrainerProfileUseCase implements IUpdateTrainerProfileUseCase {
   constructor(
-    @inject("ITrainerRepo") private readonly _trainerRepo: ITrainerRepo
-  ) {}
+    @inject("ITrainerRepo") private readonly _trainerRepo: ITrainerRepo,
+    @inject("SocketNotificationService") private _notificationService: INotificationService,
+    @inject("INotificationRepo") private _notificationRepo: INotificationRepo
+  ) { }
 
   async execute(input: UpdateTrainerProfileRequestDTO): Promise<void> {
     const { trainerId, data } = input;
-console.log(data)
+    console.log(data)
     const existing = await this._trainerRepo.findTrainerById(trainerId);
     if (!existing) {
       throw new AppError(ERROR_MESSAGES.USER_NOT_FOUND, HttpStatus.NOT_FOUND);
@@ -49,5 +53,13 @@ console.log(data)
     }
 
     await this._trainerRepo.updateTrainer(trainerId, updatedTrainer);
+    const trainerNotif = NotificationMapper.toCreateEntity({
+      message: `Your profile updated`,
+      title: "Profile Updation",
+      recipientId: trainerId,
+      senderId: "SYSTEM_SECURITY",
+    });
+    await this._notificationRepo.addNotification(trainerNotif);
+    await this._notificationService.notifyUser(trainerNotif.recipientId, NotificationMapper.toResponseDTO(trainerNotif))
   }
 }

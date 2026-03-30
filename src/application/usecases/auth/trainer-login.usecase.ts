@@ -4,7 +4,7 @@ import { ITrainerRepo } from "domain/repositories/ITrainerRepo";
 import { IPasswordHasher } from "domain/services/IPasswordHasher";
 import { IJwtService } from "domain/services/i-jwt.service";
 import { ILoginUseCase } from "application/interfaces/auth/i-login.usecase";
-import { LoginResponseDTO,LoginRequestDTO } from "application/dto/auth/login.dto";
+import { LoginResponseDTO,LoginRequestDTO, AuthUser } from "application/dto/auth/login.dto";
 import { AppError } from "domain/errors/AppError";
 import { HttpStatus } from "utils/HttpStatus";
 import { ERROR_MESSAGES } from "utils/ErrorMessage";
@@ -44,8 +44,13 @@ console.log(input)
 
     const payload = { id: trainer.trainerId!, email: trainer.email, role: UserRole.TRAINER };
     
+    let AuthTrainer:AuthUser={
+      id:trainer.trainerId,
+      name:trainer.name,
+      email:trainer.email
+    }
 
     return AuthMapper.toLoginResponse(this._jwtService.generateAccessToken(payload),
-     this._jwtService.generateRefreshToken(payload));
+     this._jwtService.generateRefreshToken(payload),UserRole.TRAINER,AuthTrainer);
   }
 }

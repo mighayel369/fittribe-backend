@@ -8,6 +8,7 @@ import { IInitiateOnlinePayment } from "application/interfaces/payment/i-initiat
 import { PaymentMapper } from "application/mappers/payment-mapper";
 import { ERROR_MESSAGES } from "utils/ErrorMessage";
 import { HttpStatus } from "utils/HttpStatus";
+import { timeToMin } from "utils/generateTimeSlots";
 @injectable()
 export class InitiateOnlinePaymentUseCase implements IInitiateOnlinePayment{
   constructor(
@@ -20,7 +21,7 @@ export class InitiateOnlinePaymentUseCase implements IInitiateOnlinePayment{
     const isBooked = await this._bookingRepo.checkAvailability(
       data.trainerId, 
       new Date(data.date), 
-      data.time
+      timeToMin(data.time)
     );
 
     if (isBooked) {
