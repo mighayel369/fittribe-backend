@@ -83,7 +83,7 @@ import { ReapplyTrainerUseCase } from "application/usecases/trainer/trainer-reap
 import { OnboardNewProgram } from "application/usecases/program/onboard-new-program";
 
 import { IProgramRepo } from "domain/repositories/IProgramRepo";
-import { ProgramRepoImpl} from "infrastructure/database/repositories/ProgramRepoImpl";
+import { ProgramRepoImpl } from "infrastructure/database/repositories/ProgramRepoImpl";
 
 
 import { ISlotRepo } from "domain/repositories/ISlotRepo";
@@ -146,7 +146,7 @@ import { RequestBookingRescheduleUseCase } from "application/usecases/booking/re
 
 import { IProcessTrainerRescheduleUseCase } from "application/interfaces/booking/i-process-trainer-reschedule.usecase";
 import { AcceptRescheduleBookingRequest } from "application/usecases/booking/accept-reschedule-booking-request";
-import { DeclineRescheduleBookingRequest } from "application/usecases/booking/decline-reschedule-booking-request";
+import { RejectRescheduleUseCase } from "application/usecases/booking/decline-reschedule-booking-request";
 
 import { FetchTrainerAllBookings } from "application/usecases/booking/fetch-all-trainer-booking.usecase";
 import { FetchTrainerAllPendingBookings } from "application/usecases/booking/fetch-all-trainer-pending-booking.usecase";
@@ -214,84 +214,146 @@ import { VerifyTrainerSession } from "application/usecases/auth/verify-trainer-s
 import { ILeaveRepo } from "domain/repositories/ILeaveRepo";
 import { LeaveRepository } from "infrastructure/database/repositories/LeaveRepository";
 
-container.register<IVerifySession<any>>("VerifyClientSession",{useClass:VerifyClientSession})
-container.register<IVerifySession<any>>("VerifyTrainerSession",{useClass:VerifyTrainerSession})
+import { RescheduleBookingByTrainer } from "application/usecases/booking/reschedule-by-trainer.usecase";
+
+import { IApplyLeaveRequest } from "application/interfaces/leave/i-apply-leave-requests.usecase";
+import { ApplyLeaveRequests } from "application/usecases/leave/apply-leave-requests.usecase";
+
+import { FetchAllTrainerLeaveRequests } from "application/usecases/leave/fetch-all-trainer-leave-requests";
+import { IFetchAllLeaveRequests } from "application/interfaces/leave/i-fetch-all-leave-requests";
+
+import { ITrainerLeaveMetrics } from "application/interfaces/leave/i-trainer-leave-metrics";
+import { GetTrainerLeaveMetrics } from "application/usecases/leave/get-trainer-leave-metrics";
+
+import { IGetAdminLeaveMetrics } from "application/interfaces/leave/i-admin-leave-metrics";
+import { GetAdminLeaveMetrics } from "application/usecases/leave/get-admin-leave-metrics";
+
+import { FetchAllAdminLeaveRequests } from "application/usecases/leave/fetch-all-admin-leave-requests";
+
+import { IUpdateLeaveStatus } from "application/interfaces/leave/i-update-leave-status";
+import { UpdateLeaveStatus } from "application/usecases/leave/update-leave-status";
+
+import { IWithdrawLeaveRequest } from "application/interfaces/leave/i-withdraw-leave-request";
+import { WithdrawLeaveRequest } from "application/usecases/leave/withdraw-leave-request";
+
+import { INotificationService } from "domain/services/i-notification.service";
+import { SocketNotificationService } from "infrastructure/services/socket-notification.service";
+import { INotificationRepo } from "domain/repositories/INotifctionRepo";
+import { NotificationRepository } from "infrastructure/database/repositories/NotificationRepoImpl";
+
+import { IGetNotification } from "application/interfaces/notification/i-get-notifications";
+import { GetAllNotification } from "application/usecases/notification/get-all-notifications";
+
+import { IMarkAsRead } from "application/interfaces/notification/i-mark-as-read";
+import { MarkAsRead } from "application/usecases/notification/mark-as-read";
+
+import { MarkAllAsRead } from "application/usecases/notification/mark-all-as-read";
+
+container.register<IWithdrawLeaveRequest>("IWithdrawLeaveRequest", { useClass:WithdrawLeaveRequest  })
+
+container.register<IMarkAsRead>("MarkAllAsRead", { useClass: MarkAllAsRead })
+
+container.register<IMarkAsRead>("IMarkAsRead", { useClass: MarkAsRead })
+
+container.register<IGetNotification>("GetAllNotification", { useClass: GetAllNotification })
+
+container.register<INotificationRepo>("INotificationRepo", { useClass: NotificationRepository })
+
+container.register<INotificationService>("SocketNotificationService", { useClass: SocketNotificationService })
+
+container.register<IUpdateLeaveStatus>("UpdateLeaveStatus", { useClass: UpdateLeaveStatus })
 
 
-container.register<IAdminDashboard>("IAdminDashboard",{useClass:AdminDashboardUsecase})
+container.register<IFetchAllLeaveRequests<any>>("FetchAllAdminLeaveRequests", { useClass: FetchAllAdminLeaveRequests })
 
-container.register<ITrainerDashBoard>("ITrainerDashBoard",{useClass:TrainerDashboardUsecase})
-container.register<ITrainerDashBoardAppointments>("ITrainerDashBoardAppointments",{useClass:TrainerDashboardAppointmentUsecase})
+container.register<IGetAdminLeaveMetrics>("GetAdminLeaveMetrics", { useClass: GetAdminLeaveMetrics })
 
+container.register<ITrainerLeaveMetrics>("GetTrainerLeaveMetrics", { useClass: GetTrainerLeaveMetrics })
 
-container.register<IUpdateUserProfileUseCase>("IUpdateUserProfileUseCase",{useClass:UpdateUserProfileUseCase})
+container.register<IFetchAllLeaveRequests<any>>("FetchAllTrainerLeaveRequests", { useClass: FetchAllTrainerLeaveRequests })
 
+container.register<IApplyLeaveRequest>("ApplyLeaveRequests", { useClass: ApplyLeaveRequests })
 
-container.register<IFetchUserDetailsUseCase<any>>("FetchUserDetailsForAdmin",{useClass:FetchUserDetailsForAdmin})
-container.register<IFetchUserDetailsUseCase<any>>("FetchUserProfileUseCase",{useClass:FetchUserProfileUseCase})
+container.register<IRequestBookingRescheduleUseCase>("RescheduleBookingByTrainer", { useClass: RescheduleBookingByTrainer })
 
-
-container.register<IReSendOtpUseCase>("IReSendOtpUseCase",{useClass:ReSendOtpUseCase})
-container.register<IVerifyAccountUseCase>("VerifyUserAccountUseCase",{useClass:VerifyUserAccountUseCase})
-container.register<IVerifyAccountUseCase>("VerifyTrainerAccountUseCase",{useClass:VerifyTrainerAccountUseCase})
+container.register<IVerifySession<any>>("VerifyClientSession", { useClass: VerifyClientSession })
+container.register<IVerifySession<any>>("VerifyTrainerSession", { useClass: VerifyTrainerSession })
 
 
-container.register<IFetchProgramInventory>("IFetchProgramInventory",{useClass:FetchProgramInventory})
+container.register<IAdminDashboard>("IAdminDashboard", { useClass: AdminDashboardUsecase })
 
-container.register<IExplorePrograms>("IExplorePrograms",{useClass:ExplorePrograms})
-
-
-container.register<IToggleProgramVisibility>("IToggleProgramVisibility",{useClass:ToggleProgramVisibilityUseCase})
-container.register<IJwtService>("JwtServiceImpl",{useClass:JwtService})
+container.register<ITrainerDashBoard>("ITrainerDashBoard", { useClass: TrainerDashboardUsecase })
+container.register<ITrainerDashBoardAppointments>("ITrainerDashBoardAppointments", { useClass: TrainerDashboardAppointmentUsecase })
 
 
-container.register<IBookSessionWithTrainer>("IBookSessionWithTrainer",{useClass:OnlineBookingUseCase})
+container.register<IUpdateUserProfileUseCase>("IUpdateUserProfileUseCase", { useClass: UpdateUserProfileUseCase })
 
 
-container.register<ICancelBooking>("CancelUserBookingUseCase",{useClass:CancelUserBookingUseCase})
-
-container.register<IFetchBookingDetails<any>>("FindTrainerBookingDetails",{useClass:FetchBookingDetailsForTrainer})
-
-
-container.register<IFetchAllBookingsUseCase<any,any>>("FetchTrainerAllBookingUseCase",{useClass:FetchTrainerAllBookings})
-container.register<IFetchAllBookingsUseCase<any,any>>("FetchTrainerPendingBookingUseCase",{useClass:FetchTrainerAllPendingBookings})
-container.register<IFetchAllBookingsUseCase<any,any>>("FetchTrainerRescheduleRequests",{useClass:FetchTrainerAllRescheduleBookings})
+container.register<IFetchUserDetailsUseCase<any>>("FetchUserDetailsForAdmin", { useClass: FetchUserDetailsForAdmin })
+container.register<IFetchUserDetailsUseCase<any>>("FetchUserProfileUseCase", { useClass: FetchUserProfileUseCase })
 
 
-
-container.register<IProcessTrainerRescheduleUseCase>("AcceptRescheduleBookingRequest", { useClass:AcceptRescheduleBookingRequest})
-container.register<IProcessTrainerRescheduleUseCase>("DeclineRescheduleBookingRequest", { useClass:DeclineRescheduleBookingRequest})
-
-
-container.register<IRequestBookingRescheduleUseCase>("RequestReschedule", { useClass: RequestBookingRescheduleUseCase})
+container.register<IReSendOtpUseCase>("IReSendOtpUseCase", { useClass: ReSendOtpUseCase })
+container.register<IVerifyAccountUseCase>("VerifyUserAccountUseCase", { useClass: VerifyUserAccountUseCase })
+container.register<IVerifyAccountUseCase>("VerifyTrainerAccountUseCase", { useClass: VerifyTrainerAccountUseCase })
 
 
-container.register<IFetchBookingDetails<any>>("FetchBookingDetails", { useClass: FetchBookingDetailsForClient})
+container.register<IFetchProgramInventory>("IFetchProgramInventory", { useClass: FetchProgramInventory })
 
-container.register<IConfirmBookingUseCase>("TrainerAcceptBookingUseCase", { useClass: ConfirmBookingUseCase})
-container.register<IDeclineBookingUseCase>("TrainerRejectBookingUseCase", { useClass: DeclineBookingUseCase})
+container.register<IExplorePrograms>("IExplorePrograms", { useClass: ExplorePrograms })
 
-container.register<IInitiateOnlinePayment>("ICreateOrderUseCase", { useClass: InitiateOnlinePaymentUseCase})
-container.register<IPaymentService>("IPaymentService", { useClass: PaymentService})
-container.register<IVeirfyOnlinePayment>("IVerifyPaymentUseCase", { useClass: VerifyOnlinePaymentUsecase})
+
+container.register<IToggleProgramVisibility>("IToggleProgramVisibility", { useClass: ToggleProgramVisibilityUseCase })
+container.register<IJwtService>("JwtServiceImpl", { useClass: JwtService })
+
+
+container.register<IBookSessionWithTrainer>("IBookSessionWithTrainer", { useClass: OnlineBookingUseCase })
+
+
+container.register<ICancelBooking>("CancelUserBookingUseCase", { useClass: CancelUserBookingUseCase })
+
+container.register<IFetchBookingDetails<any>>("FindTrainerBookingDetails", { useClass: FetchBookingDetailsForTrainer })
+
+
+container.register<IFetchAllBookingsUseCase<any, any>>("FetchTrainerAllBookingUseCase", { useClass: FetchTrainerAllBookings })
+container.register<IFetchAllBookingsUseCase<any, any>>("FetchTrainerPendingBookingUseCase", { useClass: FetchTrainerAllPendingBookings })
+container.register<IFetchAllBookingsUseCase<any, any>>("FetchTrainerRescheduleRequests", { useClass: FetchTrainerAllRescheduleBookings })
 
 
 
-container.register<IFetchTrainerAvailableSlotsUseCase>("FetchAvailableSlotUseCase", { useClass: FetchTrainerAvailableSlotsUseCase})
+container.register<IProcessTrainerRescheduleUseCase>("AcceptRescheduleBookingRequest", { useClass: AcceptRescheduleBookingRequest })
+container.register<IProcessTrainerRescheduleUseCase>("DeclineRescheduleBookingRequest", { useClass: RejectRescheduleUseCase })
 
-container.register<IUpdateTrainerWeeklyAvailabilityUseCase>("UpdateTrainerWeeklyAvailabilityUseCase", { useClass: UpdateTrainerWeeklyAvailabilityUseCase})
 
-container.register<IGetTrainerSlotConfigurationUseCase>("GetTrainerSlotUseCase", { useClass: GetTrainerSlotConfigurationUseCase})
+container.register<IRequestBookingRescheduleUseCase>("RequestReschedule", { useClass: RequestBookingRescheduleUseCase })
 
-container.register<IGetWalletUseCase>("GetWalletUseCase", { useClass: GetWalletUseCase});
 
-container.register<IChangePasswordUseCase<any>>("ChangeUserPasswordUseCase", { useClass: ChangeUserPasswordUseCase});
+container.register<IFetchBookingDetails<any>>("FetchBookingDetails", { useClass: FetchBookingDetailsForClient })
 
-container.register<IFetchAllBookingsUseCase<any,any>>("FetchUserBookingUseCase", { useClass:FetchUserAllBookings});
+container.register<IConfirmBookingUseCase>("TrainerAcceptBookingUseCase", { useClass: ConfirmBookingUseCase })
+container.register<IDeclineBookingUseCase>("TrainerRejectBookingUseCase", { useClass: DeclineBookingUseCase })
 
-container.register<IBookingRepo>("BookingRepo", { useClass:BookingRepoImpl });
+container.register<IInitiateOnlinePayment>("ICreateOrderUseCase", { useClass: InitiateOnlinePaymentUseCase })
+container.register<IPaymentService>("IPaymentService", { useClass: PaymentService })
+container.register<IVeirfyOnlinePayment>("IVerifyPaymentUseCase", { useClass: VerifyOnlinePaymentUsecase })
 
-container.register<IWalletRepo>("WalletRepo", { useClass:WalletRepoImpl });
+
+
+container.register<IFetchTrainerAvailableSlotsUseCase>("FetchAvailableSlotUseCase", { useClass: FetchTrainerAvailableSlotsUseCase })
+
+container.register<IUpdateTrainerWeeklyAvailabilityUseCase>("UpdateTrainerWeeklyAvailabilityUseCase", { useClass: UpdateTrainerWeeklyAvailabilityUseCase })
+
+container.register<IGetTrainerSlotConfigurationUseCase>("GetTrainerSlotUseCase", { useClass: GetTrainerSlotConfigurationUseCase })
+
+container.register<IGetWalletUseCase>("GetWalletUseCase", { useClass: GetWalletUseCase });
+
+container.register<IChangePasswordUseCase<any>>("ChangeUserPasswordUseCase", { useClass: ChangeUserPasswordUseCase });
+
+container.register<IFetchAllBookingsUseCase<any, any>>("FetchUserBookingUseCase", { useClass: FetchUserAllBookings });
+
+container.register<IBookingRepo>("BookingRepo", { useClass: BookingRepoImpl });
+
+container.register<IWalletRepo>("WalletRepo", { useClass: WalletRepoImpl });
 
 container.register<IUpdateProfilePicture>("UpdateTrainerProfilePicture", { useClass: UpdateTrainerProfilePicture });
 container.register<IUpdateProfilePicture>("UpdateUserProfilePicture", { useClass: UpdateUserProfilePicture });
@@ -306,9 +368,9 @@ container.register<IArchiveProgram>("IArchiveProgram", { useClass: ArchiveProgra
 container.register<ISlotRepo>("ITrainerSlotRepo", { useClass: SlotRepoImpl });
 
 container.register<IOnboardNewProgram>("IOnboardNewProgram", { useClass: OnboardNewProgram });
-container.register<IProgramRepo>("IProgramRepo",{useClass:ProgramRepoImpl});
+container.register<IProgramRepo>("IProgramRepo", { useClass: ProgramRepoImpl });
 
-container.register<ILeaveRepo>("LeaveRepository",{useClass:LeaveRepository})
+container.register<ILeaveRepo>("LeaveRepository", { useClass: LeaveRepository })
 
 
 

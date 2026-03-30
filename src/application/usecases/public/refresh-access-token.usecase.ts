@@ -24,9 +24,9 @@ export class RefreshAccessTokenUseCase implements IRefreshAccessTokenUseCase {
       if(!newAccessToken){
         throw new AppError(ERROR_MESSAGES.ACCESS_TOKEN_GENERATING_FAILURE,HttpStatus.BAD_REQUEST)
       }
-
       return {
-        accessToken:newAccessToken
+        accessToken:newAccessToken,
+        role:decoded.role
       }
   }
 }

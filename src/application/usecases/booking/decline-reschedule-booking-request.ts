@@ -5,25 +5,21 @@ import { AppError } from "domain/errors/AppError";
 import { HttpStatus } from "utils/HttpStatus";
 import { ProcessRescheduleRequestDTO } from "application/dto/booking/process-reschedule.dto";
 import { ERROR_MESSAGES } from "utils/ErrorMessage";
+import { BOOKING_STATUS } from "utils/Constants";
 @injectable()
-export class DeclineRescheduleBookingRequest implements IProcessTrainerRescheduleUseCase {
+export class RejectRescheduleUseCase implements IProcessTrainerRescheduleUseCase {
   constructor(
     @inject("BookingRepo") private readonly _bookingRepo: IBookingRepo
   ) {}
 
   async execute(data: ProcessRescheduleRequestDTO): Promise<void> {
-    const { bookingId, reason } = data;
+    const { bookingId, performedBy, reason } = data;
     const booking = await this._bookingRepo.findBookingById(bookingId);
-    console.log('booking ata usecase=>',booking)
-    if (!booking) {
-      throw new AppError(ERROR_MESSAGES.BOOKING_NOT_FOUND, HttpStatus.NOT_FOUND);
-    }
+    if (!booking) throw new AppError(ERROR_MESSAGES.BOOKING_NOT_FOUND, HttpStatus.NOT_FOUND);
 
-    if (!reason || reason.trim().length === 0) {
-       throw new AppError("A reason is required to decline a reschedule.", HttpStatus.BAD_REQUEST);
-    }
+    const wasPending = booking.status === BOOKING_STATUS.PENDING;
 
-    booking.rejectReschedule(reason);
+    booking.rejectReschedule(performedBy, reason, wasPending);
 
     await this._bookingRepo.updateBooking(bookingId, booking);
   }

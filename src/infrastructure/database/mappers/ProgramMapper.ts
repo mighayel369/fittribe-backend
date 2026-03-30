@@ -8,7 +8,6 @@ export const ProgramMapper = {
       doc.programId,
       doc.name,
       doc.description,
-      doc.duration,  
       doc.programPic,
       doc.status,
       doc.isArchived

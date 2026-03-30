@@ -6,6 +6,7 @@ import Booking, { IBooking } from "../models/BookingModel";
 import { BookingEntity } from "domain/entities/BookingEntity";
 import { BookingMapper } from "../mappers/BookingMapper";
 import { BOOKING_STATUS } from "utils/Constants";
+import { minutesToTime } from "utils/generateTimeSlots";
 
 
 @injectable()
@@ -21,20 +22,20 @@ export class BookingRepoImpl
 
 
 
-async createBooking(payload: BookingEntity): Promise<BookingEntity> {
-  const bookingData = {
-    ...payload
-  };
+  async createBooking(payload: BookingEntity): Promise<BookingEntity> {
+    const bookingData = {
+      ...payload
+    };
 
-  const createdDoc = await this.model.create(bookingData);
-  const fullBooking = await this.findBookingById(createdDoc.bookingId);
+    const createdDoc = await this.model.create(bookingData);
+    const fullBooking = await this.findBookingById(createdDoc.bookingId);
 
-  if (!fullBooking) {
-    throw new Error("Failed to retrieve booking after creation.");
+    if (!fullBooking) {
+      throw new Error("Failed to retrieve booking after creation.");
+    }
+
+    return fullBooking;
   }
-
-  return fullBooking;
-}
   async findBookings(
     searchQuery: string = "",
     filters: Record<string, any> = {},
@@ -43,6 +44,8 @@ async createBooking(payload: BookingEntity): Promise<BookingEntity> {
   ): Promise<{ data: BookingEntity[]; totalCount: number }> {
     const skip = (page - 1) * limit;
     console.log(filters)
+    console.log(skip)
+    console.log(page)
     const pipeline: any[] = [{ $match: filters }];
 
     pipeline.push(
@@ -110,91 +113,98 @@ async createBooking(payload: BookingEntity): Promise<BookingEntity> {
     };
   }
 
-async findBookedSlots(trainerId: string, date: Date): Promise<string[]> {
-  const startOfDay = new Date(date);
-  startOfDay.setHours(0, 0, 0, 0);
+  async findBookedSlots(trainerId: string, date: Date): Promise<string[]> {
+    const startOfDay = new Date(date);
+    startOfDay.setHours(0, 0, 0, 0);
 
-  const endOfDay = new Date(date);
-  endOfDay.setHours(23, 59, 59, 999);
+    const endOfDay = new Date(date);
+    endOfDay.setHours(23, 59, 59, 999);
 
-  const bookings = await this.model.find({
-    trainer: trainerId,
-    date: {
-      $gte: startOfDay,
-      $lte: endOfDay
+    const bookings = await this.model.find({
+      trainer: trainerId,
+      date: {
+        $gte: startOfDay,
+        $lte: endOfDay
+      },
+      status: { $nin: [BOOKING_STATUS.CANCELED, BOOKING_STATUS.REJECTED] }
     },
-    status: { $nin: [BOOKING_STATUS.CANCELED, BOOKING_STATUS.REJECTED] }},
-  );
+    );
 
-  return bookings.map((b) => b.timeSlot);
-}
-async findBookingById(id: string): Promise<BookingEntity | null> {
-  const result = await this.model.aggregate([
-    { $match: { bookingId: id } },
-    {
-      $lookup: {
-        from: "users",
-        localField: "user",
-        foreignField: "userId",
-        as: "userDetails"
-      }
-    },
-    {
-      $lookup: {
-        from: "trainers",
-        localField: "trainer",
-        foreignField: "trainerId",
-        as: "trainerDetails"
-      }
-    },
-    { $unwind:  "$userDetails" },
-    { $unwind: "$trainerDetails" },
-    {
-      $addFields: {
-        user: "$userDetails",
-        trainer: "$trainerDetails"
-      }
-    },
-    { $project: { userDetails: 0, trainerDetails: 0 } }
-  ]);
+    return bookings.map((b) => minutesToTime(b.timeSlot));
+  }
+  async findBookingById(id: string): Promise<BookingEntity | null> {
+    const result = await this.model.aggregate([
+      { $match: { bookingId: id } },
+      {
+        $lookup: {
+          from: "users",
+          localField: "user",
+          foreignField: "userId",
+          as: "userDetails"
+        }
+      },
+      {
+        $lookup: {
+          from: "trainers",
+          localField: "trainer",
+          foreignField: "trainerId",
+          as: "trainerDetails"
+        }
+      },
+      { $unwind: "$userDetails" },
+      { $unwind: "$trainerDetails" },
+      {
+        $addFields: {
+          user: "$userDetails",
+          trainer: "$trainerDetails"
+        }
+      },
+      { $project: { userDetails: 0, trainerDetails: 0 } }
+    ]);
 
-  if (!result || result.length === 0) return null;
-  return this.toEntity(result[0]);
-}
-async updateBooking(id: string, booking: BookingEntity): Promise<void> {
-  const persistenceData = BookingMapper.toPersistence(booking);
-  
-  await this.model.findOneAndUpdate(
-    { bookingId: id },
-    { $set: persistenceData },
-    { new: true }
-  );
-}
+    if (!result || result.length === 0) return null;
+    return this.toEntity(result[0]);
+  }
+  async updateBooking(id: string, booking: BookingEntity): Promise<void> {
+    const persistenceData = BookingMapper.toPersistence(booking);
+
+    const updateQuery: any = { $set: persistenceData };
+    if (!persistenceData.rescheduleRequest) {
+      updateQuery.$unset = { rescheduleRequest: "" };
+      delete updateQuery.$set.rescheduleRequest;
+    }
+
+    await this.model.findOneAndUpdate(
+      { bookingId: id },
+      updateQuery,
+      { new: true }
+    );
+  }
 
 
   async hasActiveBookingsForProgram(programId: string): Promise<boolean> {
-    
+
 
     const booking = await this.model.exists({
       program: programId,
-      status: { $in: [BOOKING_STATUS.PENDING,BOOKING_STATUS.CONFIRMED] }
+      status: { $in: [BOOKING_STATUS.PENDING, BOOKING_STATUS.CONFIRMED] }
     });
 
     return !!booking;
   }
 
-  async checkAvailability(trainerId: string, date: Date, time: string): Promise<boolean> {
-  const startOfDay = new Date(date);
-  startOfDay.setHours(0, 0, 0, 0);
+  async checkAvailability(trainerId: string, date: Date, time: number): Promise<boolean> {
+    const startOfDay = new Date(date);
+    startOfDay.setHours(0, 0, 0, 0);
 
-  const endOfDay = new Date(date);
-  endOfDay.setHours(23, 59, 59, 999);
+    const endOfDay = new Date(date);
+    endOfDay.setHours(23, 59, 59, 999);
     const existingBooking = await this.model.findOne({
       trainerId,
       date: {
-      $gte: startOfDay,
-      $lte: endOfDay
-    },
+        $gte: startOfDay,
+        $lte: endOfDay
+      },
       timeSlot: time,
       status: { $nin: [BOOKING_STATUS.CANCELED, BOOKING_STATUS.REJECTED] }
     });
@@ -204,14 +214,14 @@ async updateBooking(id: string, booking: BookingEntity): Promise<void> {
 
   async updateBookingStatus(bookingId: string, status: string): Promise<void> {
     await this.model.findOneAndUpdate(
-      {bookingId},
+      { bookingId },
       { $set: { status: status } },
     );
   }
 
   async rescheduleBooking(bookingId: string, data: { newDate: Date, newTimeSlot: string }): Promise<void> {
     await this.model.findOneAndUpdate(
-      {bookingId},
+      { bookingId },
       {
         $set: {
           status: BOOKING_STATUS.RESCHEDULE_REQUESTED,
@@ -232,7 +242,7 @@ async updateBooking(id: string, booking: BookingEntity): Promise<void> {
     endOfDay.setHours(23, 59, 59, 999);
 
     const stats = await this.model.aggregate([
-      { $match: { trainer: trainerId, date: { $gte: startOfDay, $lte: endOfDay },status:{$in:[BOOKING_STATUS.CONFIRMED,BOOKING_STATUS.COMPLETED]} } },
+      { $match: { trainer: trainerId, date: { $gte: startOfDay, $lte: endOfDay }, status: { $in: [BOOKING_STATUS.CONFIRMED, BOOKING_STATUS.COMPLETED] } } },
       {
         $group: {
           _id: null,
@@ -286,108 +296,106 @@ async updateBooking(id: string, booking: BookingEntity): Promise<void> {
     return result.length > 0 ? result[0].totalEarnings : 0;
   }
 
-async getPendingActions(trainerId: string): Promise<BookingEntity[]> {
-  const docs = await this.model.aggregate([
-    {
-      $match: {
-        trainer: trainerId,
-        status: { $in: [BOOKING_STATUS.PENDING, BOOKING_STATUS.RESCHEDULE_REQUESTED] }
-      }
-    },
-    {
-      $lookup: {
-        from: "trainers",
-        localField: "trainer",
-        foreignField: "trainerId",
-        as: "trainerInfo"
-      }
-    },
-    { $unwind: { path: "$trainerInfo", preserveNullAndEmptyArrays: true } },
-    {
-      $lookup: {
-        from: "users",
-        localField: "user",
-        foreignField: "userId",
-        as: "userInfo"
-      }
-    },
-    { $unwind: { path: "$userInfo", preserveNullAndEmptyArrays: true } },
+  async getPendingActions(trainerId: string): Promise<BookingEntity[]> {
+    const docs = await this.model.aggregate([
+      {
+        $match: {
+          trainer: trainerId,
+          status: { $in: [BOOKING_STATUS.PENDING, BOOKING_STATUS.RESCHEDULE_REQUESTED] }
+        }
+      },
+      {
+        $lookup: {
+          from: "trainers",
+          localField: "trainer",
+          foreignField: "trainerId",
+          as: "trainerInfo"
+        }
+      },
+      { $unwind: { path: "$trainerInfo", preserveNullAndEmptyArrays: true } },
+      {
+        $lookup: {
+          from: "users",
+          localField: "user",
+          foreignField: "userId",
+          as: "userInfo"
+        }
+      },
+      { $unwind: { path: "$userInfo", preserveNullAndEmptyArrays: true } },
 
-    {
-      $addFields: {
-        user: "$userInfo",
-        trainer: "$trainerInfo"
+      {
+        $addFields: {
+          user: "$userInfo",
+          trainer: "$trainerInfo"
+        }
+      },
+      {
+        $sort: { updatedAt: -1 }
+      },
+      {
+        $project: {
+          userInfo: 0,
+          trainerInfo: 0,
+          populatedPrograms: 0
+        }
       }
-    },
-    {
-      $sort: { updatedAt: -1 }
-    },
-    {
-      $project: {
-        userInfo: 0,
-        trainerInfo: 0,
-        populatedPrograms:0
-      }
-    }
-  ]);
+    ]);
 
-  return docs.map(doc => BookingMapper.toEntity(doc));
-}
+    return docs.map(doc => BookingMapper.toEntity(doc));
+  }
 
-async getUpcomingAppointmentsByDate(trainerId: string, date: Date): Promise<BookingEntity[]> {
-  const startOfDay = new Date(date);
-  startOfDay.setHours(0, 0, 0, 0);
+  async getUpcomingAppointmentsByDate(trainerId: string, date: Date): Promise<BookingEntity[]> {
+    const startOfDay = new Date(date);
+    startOfDay.setHours(0, 0, 0, 0);
 
-  const endOfDay = new Date(date);
-  endOfDay.setHours(23, 59, 59, 999);
+    const endOfDay = new Date(date);
+    endOfDay.setHours(23, 59, 59, 999);
 
-  const docs = await this.model.aggregate([
-    {
-      $match: {
-        trainer: trainerId,
-        date: { $gte: startOfDay, $lte: endOfDay },
-        status: {$in:[BOOKING_STATUS.COMPLETED,BOOKING_STATUS.CONFIRMED]}
-      }
-    },
-    {
-      $lookup: {
-        from: "trainers",
-        localField: "trainer",
-        foreignField: "trainerId",
-        as: "trainerInfo"
-      }
-    },
-    { $unwind:  "$trainerInfo" },
-    {
-      $lookup: {
-        from: "users",
-        localField: "user",
-        foreignField: "userId",
-        as: "userInfo"
-      }
-    },
-    { $unwind:  "$userInfo" },
+    const docs = await this.model.aggregate([
+      {
+        $match: {
+          trainer: trainerId,
+          date: { $gte: startOfDay, $lte: endOfDay },
+          status: { $in: [BOOKING_STATUS.COMPLETED, BOOKING_STATUS.CONFIRMED] }
+        }
+      },
+      {
+        $lookup: {
+          from: "trainers",
+          localField: "trainer",
+          foreignField: "trainerId",
+          as: "trainerInfo"
+        }
+      },
+      { $unwind: "$trainerInfo" },
+      {
+        $lookup: {
+          from: "users",
+          localField: "user",
+          foreignField: "userId",
+          as: "userInfo"
+        }
+      },
+      { $unwind: "$userInfo" },
 
-    {
-      $addFields: {
-        user: "$userInfo",
-        trainer: "$trainerInfo"
+      {
+        $addFields: {
+          user: "$userInfo",
+          trainer: "$trainerInfo"
+        }
+      },
+      {
+        $sort: { timeSlot: 1 }
+      },
+      {
+        $project: {
+          userInfo: 0,
+          trainerInfo: 0
+        }
       }
-    },
-    {
-      $sort: { timeSlot: 1 }
-    },
-    {
-      $project: {
-        userInfo: 0,
-        trainerInfo: 0,
-        populatedPrograms:0
-      }
-    }
-  ]);
-
-  return docs.map(doc => this.toEntity(doc));
-}
+    ]);
+    return docs.map(doc => this.toEntity(doc));
+  }
 
   async findUpcomingBookingCount(trainerId: string): Promise<number> {
     const startOfToday = new Date();
@@ -408,7 +416,7 @@ async getUpcomingAppointmentsByDate(trainerId: string, date: Date): Promise<Book
       {
         $facet: {
           metrics: [
-            { $group: { _id: null, totalRevenue: { $sum:{$cond:[{$eq:["$status","completed"]},"$adinCommission",0]}}, totalBookings: { $sum: 1 } } }
+            { $group: { _id: null, totalRevenue: { $sum: { $cond: [{ $eq: ["$status", "completed"] }, "$adinCommission", 0] } }, totalBookings: { $sum: 1 } } }
           ],
           performanceData: [
             { $match: { createdAt: { $gte: sixMonthsAgo } } },
@@ -429,15 +437,18 @@ async getUpcomingAppointmentsByDate(trainerId: string, date: Date): Promise<Book
           ],
           peakHoursData: [
             {
-              $project: {
-                startTime: { $arrayElemAt: [{ $split: ["$timeSlot", " "] }, 0] },
-                amPm: { $arrayElemAt: [{ $split: ["$timeSlot", " "] }, 1] }
+              $group:{
+                _id:"$timeSlot",count:{$sum:1}
               }
             },
-            { $group: { _id: { $concat: ["$startTime", " ", "$amPm"] }, count: { $sum: 1 } } },
             { $sort: { count: -1 } },
-            { $limit: 4 },
-            { $project: { time: "$_id", count: 1, _id: 0 } }
+            {$limit:4},{
+              $project:{
+                _id:0,
+                time:"$_id",
+                count:1
+              }
+            }
           ]
         }
       }

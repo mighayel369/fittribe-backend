@@ -1,28 +1,31 @@
+
 import 'reflect-metadata';
+import 'dotenv/config';
 import logger from 'utils/logger';
-import 'infrastructure/config/container';
-import app from "./app";
+import 'infrastructure/config/container'; 
+import server from "./app";
 import { connectDB } from "infrastructure/config/database";
 import { passportSet } from "infrastructure/config/passportConfig";
-import passport = require("passport");
-import 'dotenv/config';
-
+import { SocketService } from 'infrastructure/services/SocketService';
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, async () => {
-  try {
-    await connectDB();
+async function startServer() {
+    try {
+        await connectDB();
+        SocketService.init(server);
+        const passportConfigured = await passportSet();
+        if (!passportConfigured) {
+            logger.error("❌ Failed to configure Passport strategies.");
+            process.exit(1);
+        }
 
-    const passportConfigured = await passportSet();
-    if (!passportConfigured) {
-      logger.error("❌ Failed to configure Passport.");
-      return;
+        server.listen(PORT, () => {
+            logger.info(`✅ Server & Sockets running on port ${PORT}`);
+        });
+    } catch (error) {
+        logger.error("❌ Critical: Server startup failed", error);
+        process.exit(1);
     }
+}
 
-    app.use(passport.initialize());
-    
-    logger.info(`✅ Server is running on port ${PORT}`)
-  } catch (error) {
-    logger.error("Database connection failed",error);
-  }
-});
+startServer();

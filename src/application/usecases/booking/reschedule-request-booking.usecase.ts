@@ -5,6 +5,7 @@ import { AppError } from "domain/errors/AppError";
 import { RescheduleRequestDTO } from "application/dto/booking/reschedule-request.dto";
 import { ERROR_MESSAGES } from "utils/ErrorMessage";
 import { HttpStatus } from "utils/HttpStatus";
+import { UserRole } from "utils/Constants";
 @injectable()
 export class RequestBookingRescheduleUseCase implements IRequestBookingRescheduleUseCase {
   constructor(
@@ -13,9 +14,9 @@ export class RequestBookingRescheduleUseCase implements IRequestBookingReschedul
 
 async execute(data: RescheduleRequestDTO): Promise<void> {
     const booking = await this._bookingRepo.findBookingById(data.bookingId);
-    if (!booking) throw new AppError(ERROR_MESSAGES.BOOKING_NOT_FOUND, 404);
+    if (!booking) throw new AppError(ERROR_MESSAGES.BOOKING_NOT_FOUND, HttpStatus.NOT_FOUND);
 
-    booking.requestReschedule(data.newDate, data.newTimeSlot);
+    booking.requestReschedule(data.newDate, data.newTimeSlot,UserRole.USER);
     await this._bookingRepo.updateBooking(data.bookingId, booking);
 }
 }

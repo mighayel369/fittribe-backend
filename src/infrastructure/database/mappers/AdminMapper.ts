@@ -6,7 +6,7 @@ export const AdminMapper = {
     return new AdminEntity(
       doc.name,
       doc.email,
-      doc._id!.toString(),
+      doc.adminId,
       doc.password
     );
   }

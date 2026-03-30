@@ -8,7 +8,7 @@ export interface IBookingRepo {
   findBookings(searchQuery:string,filter?: object, page?: number, limit?: number): Promise<{ data: BookingEntity[]; totalCount: number }>;
   findBookedSlots(trainerId: string, date: Date): Promise<string[]>;
   hasActiveBookingsForProgram(programId: string): Promise<boolean>;
-  checkAvailability(trainerId: string, date: Date, time: string): Promise<boolean>
+  checkAvailability(trainerId: string, date: Date, time: number): Promise<boolean>
   updateBookingStatus(bookingId: string, status: "pending" | "confirmed" | "rejected" | "cancelled"): Promise<void>;
   rescheduleBooking(bookingId: string, data: {newDate:Date,newTimeSlot:string}): Promise<void>
   getMonthlyEarnings(trainerId: string, month: number, year: number): Promise<number>;

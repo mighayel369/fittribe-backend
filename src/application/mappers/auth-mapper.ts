@@ -3,12 +3,19 @@ import { UserEntity } from "domain/entities/UserEntity";
 import { TrainerEntity } from "domain/entities/TrainerEntity";
 import { ClientSessionDTO, TrainerSessionDTO } from "application/dto/auth/verify-session.dto";
 import { UserRole } from "utils/Constants";
+import { AuthUser } from "application/dto/auth/login.dto";
 export class AuthMapper {
-  static toLoginResponse(accessToken: string, refreshToken: string): LoginResponseDTO {
-    console.log(accessToken,refreshToken)
+static toLoginResponse(
+    accessToken: string, 
+    refreshToken: string, 
+    role: string, 
+    user: AuthUser
+  ): LoginResponseDTO {
     return {
       accessToken,
-      refreshToken
+      refreshToken,
+      role,
+      user
     };
   }
 static toVerifySessionResponseDTO(entity: UserEntity): ClientSessionDTO  {

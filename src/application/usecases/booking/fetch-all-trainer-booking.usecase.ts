@@ -13,7 +13,7 @@ export class FetchTrainerAllBookings implements IFetchAllBookingsUseCase<FetchAl
     const { data, totalCount } = await this._repo.findBookings(searchQuery, { trainer: trainerId }, currentPage, limit);
     return { 
       data: data.map(d => BookingMapper.toTrainerBookingsResponseDTO(d)),
-       total: Math.ceil(totalCount/limit) 
+       total: totalCount
       };
   }
 }

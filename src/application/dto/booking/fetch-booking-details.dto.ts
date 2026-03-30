@@ -21,6 +21,7 @@ export interface TrainerBookingDetailsResponseDTO {
     rescheduleRequest?: {
         newDate: Date;
         newTimeSlot: string;
+        requestedBy:string,
         requestedAt: Date;
     };
     rejectReason?:string
@@ -52,6 +53,7 @@ export interface UserBookingDetailsResponseDTO {
   rescheduleRequest?: {
     newDate: string;
     newTimeSlot: string;
+    requestedBy:string,
     status: string;
   };
    rejectReason?:string

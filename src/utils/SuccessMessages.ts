@@ -65,5 +65,8 @@ export const SUCCESS_MESSAGES = {
   DASHBOARD:{
      DASHBOARD_DATA_FETCHED:"Dashboard Data Fetched Fuccessfully",
      TRAINER_APPOINTMENT_DATA:"Appointments Fetched Successfully"
+  },
+  LEAVE:{
+    LEAVE_APPLIED_SUCCESSFULLY :'Leave Applied Successfully'
   }
 };

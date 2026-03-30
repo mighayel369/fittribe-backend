@@ -36,6 +36,7 @@ export interface TrainerPendingBookingDTO extends  TrainserBookingResponseDTO {
 export interface TrainerRescheduleRequestDTO extends  TrainserBookingResponseDTO {
   requestedNewDate: string;
   requestedNewTime: string;
+  requestedBy:string
 }
 
 

@@ -3,7 +3,7 @@ import { IAdminRepo } from "domain/repositories/IAdminRepo";
 import { IPasswordHasher } from "domain/services/IPasswordHasher";
 import { IJwtService } from "domain/services/i-jwt.service";
 import { ILoginUseCase } from "application/interfaces/auth/i-login.usecase";
-import { LoginResponseDTO, LoginRequestDTO } from "application/dto/auth/login.dto";
+import { LoginResponseDTO, LoginRequestDTO, AuthUser } from "application/dto/auth/login.dto";
 import { AppError } from "domain/errors/AppError";
 import { HttpStatus } from "utils/HttpStatus";
 import { AuthMapper } from "application/mappers/auth-mapper";
@@ -21,7 +21,7 @@ export class AdminLoginUsecase implements ILoginUseCase {
     const { email, password } = input;
 
     const admin = await this._AdminRepo.findAdminByEmail(email);
-
+console.log(admin)
     if (!admin || !admin.canAuthenticate()) {
       throw new AppError(ERROR_MESSAGES.INVALID_CREDENTIALS, HttpStatus.BAD_REQUEST);
     }
@@ -33,14 +33,20 @@ export class AdminLoginUsecase implements ILoginUseCase {
     }
 
     const payload = {
-      id: admin._id!,
+      id: admin.adminId,
       email: admin.email,
       role: UserRole.ADMIN,
     };
 
+    let AuthAdmin:AuthUser={
+      id:admin.adminId,
+      name:admin.name,
+      email:admin.email
+    }
+
     const accessToken = this._jwtService.generateAccessToken(payload);
     const refreshToken = this._jwtService.generateRefreshToken(payload);
     console.log(refreshToken)
-    return AuthMapper.toLoginResponse(accessToken, refreshToken);
+    return AuthMapper.toLoginResponse(accessToken, refreshToken,UserRole.ADMIN,AuthAdmin);
   }
 }

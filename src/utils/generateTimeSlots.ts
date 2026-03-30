@@ -14,26 +14,26 @@ const now = new Date();
                 continue;
             }
             let slotStart=minutesToTime(startMin)
-            let slotEnd=minutesToTime(startMin+duration)
 
-            slots.push(`${slotStart} - ${slotEnd}`);
+            slots.push(`${slotStart}`);
             startMin += duration;
         }
     }
     return slots
 }
 
-const timeToMin=(time:string):number=>{
+export const timeToMin=(time:string):number=>{
+    console.log(time)
     const [t,modifier]=time.split(" ")
     let [hours,minutes]=t.split(":").map(Number)
-
+    console.log('modify',modifier)
     if(modifier==="PM" && hours!==12) hours+=12
     if(modifier==="AM" && hours===12) hours=0
 
     return hours*60+minutes
 }
 
-const minutesToTime = (mins: number): string => {
+export const minutesToTime = (mins: number): string => {
   let hours = Math.floor(mins / 60);
   const minutes = mins % 60;
 

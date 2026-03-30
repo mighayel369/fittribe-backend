@@ -6,12 +6,17 @@ import { HttpStatus } from "utils/HttpStatus";
 import { UserProfileUpdateRequestDTO } from "application/dto/user/update-user-profile.dto";
 import { UserEntity } from "domain/entities/UserEntity";
 import { ERROR_MESSAGES } from "utils/ErrorMessage";
+import { NotificationMapper } from "application/mappers/notification-mapper";
+import { INotificationService } from "domain/services/i-notification.service";
+import { INotificationRepo } from "domain/repositories/INotifctionRepo";
 
 @injectable()
 export class UpdateUserProfileUseCase implements IUpdateUserProfileUseCase {
   constructor(
-    @inject("IUserRepo") private readonly _userRepo: IUserRepo
-  ) {}
+    @inject("IUserRepo") private readonly _userRepo: IUserRepo,
+    @inject("SocketNotificationService") private _notificationService: INotificationService,
+    @inject("INotificationRepo") private _notificationRepo: INotificationRepo
+  ) { }
 
   async execute(input: UserProfileUpdateRequestDTO): Promise<void> {
     const { userId, data } = input;
@@ -23,7 +28,7 @@ export class UpdateUserProfileUseCase implements IUpdateUserProfileUseCase {
 
     const updatedEntity = new UserEntity(
       data.name || existingUser.name,
-      existingUser.email, 
+      existingUser.email,
       userId,
       existingUser.role,
       existingUser.password,
@@ -42,5 +47,20 @@ export class UpdateUserProfileUseCase implements IUpdateUserProfileUseCase {
     }
 
     await this._userRepo.updateUserData(userId, updatedEntity);
+    const notificationData = {
+      title: "Profile Updated",
+      message: "Your profile information has been successfully updated.",
+      recipientId: userId,
+      senderId: "SYSTEM_SECURITY"
+    };
+
+    const entity = NotificationMapper.toCreateEntity(notificationData);
+
+
+    await this._notificationRepo.addNotification(entity);
+    await this._notificationService.notifyUser(
+      userId,
+      NotificationMapper.toResponseDTO(entity)
+    );
   }
 }

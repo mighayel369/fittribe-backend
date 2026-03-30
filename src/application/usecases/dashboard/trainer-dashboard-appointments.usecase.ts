@@ -12,7 +12,7 @@ export class TrainerDashboardAppointmentUsecase implements ITrainerDashBoardAppo
 
   async execute(trainerId: string, date: Date): Promise<TrainerDashboardAppointmentResponseDTO> {
     const appointments = await this._bookingRepo.getUpcomingAppointmentsByDate(trainerId, date);
-
+console.log(appointments)
     return DashboardMapper.torainerAppointmentResponseDTO(appointments)
   }
 }

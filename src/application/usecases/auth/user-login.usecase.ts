@@ -3,7 +3,7 @@ import { inject, injectable } from "tsyringe";
 import { IUserRepo } from "domain/repositories/IUserRepo";
 import { IPasswordHasher } from "domain/services/IPasswordHasher";
 import { ILoginUseCase } from "application/interfaces/auth/i-login.usecase";
-import { LoginResponseDTO,LoginRequestDTO } from "application/dto/auth/login.dto";
+import { LoginResponseDTO,LoginRequestDTO, AuthUser } from "application/dto/auth/login.dto";
 import { ERROR_MESSAGES } from "utils/ErrorMessage";
 import { AppError } from "domain/errors/AppError";
 import { HttpStatus } from "utils/HttpStatus";
@@ -19,10 +19,10 @@ export class UserLoginUseCase implements ILoginUseCase {
     @inject("JwtServiceImpl") private _jwtService: IJwtService
   ) {}
 
-  async execute(input: LoginRequestDTO): Promise<LoginResponseDTO> {
+async execute(input: LoginRequestDTO): Promise<LoginResponseDTO> {
     const { email, password } = input;
-    const user = await this._userRepo.findUserByEmail(email)
-    console.log(user)
+    const user = await this._userRepo.findUserByEmail(email);
+
     if (!user) {
       throw new AppError(ERROR_MESSAGES.USER_NOT_FOUND, HttpStatus.NOT_FOUND);
     }
@@ -31,10 +31,7 @@ export class UserLoginUseCase implements ILoginUseCase {
       throw new AppError(ERROR_MESSAGES.USER_BLOCKED, HttpStatus.FORBIDDEN);
     }
 
-    const isMatch = await this._passwordHasher.compare(
-      password, 
-      user.password ?? ""
-    );
+    const isMatch = await this._passwordHasher.compare(password, user.password ?? "");
     
     if (!isMatch) {
       throw new AppError(ERROR_MESSAGES.PASSWORD_INCORRECT, HttpStatus.BAD_REQUEST);
@@ -46,9 +43,17 @@ export class UserLoginUseCase implements ILoginUseCase {
       role: UserRole.USER 
     };
 
+    let AuthUser:AuthUser={
+      id:user.userId,
+      name:user.name,
+      email:user.email
+    }
+
     return AuthMapper.toLoginResponse(
       this._jwtService.generateAccessToken(tokenPayload),
-      this._jwtService.generateRefreshToken(tokenPayload)
+      this._jwtService.generateRefreshToken(tokenPayload),
+      UserRole.USER,
+      AuthUser 
     );
   }
 }

@@ -9,7 +9,6 @@ export class ProgramMapper {
       programId: entity.programId,
       name: entity.name,
       description: entity.description,
-      duration: entity.duration,
       programPic: entity.programPic,
       isPublished: entity.status ?? true
     };

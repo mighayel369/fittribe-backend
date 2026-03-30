@@ -43,14 +43,27 @@ export enum BOOKING_STATUS{
 }
 
 export enum LEAVE_TYPES{
-    SICK_LEAVE='sick leave',
-    CASUAL_LEAVE='casual leave',
-    MEDICAL_LEAVE='medical leave'
+    SICK_LEAVE='sick',
+    CASUAL_LEAVE='casual',
+    MEDICAL_LEAVE='medical'
 }
 
 
-export enum LEAVE_STATUS{
-    PENDING='pending',
-    ACCEPTED='accepted',
-    REJECTED='rejected'
+export enum LEAVE_STATUS {
+    PENDING = 'pending',
+    APPROVED = 'approved',
+    REJECTED = 'rejected',
+    WITHDRAWN = 'withdrawn'
 }
+
+export enum MAX_LEAVE_COUNT{
+    MEDICAL=12,
+    SICK=10,
+    CASUAL=5
+}
+
+export const PAGINATION = {
+  DEFAULT_LIMIT: 10,
+  MAX_LIMIT: 50,
+  ADMIN_PAGE_LIMIT: 20
+};
