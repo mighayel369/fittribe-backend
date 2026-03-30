@@ -211,6 +211,8 @@ import { OnlineBookingUseCase } from "application/usecases/booking/online-bookin
 import { IVerifySession } from "application/interfaces/auth/i-verify-session.usecase";
 import { VerifyClientSession } from "application/usecases/auth/verify-session.usecase";
 import { VerifyTrainerSession } from "application/usecases/auth/verify-trainer-session";
+import { ILeaveRepo } from "domain/repositories/ILeaveRepo";
+import { LeaveRepository } from "infrastructure/database/repositories/LeaveRepository";
 
 container.register<IVerifySession<any>>("VerifyClientSession",{useClass:VerifyClientSession})
 container.register<IVerifySession<any>>("VerifyTrainerSession",{useClass:VerifyTrainerSession})
@@ -306,6 +308,7 @@ container.register<ISlotRepo>("ITrainerSlotRepo", { useClass: SlotRepoImpl });
 container.register<IOnboardNewProgram>("IOnboardNewProgram", { useClass: OnboardNewProgram });
 container.register<IProgramRepo>("IProgramRepo",{useClass:ProgramRepoImpl});
 
+container.register<ILeaveRepo>("LeaveRepository",{useClass:LeaveRepository})
 
 
 

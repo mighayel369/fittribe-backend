@@ -41,3 +41,16 @@ export enum BOOKING_STATUS{
    RESCHEDULE_REQUESTED="reschedule_requested",
    REJECTED='rejected'
 }
+
+export enum LEAVE_TYPES{
+    SICK_LEAVE='sick leave',
+    CASUAL_LEAVE='casual leave',
+    MEDICAL_LEAVE='medical leave'
+}
+
+
+export enum LEAVE_STATUS{
+    PENDING='pending',
+    ACCEPTED='accepted',
+    REJECTED='rejected'
+}
