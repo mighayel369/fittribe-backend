@@ -249,6 +249,53 @@ import { MarkAsRead } from "application/usecases/notification/mark-as-read";
 
 import { MarkAllAsRead } from "application/usecases/notification/mark-all-as-read";
 
+import { IChatRepo } from "domain/repositories/IChatRepo";
+import { ChatRepoImpl } from "infrastructure/database/repositories/ChatRepoImpl";
+
+import { IMessageRepo } from "domain/repositories/IMessageRepo";
+import { MessageRepoImpl } from "infrastructure/database/repositories/MessageRepoImpl";
+
+import { IChatService } from "domain/services/i-chat-service";
+import { SocketChatService } from "infrastructure/services/chat-service";
+
+import { ISendMessage } from "application/interfaces/chat/i-send-message";
+import { SendMessage } from "application/usecases/chat/send-message";
+
+import { SocketService } from "infrastructure/services/SocketService";
+
+import { IFetchChatList } from "application/interfaces/chat/i-fetch-chat-list";
+import { FetchEstablishedTrainerChatList } from "application/usecases/chat/fetch-established-trainer-chat-list";
+import { FetchEstablishedClientChatList } from "application/usecases/chat/fetch-established-client-chat-lits.ts";
+
+import { FetchNonEstablishedTrainerChatList } from "application/usecases/chat/fetch-non-established-trainer-chat-list";
+
+import { IgetMessages } from "application/interfaces/chat/i-get-messages";
+import { getMessage } from "application/usecases/chat/get-message";
+
+import { IGetChatId } from "application/interfaces/chat/i-get-chat-id";
+import { GetChatId } from "application/usecases/chat/get-chatId";
+
+import { IMarkMessageAsRead } from "application/interfaces/chat/i-mark-as-read";
+import { MarkMessageAsRead } from "application/usecases/chat/mark-as-read";
+
+container.register<IMarkMessageAsRead>("IMarkMessageAsRead", { useClass: MarkMessageAsRead})
+
+container.register<IGetChatId>("GetChatId", { useClass: GetChatId})
+container.register<IgetMessages>("IgetMessages", { useClass: getMessage})
+container.register<IFetchChatList<any>>("FetchNonEstablishedTrainerChatList", { useClass: FetchNonEstablishedTrainerChatList})
+
+container.register<IFetchChatList<any>>("FetchEstablishedTrainerChatList", { useClass: FetchEstablishedTrainerChatList})
+container.register<IFetchChatList<any>>("FetchEstablishedClientChatList", { useClass: FetchEstablishedClientChatList})
+
+container.registerSingleton<SocketService>(SocketService);
+container.register<ISendMessage>("ISendMessage", { useClass: SendMessage })
+
+container.register<IChatService>("IChatService", { useClass: SocketChatService })
+
+
+container.register<IChatRepo>("IChatRepo", { useClass: ChatRepoImpl })
+container.register<IMessageRepo>("IMessageRepo", { useClass: MessageRepoImpl })
+
 container.register<IWithdrawLeaveRequest>("IWithdrawLeaveRequest", { useClass:WithdrawLeaveRequest  })
 
 container.register<IMarkAsRead>("MarkAllAsRead", { useClass: MarkAllAsRead })

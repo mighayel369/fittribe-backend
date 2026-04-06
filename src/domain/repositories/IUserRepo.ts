@@ -21,6 +21,7 @@ export interface IUserRepo {
     getUserGrowthData(): Promise<{date: string,count: number}[]>;
     findByResetToken(token:string):Promise<UserEntity|null>
     updateUserProfilePicture(userId:string,profilePic:string):Promise<void>
+    findActiveClients():Promise<UserEntity[]>
 }
 
 

@@ -6,15 +6,16 @@ import { AppError } from "domain/errors/AppError";
 import { ERROR_MESSAGES } from "utils/ErrorMessage";
 import { HttpStatus } from "utils/HttpStatus";
 import { TrainerMapper } from "application/mappers/trainer-mapper";
-
+import { IChatRepo } from "domain/repositories/IChatRepo";
 
 @injectable()
 export class FetchTrainerDetailsForClient implements IFetchTrainerDetails<UserTrainerViewDTO> {
   constructor(
-    @inject("ITrainerRepo") private readonly _trainerRepo: ITrainerRepo
+    @inject("ITrainerRepo") private readonly _trainerRepo: ITrainerRepo,
+    @inject("IChatRepo") private readonly _chatRepo: IChatRepo 
   ) {}
 
-  async execute(trainerId: string): Promise<UserTrainerViewDTO> {
+  async execute(trainerId: string,userId:string): Promise<UserTrainerViewDTO> {
     if(!trainerId){
       throw new AppError(ERROR_MESSAGES.INVALID_CREDENTIALS,HttpStatus.BAD_REQUEST)
     }

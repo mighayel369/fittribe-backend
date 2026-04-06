@@ -1,4 +1,4 @@
 
 export interface IFetchTrainerDetails<responseDTO>{
-    execute(trainerId:string):Promise<responseDTO>
+    execute(trainerId:string,userId?:string):Promise<responseDTO>
 }

@@ -1,7 +1,7 @@
 
 import { NotificationEntity } from "domain/entities/NotificationEntity";
 import { randomUUID } from "crypto";
-import { NotificationResponseDTO } from "application/dto/notification/notification.dro";
+import { NotificationResponseDTO } from "application/dto/notification/notification.dto";
 import { formatDistanceToNow } from 'date-fns';
 export const NotificationMapper = {
   toCreateEntity(data: { title: string, message: string, recipientId: string, senderId: string }): NotificationEntity {

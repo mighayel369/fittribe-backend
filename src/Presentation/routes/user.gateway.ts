@@ -10,6 +10,10 @@ import wallet from './payment/wallet';
 import userAccount from './account/user.account';
 import userPayment from './payment/user.payment'; 
 import userBookings from './booking/user.bookings';
+
+import sharedChat from './chat/shared.chat'
+import userChat from './chat/user.chat'
+
 import publicPrograms from './public/public.programs';
 import publicTrainers from './public/public.trainers';
 
@@ -29,4 +33,6 @@ userRouter.use('/bookings', userBookings);
 userRouter.use('/payments', userPayment); 
 userRouter.use('/wallet', wallet);
 userRouter.use('/notification',notification)
+userRouter.use('/chats',sharedChat);
+userRouter.use('/chats',userChat);
 export default userRouter;

@@ -3,6 +3,7 @@ import { UserResponseDTO } from "application/dto/user/fetch-all-users.dto";
 import { UserProfileDTO, AdminUserDetailDTO } from "application/dto/user/user-details.dto";
 import { USER_STATUS_MESSAGES } from "utils/Constants";
 import { UpdateStatusResponseDTO } from "application/dto/common/update-status.dto";
+import { publicClientResponseDTO } from "application/dto/trainer/client-lits.dto";
 export class UserMapper {
   static toUserResponseDTO(entity: UserEntity): UserResponseDTO {
     return {
@@ -43,10 +44,20 @@ export class UserMapper {
     };
   }
   static toUpdateStatusResponseDTO(isActive: boolean): UpdateStatusResponseDTO {
+
       return {
           success: true,
           message: isActive ? USER_STATUS_MESSAGES.UNBLOCK_SUCCESS : USER_STATUS_MESSAGES.BLOCK_SUCCESS,
           newStatus: isActive
       };
+  }
+
+  static toPublicClientResponseDTO(data:UserEntity):publicClientResponseDTO{
+    return {
+      clientId:data.userId,
+      clinetName:data.name,
+      clientEmail:data.email,
+      clientProfilePic:data.profilePic||''
+    }
   }
 }

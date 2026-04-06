@@ -1,7 +1,7 @@
 import { injectable } from "tsyringe";
 import { SocketService } from "./SocketService";
 import { INotificationService } from "domain/services/i-notification.service";
-import { NotificationResponseDTO } from "application/dto/notification/notification.dro";
+import { NotificationResponseDTO } from "application/dto/notification/notification.dto";
 @injectable()
 export class SocketNotificationService implements INotificationService {
   
@@ -9,7 +9,7 @@ export class SocketNotificationService implements INotificationService {
     try {
       const io = SocketService.io;
       
-      // Sending the DTO which now includes the 'time' string
+
       io.to(recipientId).emit("notification_received", payload);
       
     } catch (error) {
