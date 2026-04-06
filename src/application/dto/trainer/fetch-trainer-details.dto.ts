@@ -27,4 +27,5 @@ export interface UserTrainerViewDTO extends TrainerDetailsResponseDTO{
     address: string;
     bio: string;
     rating: number;
+    chatId?: string;
 }

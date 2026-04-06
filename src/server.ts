@@ -2,17 +2,19 @@
 import 'reflect-metadata';
 import 'dotenv/config';
 import logger from 'utils/logger';
-import 'infrastructure/config/container'; 
+import 'infrastructure/config/container';
+import { container } from "tsyringe";
+import { SocketService } from 'infrastructure/services/SocketService';
 import server from "./app";
 import { connectDB } from "infrastructure/config/database";
 import { passportSet } from "infrastructure/config/passportConfig";
-import { SocketService } from 'infrastructure/services/SocketService';
 const PORT = process.env.PORT || 5000;
 
 async function startServer() {
     try {
         await connectDB();
-        SocketService.init(server);
+        const socketService = container.resolve(SocketService);
+        socketService.init(server);
         const passportConfigured = await passportSet();
         if (!passportConfigured) {
             logger.error("❌ Failed to configure Passport strategies.");

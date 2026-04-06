@@ -5,7 +5,7 @@ import { BaseRepository } from "./BaseRepository";
 import { UserEntity } from "domain/entities/UserEntity";
 import { UserMapper } from "../mappers/UserMapper";
 import { Model } from "mongoose";
-
+import { ChatModel } from "../models/ChatModel";
 @injectable()
 export class UserRepoImpl extends BaseRepository<IUser, UserEntity> implements IUserRepo{
   protected model: Model<IUser> = UserModel; 
@@ -145,5 +145,10 @@ async getUserGrowthData(): Promise<{
 
 async updateUserProfilePicture(userId: string, profilePic: string): Promise<void> {
   await this.model.findOneAndUpdate({userId},{profilePic})
+}
+
+async findActiveClients(): Promise<UserEntity[]> {
+  let docs=await this.model.find({status:true})
+  return docs.map(doc=>this.toEntity(doc))
 }
 }

@@ -12,11 +12,14 @@ import trainerSchedule from './account/trainer.schedule';
 import trainerDashboard from './account/trainer.dashboard';
 import trainerLeaves from './account/trainer.leave'
 import trainerBookings from './booking/trainer.bookings';
+import trainerChats from './chat/trainer.chat'
+import sharedChats from './chat/shared.chat'
 import publicPrograms from './public/public.programs';
 
 const trainerRouter = express.Router();
 
-trainerRouter.use('/discovery', publicPrograms); 
+trainerRouter.use('/discovery', publicPrograms);
+
 trainerRouter.use('/auth', trainerAuth);
 trainerRouter.use('/auth', sessionAuth);
 
@@ -30,6 +33,8 @@ trainerRouter.use('/account', trainerAccount);
 trainerRouter.use('/schedule', trainerSchedule);
 trainerRouter.use('/dashboard', trainerDashboard);
 trainerRouter.use('/leaves', trainerLeaves),
+trainerRouter.use('/chats',trainerChats)
+trainerRouter.use('/chats',sharedChats)
 
 trainerRouter.use('/bookings', trainerBookings);
 trainerRouter.use('/wallet', wallet);

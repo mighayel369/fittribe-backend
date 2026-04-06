@@ -1,4 +1,4 @@
-import { NotificationResponseDTO } from "application/dto/notification/notification.dro";
+import { NotificationResponseDTO } from "application/dto/notification/notification.dto";
 
 
 export interface IGetNotification{

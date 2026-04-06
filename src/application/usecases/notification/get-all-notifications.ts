@@ -1,4 +1,4 @@
-import { NotificationResponseDTO } from "application/dto/notification/notification.dro";
+import { NotificationResponseDTO } from "application/dto/notification/notification.dto";
 import { IGetNotification } from "application/interfaces/notification/i-get-notifications";
 import { inject,injectable } from "tsyringe";
 import { INotificationRepo } from "domain/repositories/INotifctionRepo";
