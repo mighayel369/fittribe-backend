@@ -12,7 +12,8 @@ export interface upcomingAppointmentsDTO{
     timeSlot:string,
     program:string,
     status:string,
-    profilePic:string
+    profilePic:string,
+    meetLink?:string
 }
 export interface recentChatsDTO{
     clientName:string,

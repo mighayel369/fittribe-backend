@@ -1,13 +1,15 @@
 import { PaginationInputDTO } from "../common/PaginationDto"
 import { PaginationOutputDTO } from "../common/PaginationDto"
 export interface BookingResponseDTO{
-    bookingId:string,
-    trainerName:string,
-    bookedDate:string,
-    bookedTime:string,
-    bookedProgram:string,
-    sessionAmount:number,
+    bookingId:string
+    trainerName:string
+    bookedDate:string
+    bookedTime:string
+    bookedProgram:string
+    sessionAmount:number
     bookingStatus:string
+    trainerProfilePic:string
+    meetLink?:string
 }
 
 export interface FetchAllUserBookingRequestDTO extends PaginationInputDTO{
@@ -25,6 +27,7 @@ export interface TrainserBookingResponseDTO{
   bookedTime: string;
   sessionAmount: number;
   bookingStatus: string;
+  meetLink?:string
 }
 
 

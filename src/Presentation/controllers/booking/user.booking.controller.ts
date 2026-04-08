@@ -21,7 +21,7 @@ import { ProcessRescheduleRequestDTO } from 'application/dto/booking/process-res
 export class UserBookingController {
     constructor(
         @inject("IBookSessionWithTrainer") private _finalizeBooking: IBookSessionWithTrainer,
-        @inject("FetchUserBookingUseCase") private _fetchHistory: IFetchAllBookingsUseCase<FetchAllUserBookingRequestDTO, FetchAllUserBookingsResponseDTO>,
+        @inject("FetchUserBookingUseCase") private _fetchBookings: IFetchAllBookingsUseCase<FetchAllUserBookingRequestDTO, FetchAllUserBookingsResponseDTO>,
         @inject("FetchBookingDetails") private _getDetails: IFetchBookingDetails<UserBookingDetailsResponseDTO>,
         @inject("RequestReschedule") private _requestReschedule: IRequestBookingRescheduleUseCase,
         @inject("CancelUserBookingUseCase") private _cancelBooking: ICancelBooking,
@@ -96,7 +96,8 @@ export class UserBookingController {
     }
 
 
-    getHistory = async (req: Request, res: Response, next: NextFunction) => {
+
+    getBookings = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { id } = req.user as { id: string };
 
@@ -104,16 +105,18 @@ export class UserBookingController {
                 throw new AppError(ERROR_MESSAGES.UNAUTHORIZED, HttpStatus.UNAUTHORIZED);
             }
 
-            let input: FetchAllUserBookingRequestDTO = {
+            const filterType = (req.query.filter as string) || "all";
+
+            const input: FetchAllUserBookingRequestDTO = {
                 userId: id,
                 limit: 5,
                 currentPage: Number(req.query.pageNo) || 1,
                 searchQuery: (req.query.search as string) || "",
-                filter: {}
-            }
-            console.log(input)
-            const result: FetchAllUserBookingsResponseDTO = await this._fetchHistory.execute(input);
-            console.log(result)
+                filter: { filterType }
+            };
+
+            const result = await this._fetchBookings.execute(input);
+
             res.status(HttpStatus.OK).json({
                 success: true,
                 message: SUCCESS_MESSAGES.BOOKING.USER_BOOKINGS,
@@ -124,7 +127,6 @@ export class UserBookingController {
             next(err);
         }
     };
-
     getBookingDetails = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { id } = req.params;

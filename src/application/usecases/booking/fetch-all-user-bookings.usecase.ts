@@ -5,6 +5,7 @@ import { IFetchAllBookingsUseCase } from "application/interfaces/booking/i-fetch
 import { FetchAllUserBookingRequestDTO, FetchAllUserBookingsResponseDTO } from "application/dto/booking/fetch-all-bookings.dto";
 import { BookingMapper } from "application/mappers/booking-mapper";
 
+
 @injectable()
 export class FetchUserAllBookings implements IFetchAllBookingsUseCase<FetchAllUserBookingRequestDTO, FetchAllUserBookingsResponseDTO> {
   constructor(
@@ -12,20 +13,23 @@ export class FetchUserAllBookings implements IFetchAllBookingsUseCase<FetchAllUs
   ) {}
 
   async execute(input: FetchAllUserBookingRequestDTO): Promise<FetchAllUserBookingsResponseDTO> {
-    const { userId, searchQuery, currentPage, limit } = input;
-
-    const filter = { user: userId };
+    const { userId, searchQuery, currentPage, limit, filter } = input;
+    
+    const repositoryFilters = { 
+      user: userId, 
+      ...filter 
+    };
 
     const { data, totalCount } = await this.bookingRepo.findBookings(
       searchQuery,
-      filter,
+      repositoryFilters,
       currentPage,
       limit
     );
 
     return {
       data: data.map(entity => BookingMapper.toUserBookingsResponseDTO(entity)),
-      total: Math.ceil(totalCount/limit)
+      total: Math.ceil(totalCount / limit)
     };
   }
 }

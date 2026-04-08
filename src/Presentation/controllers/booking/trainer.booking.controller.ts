@@ -16,6 +16,7 @@ import { IProcessTrainerRescheduleUseCase } from "application/interfaces/booking
 import { RescheduleRequestDTO } from 'application/dto/booking/reschedule-request.dto';
 import { IRequestBookingRescheduleUseCase } from 'application/interfaces/booking/i-request-booking-reschedule.usecase';
 import { PAGINATION, UserRole } from 'utils/Constants';
+import { IGetMeetLink } from 'application/interfaces/booking/i-get-meetlink.usecase';
 @injectable()
 export class TrainerBookingController {
     constructor(
@@ -27,7 +28,9 @@ export class TrainerBookingController {
         @inject("FetchTrainerPendingBookingUseCase") private _fetchPending: IFetchAllBookingsUseCase<FetchAllTrainerBookingRequestDTO, FetchAllTrainerPendingBookingsResponseDTO>,
         @inject("FindTrainerBookingDetails") private _findDetails: IFetchBookingDetails<TrainerBookingDetailsResponseDTO>,
         @inject("FetchTrainerRescheduleRequests") private _fetchReschedule: IFetchAllBookingsUseCase<FetchAllTrainerBookingRequestDTO, FetchAllTrainerRescheduleBookingsResponseDTO>,
-        @inject("RescheduleBookingByTrainer") private _rescheduleBookingByTrainer: IRequestBookingRescheduleUseCase
+        @inject("RescheduleBookingByTrainer") private _rescheduleBookingByTrainer: IRequestBookingRescheduleUseCase,
+        @inject("IGetMeetLink") private _getmeetlink: IGetMeetLink
+
     ) { }
 
     acceptBooking = async (req: Request, res: Response, next: NextFunction) => {
@@ -202,4 +205,19 @@ rejectBooking = async (req: Request, res: Response, next: NextFunction) => {
             next(error);
         }
     };
+
+    getMeetLink=async(req:Request,res:Response,next:NextFunction)=>{
+        try{
+            let bookingId=req.params.id
+            let meetLink=await this._getmeetlink.execute(bookingId)
+
+            res.status(HttpStatus.OK).json({
+                success: true,
+                message: SUCCESS_MESSAGES.BOOKING.BOOKING_DETAILS_FETCHED,
+                data: meetLink
+            })
+        }catch(err){
+            next(err)
+        }
+    }
 }

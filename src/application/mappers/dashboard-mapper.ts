@@ -34,10 +34,11 @@ static toTrainerMonthlyPerformanceDTO(data:{month:string,sessionCount:number}): 
     return {
       bookingId:booking.bookingId,
       clientName: booking.user.name,
-      timeSlot: booking.timeSlot,
+      timeSlot: minutesToTime(booking.timeSlot),
       program: booking.program,
       status: booking.status,
-      profilePic: booking.user.profilePic || ""
+      profilePic: booking.user.profilePic || "",
+      meetLink:booking.meetLink
     };
   }
 

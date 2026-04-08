@@ -25,6 +25,7 @@ export interface TrainerBookingDetailsResponseDTO {
         requestedAt: Date;
     };
     rejectReason?:string
+    meetLink?:string
 }
 
 
@@ -57,4 +58,5 @@ export interface UserBookingDetailsResponseDTO {
     status: string;
   };
    rejectReason?:string
+   meetLink?:string
 }

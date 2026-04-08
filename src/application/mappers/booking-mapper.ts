@@ -39,7 +39,9 @@ export class BookingMapper {
       bookedProgram: entity.program,
       bookedTime: minutesToTime(entity.timeSlot),
       bookingStatus: entity.status,
-      sessionAmount: entity.totalAmount
+      sessionAmount: entity.totalAmount,
+      trainerProfilePic:entity.trainer.profilePic,
+      meetLink:entity.meetLink
     }
   }
   static toTrainerBookingsResponseDTO(entity: BookingEntity): TrainserBookingResponseDTO {
@@ -52,6 +54,7 @@ export class BookingMapper {
       bookedTime: minutesToTime(entity.timeSlot),
       bookingStatus: entity.status,
       sessionAmount: entity.totalAmount,
+      meetLink:entity.meetLink
     };
   }
 
@@ -131,7 +134,8 @@ export class BookingMapper {
           status: entity.status,
         }
         : undefined,
-      rejectReason: entity.rejectReason
+      rejectReason: entity.rejectReason,
+      meetLink:entity.meetLink
     };
   }
 
