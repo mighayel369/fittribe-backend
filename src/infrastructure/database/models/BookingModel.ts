@@ -29,7 +29,8 @@ export interface IBooking extends Document {
   };
   rescheduleCount?:number
   sessionRating?:number,
-  rejectReason?:string
+  rejectReason?:string,
+  meetLink?:string
 }
 
 const BookingSchema = new Schema<IBooking>({
@@ -64,7 +65,8 @@ const BookingSchema = new Schema<IBooking>({
   },
   rescheduleCount:Number,
   sessionRating:Number,
-  rejectReason:String
+  rejectReason:String,
+  meetLink:{type:String}
 }, { timestamps: true});
 
 export default mongoose.model<IBooking>("Booking", BookingSchema);

@@ -12,7 +12,7 @@ router.get('/:id/details', ctrl.getBookingDetails);
 
 router.delete('/:bookingId', ctrl.cancelSession);
 
-router.get('/history', validateRequest(userBookingQuerySchema, "query"), ctrl.getHistory);
+router.get('/history', validateRequest(userBookingQuerySchema, "query"), ctrl.getBookings);
 
 router.post('/checkout', validateRequest(checkoutSchema), ctrl.checkoutAndBook);
 router.post('/reschedule', validateRequest(userRescheduleSchema), ctrl.requestReschedule);

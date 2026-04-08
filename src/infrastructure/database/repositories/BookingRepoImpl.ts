@@ -8,6 +8,26 @@ import { BookingMapper } from "../mappers/BookingMapper";
 import { BOOKING_STATUS } from "utils/Constants";
 import { minutesToTime } from "utils/generateTimeSlots";
 
+const BookingFilterStrategies: Record<string, (today: Date) => any> = {
+  upcoming: (today) => ({
+    date: { $gte: today },
+    status: { $ne: 'completed' }
+  }),
+  today: (today) => {
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    return {
+      date: { $gte: today, $lt: tomorrow }
+    };
+  },
+  history: (today) => ({
+    $and: [
+      { status: BOOKING_STATUS.COMPLETED },
+      { date: { $lt: today } }
+    ]
+  }),
+  all: () => ({})
+};
 
 @injectable()
 export class BookingRepoImpl
@@ -36,6 +56,7 @@ export class BookingRepoImpl
 
     return fullBooking;
   }
+
   async findBookings(
     searchQuery: string = "",
     filters: Record<string, any> = {},
@@ -43,29 +64,19 @@ export class BookingRepoImpl
     limit: number = 5
   ): Promise<{ data: BookingEntity[]; totalCount: number }> {
     const skip = (page - 1) * limit;
-    console.log(filters)
-    console.log(skip)
-    console.log(page)
-    const pipeline: any[] = [{ $match: filters }];
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const { filterType, ...baseFilters } = filters;
+    const strategyQuery = BookingFilterStrategies[filterType]?.(today) || {};
+    const matchObj = { ...baseFilters, ...strategyQuery };
+
+    const pipeline: any[] = [{ $match: matchObj }];
 
     pipeline.push(
-      {
-        $lookup: {
-          from: "trainers",
-          localField: "trainer",
-          foreignField: "trainerId",
-          as: "trainerInfo"
-        }
-      },
+      { $lookup: { from: "trainers", localField: "trainer", foreignField: "trainerId", as: "trainerInfo" } },
       { $unwind: "$trainerInfo" },
-      {
-        $lookup: {
-          from: "users",
-          localField: "user",
-          foreignField: "userId",
-          as: "userInfo"
-        }
-      },
+      { $lookup: { from: "users", localField: "user", foreignField: "userId", as: "userInfo" } },
       { $unwind: "$userInfo" }
     );
 
@@ -87,29 +98,17 @@ export class BookingRepoImpl
     const totalCount = countRes.length > 0 ? countRes[0].total : 0;
 
     pipeline.push(
-      { $sort: { createdAt: -1 } },
+      { $sort: { date: 1, timeSlot: 1 } },
       { $skip: skip },
       { $limit: limit },
-      {
-        $addFields: {
-          user: "$userInfo",
-          trainer: "$trainerInfo"
-        }
-      },
-      {
-        $project: {
-          userInfo: 0,
-          trainerInfo: 0
-        }
-      }
+      { $addFields: { user: "$userInfo", trainer: "$trainerInfo" } },
+      { $project: { userInfo: 0, trainerInfo: 0 } }
     );
 
-    const docs = await this.model.aggregate(pipeline)
-    const data = docs.map(d => this.toEntity(d));
-
-    return {
-      data,
-      totalCount
+    const docs = await this.model.aggregate(pipeline);
+    return { 
+      data: docs.map(d => this.toEntity(d)), 
+      totalCount 
     };
   }
 
@@ -437,16 +436,16 @@ export class BookingRepoImpl
           ],
           peakHoursData: [
             {
-              $group:{
-                _id:"$timeSlot",count:{$sum:1}
+              $group: {
+                _id: "$timeSlot", count: { $sum: 1 }
               }
             },
             { $sort: { count: -1 } },
-            {$limit:4},{
-              $project:{
-                _id:0,
-                time:"$_id",
-                count:1
+            { $limit: 4 }, {
+              $project: {
+                _id: 0,
+                time: "$_id",
+                count: 1
               }
             }
           ]

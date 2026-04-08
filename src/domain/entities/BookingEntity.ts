@@ -34,7 +34,8 @@ export class BookingEntity {
       createdAt: Date;
     },
     public readonly rescheduleCount?:number,
-    public rejectReason?:string
+    public rejectReason?:string,
+    public meetLink?:string
   ) {}
 
   public get trainerId(): string {

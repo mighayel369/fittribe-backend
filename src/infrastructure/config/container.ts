@@ -278,6 +278,11 @@ import { GetChatId } from "application/usecases/chat/get-chatId";
 import { IMarkMessageAsRead } from "application/interfaces/chat/i-mark-as-read";
 import { MarkMessageAsRead } from "application/usecases/chat/mark-as-read";
 
+import { IGetMeetLink } from "application/interfaces/booking/i-get-meetlink.usecase";
+import { StartSessionUseCase } from "application/usecases/booking/start-session.usecase";
+
+container.register<IGetMeetLink>("IGetMeetLink", { useClass: StartSessionUseCase})
+
 container.register<IMarkMessageAsRead>("IMarkMessageAsRead", { useClass: MarkMessageAsRead})
 
 container.register<IGetChatId>("GetChatId", { useClass: GetChatId})

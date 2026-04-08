@@ -21,5 +21,6 @@ router.put('/reschedule', validateRequest(trainerRescheduleSchema), ctrl.resched
 
 router.get('/:bookingId', ctrl.getBookingDetails); 
 
+router.patch('/get-meetlink/:id',ctrl.getMeetLink)
 
 export default router;

@@ -29,7 +29,8 @@ export const BookingMapper = {
       createdAt: (doc as any).updatedAt || new Date(),
     } : undefined,
       doc.rescheduleCount,
-      doc.rejectReason
+      doc.rejectReason,
+      doc.meetLink
     );
   },
 toPersistence(entity: BookingEntity): Partial<IBooking> {
@@ -55,7 +56,8 @@ toPersistence(entity: BookingEntity): Partial<IBooking> {
         requestedBy: (entity.rescheduleRequest as any).requestedBy || "user"
       } : undefined,
       rescheduleCount: entity.rescheduleCount || 0,
-      rejectReason: entity.rejectReason
+      rejectReason: entity.rejectReason,
+      meetLink:entity.meetLink
     };
   }
 };
