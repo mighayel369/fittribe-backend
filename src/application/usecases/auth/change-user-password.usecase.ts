@@ -1,8 +1,8 @@
 import { inject, injectable } from "tsyringe";
 import { IChangePasswordUseCase } from "../../interfaces/auth/i-change-password.usecase";
 import { ChangePasswordRequestDTO } from "application/dto/auth/change-password.dto";
-import { IUserRepo } from "domain/repositories/IUserRepo";
-import { IPasswordHasher } from "domain/services/IPasswordHasher";
+import { IUserRepo ,I_USER_REPO_TOKEN} from "domain/repositories/IUserRepo";
+import { I_PASSWORD_HASHER_TOKEN, IPasswordHasher } from "domain/services/IPasswordHasher";
 import { AppError } from "domain/errors/AppError";
 import { HttpStatus } from "utils/HttpStatus";
 import { ERROR_MESSAGES } from "utils/ErrorMessage";
@@ -10,8 +10,8 @@ import { ERROR_MESSAGES } from "utils/ErrorMessage";
 @injectable()
 export class ChangeUserPasswordUseCase implements IChangePasswordUseCase<ChangePasswordRequestDTO> {
   constructor(
-    @inject("IUserRepo") private readonly userRepo: IUserRepo,
-    @inject("IPasswordHasher") private readonly passwordHasher: IPasswordHasher
+    @inject(I_USER_REPO_TOKEN) private readonly userRepo: IUserRepo,
+    @inject(I_PASSWORD_HASHER_TOKEN) private readonly passwordHasher: IPasswordHasher
   ) {}
   async execute(input:ChangePasswordRequestDTO): Promise<void> {
     let {userId,oldPassword,newPassword}=input

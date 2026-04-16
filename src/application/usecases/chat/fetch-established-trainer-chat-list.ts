@@ -1,18 +1,18 @@
 import { inject, injectable } from "tsyringe";
-import { IChatRepo } from "domain/repositories/IChatRepo";
+import { I_CHAT_REPO_TOKEN, IChatRepo } from "domain/repositories/IChatRepo";
 import { IFetchChatList } from "application/interfaces/chat/i-fetch-chat-list";
-import { ChatListResponseDTO } from "application/dto/chat/chat-list.dto";
+import { ChatListResponseDTO, TrainerChatListRequestDTO } from "application/dto/chat/chat-list.dto";
 import { ChatMapper } from "application/mappers/chat-mapper";
 
 @injectable()
-export class FetchEstablishedTrainerChatList implements IFetchChatList<ChatListResponseDTO> {
+export class FetchEstablishedTrainerChatList implements IFetchChatList<TrainerChatListRequestDTO, ChatListResponseDTO> {
     constructor(
-        @inject("IChatRepo") private _chatRepo: IChatRepo
+      @inject(I_CHAT_REPO_TOKEN) private _chatRepo: IChatRepo,
     ) { }
 
-    async execute(id: string): Promise<ChatListResponseDTO[]> {
-
-        const chatList = await this._chatRepo.getChatListForTrainer(id);
-        return chatList.map((chat) => ChatMapper.toTrainerChatListResponseDTO(chat, id));
+    async execute(input: TrainerChatListRequestDTO): Promise<ChatListResponseDTO[]> {
+        const { trainerId, searchQuery } = input;
+        const chatList = await this._chatRepo.getChatListForTrainer(trainerId, searchQuery);
+        return chatList.map((chat) => ChatMapper.toTrainerChatListResponseDTO(chat, trainerId));
     }
 }

@@ -7,6 +7,7 @@ import { BookingEntity } from "domain/entities/BookingEntity";
 import { BookingMapper } from "../mappers/BookingMapper";
 import { BOOKING_STATUS } from "utils/Constants";
 import { minutesToTime } from "utils/generateTimeSlots";
+import { DashboardMetrics } from "domain/repositories/types/AdminBookingDashboard";
 
 const BookingFilterStrategies: Record<string, (today: Date) => any> = {
   upcoming: (today) => ({
@@ -106,9 +107,9 @@ export class BookingRepoImpl
     );
 
     const docs = await this.model.aggregate(pipeline);
-    return { 
-      data: docs.map(d => this.toEntity(d)), 
-      totalCount 
+    return {
+      data: docs.map(d => this.toEntity(d)),
+      totalCount
     };
   }
 
@@ -415,7 +416,7 @@ export class BookingRepoImpl
       {
         $facet: {
           metrics: [
-            { $group: { _id: null, totalRevenue: { $sum: { $cond: [{ $eq: ["$status", "completed"] }, "$adinCommission", 0] } }, totalBookings: { $sum: 1 } } }
+            { $group: { _id: null, totalRevenue: { $sum: { $cond: [{ $eq: ["$status", BOOKING_STATUS.COMPLETED] }, "$adminCommission", 0] } }, totalBookings: { $sum: 1 } } }
           ],
           performanceData: [
             { $match: { createdAt: { $gte: sixMonthsAgo } } },
@@ -488,18 +489,16 @@ export class BookingRepoImpl
     return await this.model.aggregate([
       {
         $match: {
-          createdAt: { $gte: startOfMonth, $lte: now }
+          createdAt: { $gte: startOfMonth, $lte: now },
         }
       },
       {
         $group: {
           _id: "$trainer",
-          bookings: { $sum: 1 },
-          revenue: { $sum: "$trainerEarnings" },
-          avgRating: { $avg: "$sessionRating" }
+          bookingsCount: { $sum: 1 },
+          totalRevenue: { $sum: "$trainerEarning" }
         }
       },
-      { $sort: { revenue: -1 } },
       {
         $lookup: {
           from: "trainers",
@@ -514,17 +513,22 @@ export class BookingRepoImpl
           _id: 0,
           month: { $literal: now.toLocaleString('default', { month: 'long' }) },
           name: "$trainerInfo.name",
-          bookings: 1,
-          rating: { $ifNull: ["$avgRating", 0] },
-          revenue: 1,
-          useage: {
+          bookings: "$bookingsCount",
+          rating: { $ifNull: ["$trainerInfo.rating", 0] },
+          revenue: "$totalRevenue",
+          usage: {
             $concat: [
               {
                 $toString: {
                   $round: [
                     {
                       $multiply: [
-                        { $divide: ["$bookings", totalCapacityToDate] },
+                        {
+                          $divide: [
+                            "$bookingsCount",
+                            { $max: [totalCapacityToDate, 1] }
+                          ]
+                        },
                         100
                       ]
                     },
@@ -537,7 +541,104 @@ export class BookingRepoImpl
           }
         }
       },
+      { $sort: { revenue: -1 } },
       { $limit: 5 }
     ]);
   }
+
+async getAdminDashboardMetrics(range: '7days' | '6months' = '7days'): Promise<DashboardMetrics> {
+  const now = new Date();
+  
+  const todayStart = new Date(now);
+  todayStart.setHours(0, 0, 0, 0);
+  const todayEnd = new Date(now);
+  todayEnd.setHours(23, 59, 59, 999);
+
+  let startDate = new Date();
+  let groupField: any;
+
+  if (range === '7days') {
+    startDate.setDate(now.getDate() - 6);
+    startDate.setHours(0, 0, 0, 0);
+    groupField = { $dateToString: { format: "%Y-%m-%d", date: "$date" } };
+  } else {
+    startDate.setMonth(now.getMonth() - 5);
+    startDate.setDate(1);
+    startDate.setHours(0, 0, 0, 0);
+    groupField = { $dateToString: { format: "%Y-%m", date: "$date" } };
+  }
+
+  const [data] = await this.model.aggregate([
+    {
+      $facet: {
+        stats: [
+          {
+            $group: {
+              _id: null,
+              totalBookings: { $sum: 1 },
+              completed: { $sum: { $cond: [{ $eq: ["$status", "completed"] }, 1, 0] } },
+              pendingRequests: { $sum: { $cond: [{ $eq: ["$status", "pending"] }, 1, 0] } },
+              todaySessions: {
+                $sum: {
+                  $cond: [
+                    { $and: [{ $gte: ["$date", todayStart] }, { $lte: ["$date", todayEnd] }] },
+                    1, 0
+                  ]
+                }
+              }
+            }
+          }
+        ],
+        bookingTrend: [
+          { $match: { date: { $gte: startDate } } },
+          {
+            $group: {
+              _id: groupField,
+              count: { $sum: 1 }
+            }
+          },
+          { $sort: { "_id": 1 } },
+          {
+            $project: {
+              label: "$_id",
+              bookings: "$count",
+              _id: 0
+            }
+          }
+        ],
+        statusDistribution: [
+          {
+            $group: {
+              _id: "$status",
+              count: { $sum: 1 }
+            }
+          },
+          {
+            $project: {
+              label: { $toUpper: "$_id" },
+              count: 1,
+              _id: 0
+            }
+          }
+        ]
+      }
+    }
+  ]);
+
+  const statsObj = data.stats[0] || { totalBookings: 0, completed: 0, pendingRequests: 0, todaySessions: 0 };
+  const successRate = statsObj.totalBookings > 0
+    ? ((statsObj.completed / statsObj.totalBookings) * 100).toFixed(1) + "%"
+    : "0%";
+
+  return {
+    stats: {
+      todaySessions: statsObj.todaySessions,
+      pendingRequests: statsObj.pendingRequests,
+      totalBookings: statsObj.totalBookings,
+      successRate: successRate
+    },
+    trends: data.bookingTrend,
+    distribution: data.statusDistribution
+  };
 }
+  }

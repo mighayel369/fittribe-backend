@@ -1,5 +1,5 @@
 import { inject, injectable } from "tsyringe";
-import { IProgramRepo } from "domain/repositories/IProgramRepo";
+import { I_PROGRAM_REPO_TOKEN, IProgramRepo } from "domain/repositories/IProgramRepo";
 import { IFetchProgramDetails} from "application/interfaces/program/i-program-details";
 import { ProgramDetailsResponseDTO } from "application/dto/programs/program-details.dto";
 import { AppError } from "domain/errors/AppError";
@@ -10,7 +10,7 @@ import { ERROR_MESSAGES } from "utils/ErrorMessage";
 @injectable()
 export class FetchProgramDetails implements IFetchProgramDetails {
   constructor(
-    @inject("IProgramRepo") private readonly _programRepo: IProgramRepo
+    @inject(I_PROGRAM_REPO_TOKEN) private readonly _programRepo: IProgramRepo
   ) {}
 
   async execute(programId: string): Promise<ProgramDetailsResponseDTO> {

@@ -3,11 +3,11 @@ import { inject, injectable } from "tsyringe";
 import { HttpStatus } from 'utils/HttpStatus';
 import { SUCCESS_MESSAGES } from 'utils/SuccessMessages';
 import { WalletDetailsResponseDTO, WalletTransactionInputDTO } from 'application/dto/wallet/WalletTransactionsDTO';
-import { IGetWalletUseCase } from 'application/interfaces/wallet/IGetWalletUseCase';
+import { I_GET_WALLET_USE_CASE_TOKEN, IGetWalletUseCase } from 'application/interfaces/wallet/IGetWalletUseCase';
 @injectable()
 export class WalletController {
     constructor(
-        @inject("GetWalletUseCase") private _getWallet: IGetWalletUseCase,
+        @inject(I_GET_WALLET_USE_CASE_TOKEN) private _getWallet: IGetWalletUseCase,
     ) { }
 
     getMyWallet = async (req: Request, res: Response, next: NextFunction) => {

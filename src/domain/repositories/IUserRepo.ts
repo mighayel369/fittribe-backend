@@ -1,6 +1,6 @@
 import { UserEntity} from "domain/entities/UserEntity";
 
-
+export const I_USER_REPO_TOKEN = Symbol("I_USER_REPO_TOKEN");
 
 export interface IUserRepo {
     registerUser(payload: UserEntity): Promise<UserEntity|null>;

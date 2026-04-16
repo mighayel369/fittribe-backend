@@ -5,19 +5,19 @@ import { HttpStatus } from 'utils/HttpStatus';
 import { AppError } from 'domain/errors/AppError';
 import config from 'config';
 import { SUCCESS_MESSAGES } from 'utils/SuccessMessages';
-import { IFetchAllUsersUseCase } from 'application/interfaces/user/i-fetch-all-users.usecase';
-import { IFetchUserDetailsUseCase } from 'application/interfaces/user/i-fetch-user-details.usecase';
+import { I_FETCH_ALL_USERS_TOKEN, IFetchAllUsersUseCase } from 'application/interfaces/user/i-fetch-all-users.usecase';
+import { I_FETCH_USER_DETAILS_ADMIN_TOKEN, IFetchUserDetailsUseCase } from 'application/interfaces/user/i-fetch-user-details.usecase';
 import { AdminUserDetailDTO } from 'application/dto/user/user-details.dto';
-import { IUpdateStatus } from 'application/interfaces/common/i-update-status.usecase';
+import { I_UPDATE_USER_STATUS_TOKEN, IUpdateStatus } from 'application/interfaces/common/i-update-status.usecase';
 import { FetchAllUsersRequestDTO, FetchAllUsersResponseDTO } from 'application/dto/user/fetch-all-users.dto';
 import { UpdateStatusRequestDTO, UpdateStatusResponseDTO } from 'application/dto/common/update-status.dto';
 import { PAGINATION } from 'utils/Constants';
 @injectable()
 export class UserManagementController {
     constructor(
-        @inject("FindAllUsersUseCase") private _findAllUsers: IFetchAllUsersUseCase,
-        @inject("FetchUserDetailsForAdmin") private _findDetails: IFetchUserDetailsUseCase<AdminUserDetailDTO>,
-        @inject("BlockUnblockUserUseCase") private _updateStatus: IUpdateStatus,
+        @inject(I_FETCH_ALL_USERS_TOKEN) private _findAllUsers: IFetchAllUsersUseCase,
+        @inject(I_FETCH_USER_DETAILS_ADMIN_TOKEN) private _findDetails: IFetchUserDetailsUseCase<AdminUserDetailDTO>,
+        @inject(I_UPDATE_USER_STATUS_TOKEN) private _updateStatus: IUpdateStatus,
     ) { }
 
     private _getPaginationParams = (req: Request): FetchAllUsersRequestDTO => ({

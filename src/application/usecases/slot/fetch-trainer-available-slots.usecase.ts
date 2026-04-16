@@ -1,16 +1,16 @@
 import { inject, injectable } from "tsyringe";
-import { ISlotRepo } from "domain/repositories/ISlotRepo";
-import { IBookingRepo } from "domain/repositories/IBookingRepo";
+import { I_SLOT_REPO_TOKEN, ISlotRepo } from "domain/repositories/ISlotRepo";
+import { I_BOOKING_REPO_TOKEN, IBookingRepo } from "domain/repositories/IBookingRepo";
 import { IFetchTrainerAvailableSlotsUseCase } from "application/interfaces/slot/i-fetch-trainer-available-slots.usecase";
 import { generateHourlySlots } from "utils/generateTimeSlots";
 import { FetchAvailableSlotResponseDTO, FetchAvailableSlotsRequestDTO } from "application/dto/slot/fetch-trainer-available-slots.dto";
-import { ILeaveRepo } from "domain/repositories/ILeaveRepo";
+import { I_LEAVE_REPO_TOKEN, ILeaveRepo } from "domain/repositories/ILeaveRepo";
 @injectable()
 export class FetchTrainerAvailableSlotsUseCase implements IFetchTrainerAvailableSlotsUseCase {
   constructor(
-    @inject("ITrainerSlotRepo") private _slotRepo: ISlotRepo,
-    @inject("BookingRepo") private _bookingRepo: IBookingRepo,
-    @inject("LeaveRepository") private _leaveRepo: ILeaveRepo,
+    @inject(I_SLOT_REPO_TOKEN) private _slotRepo: ISlotRepo,
+    @inject(I_BOOKING_REPO_TOKEN) private _bookingRepo: IBookingRepo,
+    @inject(I_LEAVE_REPO_TOKEN) private _leaveRepo: ILeaveRepo,
   ) {}
 
   async execute(input: FetchAvailableSlotsRequestDTO): Promise<FetchAvailableSlotResponseDTO> {

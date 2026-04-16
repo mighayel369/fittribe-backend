@@ -1,5 +1,5 @@
 import { IFetchUserDetailsUseCase } from "application/interfaces/user/i-fetch-user-details.usecase";
-import { IUserRepo } from "domain/repositories/IUserRepo";
+import { I_USER_REPO_TOKEN, IUserRepo } from "domain/repositories/IUserRepo";
 import { AdminUserDetailDTO } from "application/dto/user/user-details.dto";
 import { UserMapper } from "application/mappers/user-mapper";
 import { ERROR_MESSAGES } from "utils/ErrorMessage";
@@ -9,7 +9,7 @@ import { inject,injectable } from "tsyringe";
 
 @injectable()
 export class FetchUserDetailsForAdmin implements IFetchUserDetailsUseCase<AdminUserDetailDTO> {
-  constructor( @inject("IUserRepo") private readonly _userRepo: IUserRepo) {}
+  constructor( @inject(I_USER_REPO_TOKEN) private readonly _userRepo: IUserRepo) {}
 
   async execute(userId: string): Promise<AdminUserDetailDTO> {
     const user = await this._userRepo.findUserById(userId);

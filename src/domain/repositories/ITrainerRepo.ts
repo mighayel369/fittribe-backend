@@ -1,6 +1,8 @@
 
 import { TrainerEntity, TrainerFilter } from "domain/entities/TrainerEntity";
 
+export const I_TRAINER_REPO_TOKEN = Symbol("I_TRAINER_REPO_TOKEN");
+
 export interface ITrainerRepo {
   RegisterTrainer(payload: TrainerEntity): Promise<void>; 
   findTrainerById(id: string): Promise<TrainerEntity|null>;
@@ -13,4 +15,5 @@ export interface ITrainerRepo {
   updateTrainerStatus(id: string, status: boolean): Promise<void>;
   countActiveTrainers(): Promise<number>;
   updateTrainerProfilePicture(userId:string,profilePic:string):Promise<void>
+  updatePassword(id: string, hashedPassword: string): Promise<void>;
 }

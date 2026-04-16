@@ -1,5 +1,9 @@
 
 import { BookingEntity} from "domain/entities/BookingEntity";
+import { DashboardMetrics } from "./types/AdminBookingDashboard";
+
+
+export const I_BOOKING_REPO_TOKEN = Symbol("I_BOOKING_REPO_TOKEN");
 
 export interface IBookingRepo {
   createBooking(payload:BookingEntity): Promise<BookingEntity|null>;
@@ -25,4 +29,5 @@ export interface IBookingRepo {
   }>;
   getTrainerPerformanceAnalytics(): Promise<any[]>;
   calculateUserRetention(): Promise<string>;
+getAdminDashboardMetrics(range?: '7days' | '6months'): Promise<DashboardMetrics>;
 }

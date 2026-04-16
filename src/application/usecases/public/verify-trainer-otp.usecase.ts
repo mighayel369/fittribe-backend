@@ -1,9 +1,9 @@
-import { IWalletRepo } from "domain/repositories/IWalletRepo";
+import { I_WALLET_REPO_TOKEN, IWalletRepo } from "domain/repositories/IWalletRepo";
 import { IVerifyAccountUseCase } from "application/interfaces/public/i-verify-otp.usecase";
-import { IOtpService } from "domain/services/IOtpService";
-import { ITrainerRepo } from "domain/repositories/ITrainerRepo";
+import { I_OTP_SERVICE_TOKEN, IOtpService } from "domain/services/IOtpService";
+import { I_TRAINER_REPO_TOKEN, ITrainerRepo } from "domain/repositories/ITrainerRepo";
 import { VerifyAccountRequestDTO } from "application/dto/public/verify-account.dto";
-import { ISlotRepo } from "domain/repositories/ISlotRepo";
+import { I_SLOT_REPO_TOKEN, ISlotRepo } from "domain/repositories/ISlotRepo";
 import { inject,injectable } from "tsyringe";
 import { AppError } from "domain/errors/AppError";
 import { HttpStatus } from "utils/HttpStatus";
@@ -13,10 +13,10 @@ import { ERROR_MESSAGES } from "utils/ErrorMessage";
 
 export class VerifyTrainerAccountUseCase implements IVerifyAccountUseCase {
   constructor(
-    @inject('IOtpService') private readonly _otpService: IOtpService,
-    @inject('ITrainerRepo') private readonly _trainerRepo: ITrainerRepo,
-    @inject("ITrainerSlotRepo") private readonly _slotRepo: ISlotRepo,
-    @inject("WalletRepo") private readonly _walletRepo: IWalletRepo,
+    @inject(I_OTP_SERVICE_TOKEN) private readonly _otpService: IOtpService,
+    @inject(I_TRAINER_REPO_TOKEN) private readonly _trainerRepo: ITrainerRepo,
+    @inject(I_SLOT_REPO_TOKEN) private readonly _slotRepo: ISlotRepo,
+    @inject(I_WALLET_REPO_TOKEN) private readonly _walletRepo: IWalletRepo,
   ) {}
 
   async execute(input: VerifyAccountRequestDTO): Promise<boolean> {

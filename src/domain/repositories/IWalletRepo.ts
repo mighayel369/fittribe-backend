@@ -1,4 +1,7 @@
 import { WalletEntity } from "domain/entities/WalletEntity";
+
+export const I_WALLET_REPO_TOKEN = Symbol("I_WALLET_REPO_TOKEN");
+
 export interface IWalletRepo {
   createWallet(ownerId: string): Promise<WalletEntity>;
   getWalletWithPaginatedTransactions(

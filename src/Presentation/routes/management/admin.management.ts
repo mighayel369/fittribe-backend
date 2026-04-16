@@ -13,4 +13,8 @@ router.patch(
   validateRequest(updateLeaveStatusSchema), 
   ctrl.updateLeaveStatus
 );
+
+router.get('/export-leave-report',ctrl.exportLeaveReport)
+
+router.get('/export-report',ctrl.exportDashboardReport)
 export default router;

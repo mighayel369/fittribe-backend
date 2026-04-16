@@ -1,21 +1,21 @@
 import { injectable, inject } from "tsyringe";
 import { IUpdateUserProfileUseCase } from "application/interfaces/user/i-update-user-profile.usecase";
-import { IUserRepo } from "domain/repositories/IUserRepo";
+import { I_USER_REPO_TOKEN, IUserRepo } from "domain/repositories/IUserRepo";
 import { AppError } from "domain/errors/AppError";
 import { HttpStatus } from "utils/HttpStatus";
 import { UserProfileUpdateRequestDTO } from "application/dto/user/update-user-profile.dto";
 import { UserEntity } from "domain/entities/UserEntity";
 import { ERROR_MESSAGES } from "utils/ErrorMessage";
 import { NotificationMapper } from "application/mappers/notification-mapper";
-import { INotificationService } from "domain/services/i-notification.service";
-import { INotificationRepo } from "domain/repositories/INotifctionRepo";
+import { I_NOTIFICATION_SERVICE_TOKEN, INotificationService } from "domain/services/i-notification.service";
+import { I_NOTIFICATION_REPO_TOKEN, INotificationRepo } from "domain/repositories/INotifctionRepo";
 
 @injectable()
 export class UpdateUserProfileUseCase implements IUpdateUserProfileUseCase {
   constructor(
-    @inject("IUserRepo") private readonly _userRepo: IUserRepo,
-    @inject("SocketNotificationService") private _notificationService: INotificationService,
-    @inject("INotificationRepo") private _notificationRepo: INotificationRepo
+    @inject(I_USER_REPO_TOKEN) private readonly _userRepo: IUserRepo,
+    @inject(I_NOTIFICATION_SERVICE_TOKEN) private _notificationService: INotificationService,
+    @inject(I_NOTIFICATION_REPO_TOKEN) private _notificationRepo: INotificationRepo
   ) { }
 
   async execute(input: UserProfileUpdateRequestDTO): Promise<void> {

@@ -5,27 +5,27 @@ import { HttpStatus } from 'utils/HttpStatus';
 import { AppError } from 'domain/errors/AppError';
 import config from 'config';
 import { SUCCESS_MESSAGES } from 'utils/SuccessMessages';
-import { IOnboardNewProgram } from 'application/interfaces/program/i-onboard-new-program';
+import { I_ONBOARD_NEW_PROGRAM_TOKEN, IOnboardNewProgram } from 'application/interfaces/program/i-onboard-new-program';
 import { OnboardProgramRequestDTO } from 'application/dto/programs/onboard-new-program.dto';
-import { IFetchProgramInventory } from 'application/interfaces/program/i-fetch-program-summary';
+import { I_FETCH_PROGRAM_INVENTORY_TOKEN, IFetchProgramInventory } from 'application/interfaces/program/i-fetch-program-summary';
 import { FetchProgramInventoryRequestDTO, FetchProgramInventoryResponseDTO } from 'application/dto/programs/program-summary.dto';
-import { IModifyProgramSpecs } from 'application/interfaces/program/i-modify-program-specs';
+import { I_MODIFY_PROGRAM_SPECS_TOKEN, IModifyProgramSpecs } from 'application/interfaces/program/i-modify-program-specs';
 import { ModifyProgramSpecsRequestDTO } from 'application/dto/programs/modify-program-sepcs.dto';
-import { IArchiveProgram } from 'application/interfaces/program/i-archive-program';
-import { IToggleProgramVisibility } from 'application/interfaces/program/i-toggle-program-visibility';
+import { I_ARCHIVE_PROGRAM_TOKEN, IArchiveProgram } from 'application/interfaces/program/i-archive-program';
+import { I_TOGGLE_PROGRAM_VISIBILITY_TOKEN, IToggleProgramVisibility } from 'application/interfaces/program/i-toggle-program-visibility';
 import { ToggleProgramVisibilityRequestDTO, ToggleProgramVisibilityResponseDTO } from 'application/dto/programs/toggle-program-visibility.dto';
 import { ProgramDetailsResponseDTO } from 'application/dto/programs/program-details.dto';
-import { IFetchProgramDetails } from 'application/interfaces/program/i-program-details';
+import { I_FETCH_PROGRAM_DETAILS_TOKEN, IFetchProgramDetails } from 'application/interfaces/program/i-program-details';
 import { PAGINATION } from 'utils/Constants';
 @injectable()
 export class ProgramsManagementController {
     constructor(
-        @inject("IToggleProgramVisibility") private _toggleVisibility: IToggleProgramVisibility,
-        @inject('IOnboardNewProgram') private _onboardProgram: IOnboardNewProgram,
-        @inject('IArchiveProgram') private _archiveProgram: IArchiveProgram,
-        @inject("IFetchProgramInventory") private _fetchInventory: IFetchProgramInventory,
-        @inject("IModifyProgramSpecs") private _modifyProgram: IModifyProgramSpecs,
-        @inject("IFetchProgramDetails") private _getDetails: IFetchProgramDetails,
+        @inject(I_TOGGLE_PROGRAM_VISIBILITY_TOKEN) private _toggleVisibility: IToggleProgramVisibility,
+        @inject(I_ONBOARD_NEW_PROGRAM_TOKEN) private _onboardProgram: IOnboardNewProgram,
+        @inject(I_ARCHIVE_PROGRAM_TOKEN) private _archiveProgram: IArchiveProgram,
+        @inject(I_FETCH_PROGRAM_INVENTORY_TOKEN) private _fetchInventory: IFetchProgramInventory,
+        @inject(I_MODIFY_PROGRAM_SPECS_TOKEN) private _modifyProgram: IModifyProgramSpecs,
+        @inject(I_FETCH_PROGRAM_DETAILS_TOKEN) private _getDetails: IFetchProgramDetails,
     ) { }
     onboardNewProgram = async (req: Request, res: Response, next: NextFunction) => {
         try {

@@ -1,12 +1,12 @@
 
 import { inject, injectable } from "tsyringe";
-import { ITrainerRepo } from "domain/repositories/ITrainerRepo";
-import { IPasswordHasher } from "domain/services/IPasswordHasher";
-import { ICloudinaryService } from "domain/services/ICloudinaryService";
+import { ITrainerRepo,I_TRAINER_REPO_TOKEN } from "domain/repositories/ITrainerRepo";
+import { I_PASSWORD_HASHER_TOKEN, IPasswordHasher } from "domain/services/IPasswordHasher";
+import { I_CLOUDINARY_SERVICE_TOKEN, ICloudinaryService } from "domain/services/ICloudinaryService";
 import { IRegisterUseCase } from "application/interfaces/auth/i-register.usecase";
 import { AppError } from "domain/errors/AppError";
 import { HttpStatus } from "utils/HttpStatus";
-import { IOtpService } from "domain/services/IOtpService";
+import { I_OTP_SERVICE_TOKEN, IOtpService } from "domain/services/IOtpService";
 import { RegisterResponseDTO, TrainerRegisterRequestDTO } from "application/dto/auth/register.dto";
 import { STATUS, UserRole } from "utils/Constants";
 import { ERROR_MESSAGES } from "utils/ErrorMessage";
@@ -16,10 +16,10 @@ import { randomUUID } from "crypto";
 @injectable()
 export class TrainerRegisterUseCase implements IRegisterUseCase<TrainerRegisterRequestDTO> {
   constructor(
-    @inject("ITrainerRepo") private readonly _trainerRepo: ITrainerRepo,
-    @inject("IPasswordHasher") private readonly _passwordHasher: IPasswordHasher,
-    @inject("ICloudinaryService") private readonly _cloudinaryService: ICloudinaryService,
-    @inject("IOtpService") private readonly _otpService: IOtpService 
+    @inject(I_TRAINER_REPO_TOKEN) private readonly _trainerRepo: ITrainerRepo,
+    @inject(I_PASSWORD_HASHER_TOKEN) private readonly _passwordHasher: IPasswordHasher,
+    @inject(I_CLOUDINARY_SERVICE_TOKEN) private readonly _cloudinaryService: ICloudinaryService,
+    @inject(I_OTP_SERVICE_TOKEN) private readonly _otpService: IOtpService 
   ) {}
 
   async execute(input: TrainerRegisterRequestDTO, file?: Express.Multer.File): Promise<RegisterResponseDTO> {

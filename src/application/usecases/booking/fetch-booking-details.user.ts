@@ -1,7 +1,7 @@
 
 import { inject, injectable } from "tsyringe";
 import { IFetchBookingDetails } from "application/interfaces/booking/i-fetch-booking-details.usecase";
-import { IBookingRepo } from "domain/repositories/IBookingRepo";
+import { I_BOOKING_REPO_TOKEN, IBookingRepo } from "domain/repositories/IBookingRepo";
 import { BookingMapper } from "application/mappers/booking-mapper";
 import { AppError } from "domain/errors/AppError";
 import { UserBookingDetailsResponseDTO } from "application/dto/booking/fetch-booking-details.dto";
@@ -10,7 +10,7 @@ import { HttpStatus } from "utils/HttpStatus";
 @injectable()
 export class FetchBookingDetailsForClient implements IFetchBookingDetails<UserBookingDetailsResponseDTO>{
     constructor(
-        @inject("BookingRepo") private _bookingRepo: IBookingRepo
+        @inject(I_BOOKING_REPO_TOKEN) private _bookingRepo: IBookingRepo
     ) {}
 
     async execute(bookingId: string): Promise<UserBookingDetailsResponseDTO> {

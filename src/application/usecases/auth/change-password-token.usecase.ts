@@ -3,7 +3,7 @@ import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 import { IChangePasswordUseCase } from "../../interfaces/auth/i-change-password.usecase";
 import { ResetPasswordTokenBasedDTO } from "application/dto/auth/change-password.dto";
-import { IUserRepo } from "domain/repositories/IUserRepo";
+import { IUserRepo,I_USER_REPO_TOKEN } from "domain/repositories/IUserRepo";
 import { AppError } from "domain/errors/AppError";
 import { HttpStatus } from "utils/HttpStatus";
 import { ERROR_MESSAGES } from "utils/ErrorMessage";
@@ -11,7 +11,7 @@ import { ERROR_MESSAGES } from "utils/ErrorMessage";
 @injectable()
 export class ResetPasswordUseCase implements IChangePasswordUseCase<ResetPasswordTokenBasedDTO> {
   constructor(
-    @inject("IUserRepo") private readonly userRepo: IUserRepo,
+    @inject(I_USER_REPO_TOKEN ) private readonly userRepo: IUserRepo,
   ) {}
 
   async execute(input: ResetPasswordTokenBasedDTO): Promise<void> {

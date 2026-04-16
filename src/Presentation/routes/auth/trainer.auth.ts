@@ -26,4 +26,6 @@ router.post(
     ctrl.verifyOtp
 );
 
+
+
 export default router;

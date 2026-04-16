@@ -1,7 +1,7 @@
 import { inject, injectable } from "tsyringe";
 import { IRefreshAccessTokenUseCase } from "../../interfaces/public/i-refresh-access-token.usecase";
 import { RefreshTokenResponseDTO } from "../../dto/public/refresh-token.response.dto";
-import { IJwtService } from "domain/services/i-jwt.service";
+import { I_JWT_SERVICE_TOKEN, IJwtService } from "domain/services/i-jwt.service";
 import { ERROR_MESSAGES } from "utils/ErrorMessage";
 import { AppError } from "domain/errors/AppError";
 import { HttpStatus } from "utils/HttpStatus";
@@ -9,7 +9,7 @@ import { HttpStatus } from "utils/HttpStatus";
 @injectable()
 export class RefreshAccessTokenUseCase implements IRefreshAccessTokenUseCase {
   constructor(
-       @inject("JwtServiceImpl") private _jwtService: IJwtService 
+       @inject(I_JWT_SERVICE_TOKEN) private _jwtService: IJwtService 
   ) {}
 
   async execute(refreshToken: string): Promise<RefreshTokenResponseDTO> {

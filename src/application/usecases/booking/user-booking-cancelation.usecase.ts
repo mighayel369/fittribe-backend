@@ -1,6 +1,6 @@
 import { inject, injectable } from "tsyringe";
-import { IBookingRepo } from "domain/repositories/IBookingRepo";
-import { IWalletRepo } from "domain/repositories/IWalletRepo";
+import { I_BOOKING_REPO_TOKEN, IBookingRepo } from "domain/repositories/IBookingRepo";
+import { I_WALLET_REPO_TOKEN, IWalletRepo } from "domain/repositories/IWalletRepo";
 import { ICancelBooking } from "application/interfaces/booking/i-cancel-booking.usecase";
 import config from "config";
 import { AppError } from "domain/errors/AppError";
@@ -10,8 +10,8 @@ import { BOOKING_STATUS } from "utils/Constants";
 @injectable()
 export class CancelUserBookingUseCase implements ICancelBooking { 
   constructor(
-    @inject("BookingRepo") private _bookingRepo: IBookingRepo,
-    @inject("WalletRepo") private _walletRepo: IWalletRepo
+    @inject(I_BOOKING_REPO_TOKEN) private _bookingRepo: IBookingRepo,
+    @inject(I_WALLET_REPO_TOKEN) private _walletRepo: IWalletRepo
   ) {}
 
   async execute(bookingId: string): Promise<void> {
@@ -27,11 +27,10 @@ export class CancelUserBookingUseCase implements ICancelBooking {
       throw new AppError(ERROR_MESSAGES.CANCELLATION_TIME_OVER, HttpStatus.BAD_REQUEST);
     }
 
-    const trainerId = booking.trainerId;
     const userId = booking.userId;
+    
 
-
-    await this._walletRepo.releaseHoldWithoutBalance(trainerId, bookingId);
+    await this._walletRepo.releaseHoldWithoutBalance(booking.trainerId, bookingId);
     await this._walletRepo.releaseHoldWithoutBalance(config.ADMIN_WALLET, bookingId);
 
     await this._walletRepo.credit(

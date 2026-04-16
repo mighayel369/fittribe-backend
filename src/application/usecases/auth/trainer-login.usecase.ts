@@ -1,8 +1,8 @@
 
 import { inject, injectable } from "tsyringe";
-import { ITrainerRepo } from "domain/repositories/ITrainerRepo";
-import { IPasswordHasher } from "domain/services/IPasswordHasher";
-import { IJwtService } from "domain/services/i-jwt.service";
+import { ITrainerRepo,I_TRAINER_REPO_TOKEN } from "domain/repositories/ITrainerRepo";
+import { I_PASSWORD_HASHER_TOKEN, IPasswordHasher } from "domain/services/IPasswordHasher";
+import { I_JWT_SERVICE_TOKEN, IJwtService } from "domain/services/i-jwt.service";
 import { ILoginUseCase } from "application/interfaces/auth/i-login.usecase";
 import { LoginResponseDTO,LoginRequestDTO, AuthUser } from "application/dto/auth/login.dto";
 import { AppError } from "domain/errors/AppError";
@@ -13,9 +13,9 @@ import { UserRole } from "utils/Constants";
 @injectable()
 export class TrainerLoginUseCase implements ILoginUseCase {
   constructor(
-    @inject("ITrainerRepo") private readonly _trainerRepo: ITrainerRepo,
-    @inject("IPasswordHasher") private readonly _passwordHasher: IPasswordHasher,
-    @inject("JwtServiceImpl") private _jwtService: IJwtService
+    @inject(I_TRAINER_REPO_TOKEN) private readonly _trainerRepo: ITrainerRepo,
+    @inject(I_PASSWORD_HASHER_TOKEN) private readonly _passwordHasher: IPasswordHasher,
+    @inject(I_JWT_SERVICE_TOKEN) private _jwtService: IJwtService
   ) {}
 
   async execute(input: LoginRequestDTO): Promise<LoginResponseDTO> {

@@ -5,7 +5,6 @@ import notification from './notification/notification.route'
 
 import trainerAuth from './auth/trainer.auth';
 import sessionAuth from './auth/session.auth';
-import securityAuth from './auth/security.auth';
 import wallet from './payment/wallet';
 import trainerAccount from './account/trainer.account';
 import trainerSchedule from './account/trainer.schedule';
@@ -14,6 +13,7 @@ import trainerLeaves from './account/trainer.leave'
 import trainerBookings from './booking/trainer.bookings';
 import trainerChats from './chat/trainer.chat'
 import sharedChats from './chat/shared.chat'
+import trainerReviews from './review/trainer.review'
 import publicPrograms from './public/public.programs';
 
 const trainerRouter = express.Router();
@@ -27,7 +27,6 @@ trainerRouter.use('/auth', sessionAuth);
 trainerRouter.use(authorizeRoles(UserRole.TRAINER));
 
 
-trainerRouter.use('/auth/security', securityAuth); 
 
 trainerRouter.use('/account', trainerAccount);
 trainerRouter.use('/schedule', trainerSchedule);
@@ -39,4 +38,5 @@ trainerRouter.use('/chats',sharedChats)
 trainerRouter.use('/bookings', trainerBookings);
 trainerRouter.use('/wallet', wallet);
 trainerRouter.use('/notification',notification)
+trainerRouter.use('/review',trainerReviews)
 export default trainerRouter;

@@ -5,28 +5,28 @@ import { HttpStatus } from 'utils/HttpStatus';
 import { AppError } from 'domain/errors/AppError';
 import config from 'config';
 import { SUCCESS_MESSAGES } from 'utils/SuccessMessages';
-import { IFetchAllBookingsUseCase } from 'application/interfaces/booking/i-fetch-all-bookings.usecase';
+import { I_FETCH_USER_ALL_BOOKINGS_TOKEN, IFetchAllBookingsUseCase } from 'application/interfaces/booking/i-fetch-all-bookings.usecase';
 import { BookingResponseDTO, FetchAllUserBookingRequestDTO, FetchAllUserBookingsResponseDTO } from 'application/dto/booking/fetch-all-bookings.dto';
-import { IFetchBookingDetails } from 'application/interfaces/booking/i-fetch-booking-details.usecase';
+import { I_FETCH_CLIENT_BOOKING_DETAILS_TOKEN, IFetchBookingDetails } from 'application/interfaces/booking/i-fetch-booking-details.usecase';
 import { UserBookingDetailsResponseDTO } from 'application/dto/booking/fetch-booking-details.dto';
-import { IBookSessionWithTrainer } from 'application/interfaces/booking/i-book-session-with-trainer.usecase';
+import { I_BOOK_SESSION_WITH_TRAINER_TOKEN, IBookSessionWithTrainer } from 'application/interfaces/booking/i-book-session-with-trainer.usecase';
 import { RescheduleRequestDTO } from 'application/dto/booking/reschedule-request.dto';
-import { IRequestBookingRescheduleUseCase } from 'application/interfaces/booking/i-request-booking-reschedule.usecase';
-import { ICancelBooking } from 'application/interfaces/booking/i-cancel-booking.usecase';
+import { I_REQUEST_BOOKING_RESCHEDULE_TOKEN, IRequestBookingRescheduleUseCase } from 'application/interfaces/booking/i-request-booking-reschedule.usecase';
+import { I_CANCEL_BOOKING_TOKEN, ICancelBooking } from 'application/interfaces/booking/i-cancel-booking.usecase';
 import { OnlineBookingRequestDTO } from 'application/dto/booking/book-trainer.dto.';
-import { IProcessTrainerRescheduleUseCase } from 'application/interfaces/booking/i-process-trainer-reschedule.usecase';
+import { I_ACCEPT_RESCHEDULE_REQUEST_TOKEN, I_DECLINE_RESCHEDULE_REQUEST_TOKEN, IProcessTrainerRescheduleUseCase } from 'application/interfaces/booking/i-process-trainer-reschedule.usecase';
 import { UserRole } from 'utils/Constants';
 import { ProcessRescheduleRequestDTO } from 'application/dto/booking/process-reschedule.dto';
 @injectable()
 export class UserBookingController {
     constructor(
-        @inject("IBookSessionWithTrainer") private _finalizeBooking: IBookSessionWithTrainer,
-        @inject("FetchUserBookingUseCase") private _fetchBookings: IFetchAllBookingsUseCase<FetchAllUserBookingRequestDTO, FetchAllUserBookingsResponseDTO>,
-        @inject("FetchBookingDetails") private _getDetails: IFetchBookingDetails<UserBookingDetailsResponseDTO>,
-        @inject("RequestReschedule") private _requestReschedule: IRequestBookingRescheduleUseCase,
-        @inject("CancelUserBookingUseCase") private _cancelBooking: ICancelBooking,
-        @inject("AcceptRescheduleBookingRequest") private _acceptReschedule: IProcessTrainerRescheduleUseCase,
-        @inject("DeclineRescheduleBookingRequest") private _declineReschedule: IProcessTrainerRescheduleUseCase,
+        @inject(I_BOOK_SESSION_WITH_TRAINER_TOKEN) private _finalizeBooking: IBookSessionWithTrainer,
+        @inject(I_FETCH_USER_ALL_BOOKINGS_TOKEN) private _fetchBookings: IFetchAllBookingsUseCase<FetchAllUserBookingRequestDTO, FetchAllUserBookingsResponseDTO>,
+        @inject(I_FETCH_CLIENT_BOOKING_DETAILS_TOKEN) private _getDetails: IFetchBookingDetails<UserBookingDetailsResponseDTO>,
+        @inject(I_REQUEST_BOOKING_RESCHEDULE_TOKEN) private _requestReschedule: IRequestBookingRescheduleUseCase,
+        @inject(I_CANCEL_BOOKING_TOKEN) private _cancelBooking: ICancelBooking,
+        @inject(I_ACCEPT_RESCHEDULE_REQUEST_TOKEN) private _acceptReschedule: IProcessTrainerRescheduleUseCase,
+        @inject(I_DECLINE_RESCHEDULE_REQUEST_TOKEN) private _declineReschedule: IProcessTrainerRescheduleUseCase,
 
     ) { }
 

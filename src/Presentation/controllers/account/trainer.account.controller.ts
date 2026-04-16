@@ -6,24 +6,38 @@ import { AppError } from 'domain/errors/AppError';
 import { SUCCESS_MESSAGES } from 'utils/SuccessMessages';
 
 
-import { IReapplyTrainer } from "application/interfaces/trainer/i-reapply-trainer.usecase";
+import { IReapplyTrainer ,I_REAPPLY_TRAINER_TOKEN} from "application/interfaces/trainer/i-reapply-trainer.usecase";
 import { ReapplyTrainerRequestDTO, ReapplyTrainerDTO } from "application/dto/trainer/update-trainer-profile.dto";
-import { IVerifySession } from 'application/interfaces/auth/i-verify-session.usecase';
+import { IVerifySession,I_VERIFY_TRAINER_SESSION_TOKEN } from 'application/interfaces/auth/i-verify-session.usecase';
 import { TrainerSessionDTO } from 'application/dto/auth/verify-session.dto';
-import { IUpdateProfilePicture } from "application/interfaces/common/i-update-profile-picture.usecase";
+import { IUpdateProfilePicture,I_UPDATE_TRAINER_PROFILE_PICTURE_TOKEN } from "application/interfaces/common/i-update-profile-picture.usecase";
 import { TrainerPrivateProfileDTO } from "application/dto/trainer/fetch-trainer-details.dto";
-import { IUpdateTrainerProfileUseCase } from "application/interfaces/trainer/i-update-trainer-profile.usecase";
+import { IUpdateTrainerProfileUseCase,I_UPDATE_TRAINER_PROFILE_TOKEN } from "application/interfaces/trainer/i-update-trainer-profile.usecase";
 import { UpdateTrainerProfileDTO } from "application/dto/trainer/update-trainer-profile.dto";
-import { IFetchTrainerDetails } from 'application/interfaces/trainer/i-fetch-trainer-details.usecase';
-
+import { IFetchTrainerDetails ,I_FETCH_TRAINER_DETAILS_TOKEN} from 'application/interfaces/trainer/i-fetch-trainer-details.usecase';
+import { IChangePasswordUseCase,I_TRAINER_CHANGE_PASSWORD_USECASE_TOKEN } from 'application/interfaces/auth/i-change-password.usecase';
+import { ChangePasswordRequestDTO } from 'application/dto/auth/change-password.dto';
 @injectable()
 export class TrainerAccountController {
     constructor(
-        @inject("TrainerReapplyUsecase") private readonly _reapply: IReapplyTrainer,
-        @inject("VerifyTrainerSession") private _verifySessione: IVerifySession<TrainerSessionDTO>,
-        @inject("FetchTrainerProfileUseCase") private _getProfile: IFetchTrainerDetails<TrainerPrivateProfileDTO>,
-        @inject("TrainerProfileUseCase") private _updateProfile: IUpdateTrainerProfileUseCase,
-        @inject("UpdateTrainerProfilePicture") private _updateAvatar: IUpdateProfilePicture,
+        @inject(I_REAPPLY_TRAINER_TOKEN)
+        private readonly _reapply: IReapplyTrainer,
+
+        @inject(I_VERIFY_TRAINER_SESSION_TOKEN)
+        private _verifySessione: IVerifySession<TrainerSessionDTO>,
+
+        
+        @inject(I_TRAINER_CHANGE_PASSWORD_USECASE_TOKEN)
+        private _changePassword: IChangePasswordUseCase<ChangePasswordRequestDTO>,
+
+        @inject(I_FETCH_TRAINER_DETAILS_TOKEN)
+        private _getProfile: IFetchTrainerDetails<TrainerPrivateProfileDTO>,
+
+        @inject(I_UPDATE_TRAINER_PROFILE_TOKEN)
+        private _updateProfile: IUpdateTrainerProfileUseCase,
+
+        @inject(I_UPDATE_TRAINER_PROFILE_PICTURE_TOKEN)
+        private _updateAvatar: IUpdateProfilePicture,
     ) { }
 
 
@@ -88,6 +102,29 @@ export class TrainerAccountController {
                 data: result
             });
         } catch (error) { next(error); }
+    };
+
+    changePassword = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const userId = (req.user as { id: string }).id;
+    
+            const { oldPassword, newPassword } = req.body; 
+            
+            const payload: ChangePasswordRequestDTO = {
+                oldPassword,
+                newPassword,
+                userId
+            };
+    
+            await this._changePassword.execute(payload);
+    
+            res.status(HttpStatus.OK).json({
+                success: true,
+                message: SUCCESS_MESSAGES.AUTH.PASSWORD_UPDATED
+            });
+        } catch (error) {
+            next(error);
+        }
     };
 
 }

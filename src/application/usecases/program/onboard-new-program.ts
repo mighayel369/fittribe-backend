@@ -1,16 +1,16 @@
 import { injectable, inject } from "tsyringe";
 import { randomUUID } from "crypto";
 import { ProgramEntity } from "domain/entities/ProgramEntity";
-import { IProgramRepo } from "domain/repositories/IProgramRepo";
-import { ICloudinaryService } from "domain/services/ICloudinaryService";
+import { I_PROGRAM_REPO_TOKEN, IProgramRepo } from "domain/repositories/IProgramRepo";
+import { I_CLOUDINARY_SERVICE_TOKEN, ICloudinaryService } from "domain/services/ICloudinaryService";
 import { OnboardProgramRequestDTO } from "application/dto/programs/onboard-new-program.dto";
 import { IOnboardNewProgram } from "application/interfaces/program/i-onboard-new-program";
 
 @injectable()
 export class OnboardNewProgram implements IOnboardNewProgram {
   constructor(
-    @inject("IProgramRepo") private readonly _programRepo: IProgramRepo,
-    @inject("ICloudinaryService") private readonly _cloudinaryService: ICloudinaryService
+    @inject(I_PROGRAM_REPO_TOKEN) private readonly _programRepo: IProgramRepo,
+    @inject(I_CLOUDINARY_SERVICE_TOKEN) private readonly _cloudinaryService: ICloudinaryService
   ) {}
 
   async execute(input: OnboardProgramRequestDTO): Promise<void> {

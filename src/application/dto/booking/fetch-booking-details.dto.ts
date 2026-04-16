@@ -2,6 +2,8 @@ import { BOOKING_STATUS } from "utils/Constants";
 
 export interface TrainerBookingDetailsResponseDTO {
     bookingId: string;
+    chatId:string|null
+    clientId:string;
     clientName: string;
     clientEmail: string;
     clientPhone?: string;
@@ -25,7 +27,8 @@ export interface TrainerBookingDetailsResponseDTO {
         requestedAt: Date;
     };
     rejectReason?:string
-    meetLink?:string
+    meetLink?:string,
+    isReviewed?:boolean,
 }
 
 
@@ -58,5 +61,37 @@ export interface UserBookingDetailsResponseDTO {
     status: string;
   };
    rejectReason?:string
-   meetLink?:string
+   meetLink?:string,
+   isReviewed?:boolean
+}
+
+export interface AdminBookingDetailsResponseDTO{
+  bookingId:string
+  scheduledDate:string
+  scheduledTime:string
+  duration:number
+  sssionType:string
+  bookingStatus:string
+  payment:{
+    baseRate:number
+    platformFee:number
+    totalAmount:number
+    paymentType:string
+  }
+  client:{
+    name:string
+    email:string
+    clientId:string
+    totalSessions:number
+    joinedOn:string
+    profilePic:string
+  }
+  trainer:{
+    name:string,
+    trainerId:string
+    serviceProvided:string
+    rating:number
+    experience:string
+    profilePic:string
+  }
 }

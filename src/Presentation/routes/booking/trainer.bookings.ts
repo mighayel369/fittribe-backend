@@ -23,4 +23,6 @@ router.get('/:bookingId', ctrl.getBookingDetails);
 
 router.patch('/get-meetlink/:id',ctrl.getMeetLink)
 
+router.patch('/mark-as-complete/:id',ctrl.markAsComplete)
+
 export default router;

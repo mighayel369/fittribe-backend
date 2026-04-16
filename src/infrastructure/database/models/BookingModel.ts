@@ -1,5 +1,6 @@
 import mongoose, { Schema, Document } from "mongoose";
 import { BOOKING_STATUS, UserRole } from "utils/Constants";
+
 export interface IBooking extends Document {
   bookingId:string
   user: string;
@@ -30,7 +31,8 @@ export interface IBooking extends Document {
   rescheduleCount?:number
   sessionRating?:number,
   rejectReason?:string,
-  meetLink?:string
+  meetLink?:string,
+  isReviewed?:boolean,
 }
 
 const BookingSchema = new Schema<IBooking>({
@@ -66,7 +68,8 @@ const BookingSchema = new Schema<IBooking>({
   rescheduleCount:Number,
   sessionRating:Number,
   rejectReason:String,
-  meetLink:{type:String}
+  meetLink:{type:String},
+  isReviewed:{type:Boolean,default:false},
 }, { timestamps: true});
 
 export default mongoose.model<IBooking>("Booking", BookingSchema);

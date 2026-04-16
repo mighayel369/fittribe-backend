@@ -1,7 +1,7 @@
 
 import { IUpdateStatus } from "application/interfaces/common/i-update-status.usecase";
 import { inject, injectable } from "tsyringe";
-import { ITrainerRepo } from "domain/repositories/ITrainerRepo";
+import { I_TRAINER_REPO_TOKEN, ITrainerRepo } from "domain/repositories/ITrainerRepo";
 import { AppError } from "domain/errors/AppError";
 import { HttpStatus } from "utils/HttpStatus";
 import logger from "utils/logger";
@@ -10,7 +10,7 @@ import { TrainerMapper } from "application/mappers/trainer-mapper";
 @injectable()
 export class UpdateTrainerStatusUseCase implements IUpdateStatus {
   constructor(
-    @inject("ITrainerRepo") private readonly _trainerRepo: ITrainerRepo
+    @inject(I_TRAINER_REPO_TOKEN) private readonly _trainerRepo: ITrainerRepo
   ) {}
 
   async execute(input: UpdateStatusRequestDTO): Promise<UpdateStatusResponseDTO> {

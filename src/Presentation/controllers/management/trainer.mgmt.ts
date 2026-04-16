@@ -5,23 +5,23 @@ import { HttpStatus } from 'utils/HttpStatus';
 import { AppError } from 'domain/errors/AppError';
 import config from 'config';
 import { SUCCESS_MESSAGES } from 'utils/SuccessMessages';
-import { IUpdateStatus } from 'application/interfaces/common/i-update-status.usecase';
+import { I_UPDATE_STATUS_TOKEN, IUpdateStatus } from 'application/interfaces/common/i-update-status.usecase';
 import { UpdateStatusRequestDTO, UpdateStatusResponseDTO } from 'application/dto/common/update-status.dto';
 import { TrainerApprovalRequestDTO, TrainerApprovalResponseDTO } from 'application/dto/trainer/trainer-approval.dto';
-import { IHandleTrainerApproval } from 'application/interfaces/trainer/i-handle-trainer-approval.usecase';
-import { IFetchAllTrainersUseCase } from 'application/interfaces/trainer/i-fetch-all-trainers.usecase';
+import { I_HANDLE_TRAINER_APPROVAL_TOKEN, IHandleTrainerApproval } from 'application/interfaces/trainer/i-handle-trainer-approval.usecase';
+import { I_FETCH_ALL_PENDING_TRAINERS_TOKEN, I_FETCH_ALL_TRAINERS_TOKEN, IFetchAllTrainersUseCase } from 'application/interfaces/trainer/i-fetch-all-trainers.usecase';
 import { FetchAllPendingTrainersResponseDTO, FetchAllTrainersRequestDTO, FetchAllTrainersResponseDTO, FetchAllClientTrainersResponseDTO } from 'application/dto/trainer/fetch-all-trainers.dto';
-import { IFetchTrainerDetails } from 'application/interfaces/trainer/i-fetch-trainer-details.usecase';
+import { I_FETCH_TRAINER_DETAILS_ADMIN_TOKEN, IFetchTrainerDetails } from 'application/interfaces/trainer/i-fetch-trainer-details.usecase';
 import { TrainerDetailsResponseDTO } from 'application/dto/trainer/fetch-trainer-details.dto';
 import { PAGINATION } from 'utils/Constants';
 @injectable()
 export class TrainerManagementController {
     constructor(
-        @inject("BlockUnblockTrainerUseCase") private _toggleStatus: IUpdateStatus,
-        @inject("FetchTrainerDetailsForAdmin") private _getDetails: IFetchTrainerDetails<TrainerDetailsResponseDTO>,
-        @inject("FindAllTrainersUseCase") private _getVerified: IFetchAllTrainersUseCase<FetchAllTrainersResponseDTO>,
-        @inject("FindAllPendingTrainers") private _getPending: IFetchAllTrainersUseCase<FetchAllPendingTrainersResponseDTO>,
-        @inject("TrainerVerificationUseCase") private _handleApproval: IHandleTrainerApproval,
+        @inject(I_UPDATE_STATUS_TOKEN) private _toggleStatus: IUpdateStatus,
+        @inject(I_FETCH_TRAINER_DETAILS_ADMIN_TOKEN) private _getDetails: IFetchTrainerDetails<TrainerDetailsResponseDTO>,
+        @inject(I_FETCH_ALL_TRAINERS_TOKEN) private _getVerified: IFetchAllTrainersUseCase<FetchAllTrainersResponseDTO>,
+        @inject(I_FETCH_ALL_PENDING_TRAINERS_TOKEN) private _getPending: IFetchAllTrainersUseCase<FetchAllPendingTrainersResponseDTO>,
+        @inject(I_HANDLE_TRAINER_APPROVAL_TOKEN) private _handleApproval: IHandleTrainerApproval,
     ) { }
 
     private _getPaginationParams = (req: Request): FetchAllTrainersRequestDTO => ({

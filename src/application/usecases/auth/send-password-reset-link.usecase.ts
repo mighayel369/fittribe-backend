@@ -2,16 +2,16 @@ import { inject, injectable } from "tsyringe";
 import crypto from 'crypto';
 import config from "config";
 import { ISendPasswordResetLinkUseCase } from "../../interfaces/auth/i-send-password-reset-link.usecase";
-import { IUserRepo } from "domain/repositories/IUserRepo";
-import { IOtpService } from "domain/services/IOtpService";
+import { IUserRepo,I_USER_REPO_TOKEN } from "domain/repositories/IUserRepo";
+import { I_OTP_SERVICE_TOKEN, IOtpService } from "domain/services/IOtpService";
 import { ERROR_MESSAGES } from "utils/ErrorMessage";
 import { AppError } from "domain/errors/AppError";
 import { HttpStatus } from "utils/HttpStatus";
 @injectable()
 export class SendPasswordResetLinkUseCase implements ISendPasswordResetLinkUseCase {
   constructor(
-    @inject("IUserRepo") private readonly userRepo: IUserRepo,
-    @inject("IOtpService") private readonly mailService: IOtpService
+    @inject(I_USER_REPO_TOKEN) private readonly userRepo: IUserRepo,
+    @inject(I_OTP_SERVICE_TOKEN) private readonly mailService: IOtpService
   ) {}
 
   async execute(email: string): Promise<void> {

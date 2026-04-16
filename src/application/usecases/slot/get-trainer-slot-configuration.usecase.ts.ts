@@ -1,5 +1,5 @@
 import { inject, injectable } from "tsyringe";
-import { ISlotRepo } from "domain/repositories/ISlotRepo";
+import { I_SLOT_REPO_TOKEN, ISlotRepo } from "domain/repositories/ISlotRepo";
 import { IGetTrainerSlotConfigurationUseCase } from "application/interfaces/slot/i-get-trainer-slot-configuration.usecase";
 import { AppError } from "domain/errors/AppError";
 import { HttpStatus } from "utils/HttpStatus";
@@ -8,7 +8,7 @@ import { SlotMapper } from "application/mappers/slot-mapper";
 @injectable()
 export class GetTrainerSlotConfigurationUseCase implements IGetTrainerSlotConfigurationUseCase {
   constructor(
-    @inject("ITrainerSlotRepo") private readonly _slotRepo: ISlotRepo
+    @inject(I_SLOT_REPO_TOKEN) private readonly _slotRepo: ISlotRepo
   ) {}
 
   async execute(trainerId: string): Promise<TrainerSlotResponseDTO> {

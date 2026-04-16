@@ -8,6 +8,7 @@ import { BaseRepository } from "./BaseRepository";
 import { LEAVE_STATUS } from "utils/Constants";
 
 
+
 @injectable()
 export class LeaveRepository extends BaseRepository<ILeave, LeaveEntity> implements ILeaveRepo {
   protected model = Leave;
@@ -158,4 +159,33 @@ async checkOverlap(trainerId: string, startDate: Date, endDate: Date): Promise<b
     return !!conflict; 
 }
 
+async findLeaveReport(): Promise<LeaveEntity[]> {
+  const today = new Date();
+  const startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+  const endDate = new Date(today.getFullYear(), today.getMonth() + 1, 0, 23, 59, 59);
+
+  const docs = await this.model.aggregate([
+    {
+      $match: {
+        start: { $gte: startDate, $lte: endDate }
+      }
+    },
+    {
+      $lookup: {
+        from: "trainers", 
+        localField: "trainer",
+        foreignField: "trainerId",
+        as: "trainerDetails"
+      }
+    },
+    { $unwind: "$trainerDetails" },
+    {
+      $addFields: {
+        trainer: "$trainerDetails" 
+      }
+    }
+  ]);
+
+  return docs.map(doc => this.toEntity(doc));
+}
 }

@@ -1,5 +1,5 @@
 import { inject, injectable } from "tsyringe";
-import { IProgramRepo } from "domain/repositories/IProgramRepo";
+import { I_PROGRAM_REPO_TOKEN, IProgramRepo } from "domain/repositories/IProgramRepo";
 import { AppError } from "domain/errors/AppError";
 import { HttpStatus } from "utils/HttpStatus";
 import { IToggleProgramVisibility } from "application/interfaces/program/i-toggle-program-visibility";
@@ -13,7 +13,7 @@ import { ProgramMapper } from "application/mappers/program-mapper";
 @injectable()
 export class ToggleProgramVisibilityUseCase implements IToggleProgramVisibility {
   constructor(
-    @inject("IProgramRepo") private readonly _programRepo: IProgramRepo
+    @inject(I_PROGRAM_REPO_TOKEN) private readonly _programRepo: IProgramRepo
   ) {}
 
   async execute(input: ToggleProgramVisibilityRequestDTO): Promise<ToggleProgramVisibilityResponseDTO> {

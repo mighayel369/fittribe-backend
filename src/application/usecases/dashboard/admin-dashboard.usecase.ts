@@ -1,14 +1,14 @@
 import { IAdminDashboard } from "application/interfaces/dashboard/i-admin-dashboard.usecase";
-import { IBookingRepo } from "domain/repositories/IBookingRepo";
-import { ITrainerRepo } from "domain/repositories/ITrainerRepo";
+import { I_BOOKING_REPO_TOKEN, IBookingRepo } from "domain/repositories/IBookingRepo";
+import { I_TRAINER_REPO_TOKEN, ITrainerRepo } from "domain/repositories/ITrainerRepo";
 import { AdminDashbardResponseDTO } from "application/dto/dashboard/admin-dashboard.dto";
 import { inject,injectable } from "tsyringe";
 import { DashboardMapper } from "application/mappers/dashboard-mapper";
 @injectable()
 export class AdminDashboardUsecase implements IAdminDashboard {
     constructor(
-        @inject('BookingRepo') private _bookingRepo: IBookingRepo,
-        @inject("ITrainerRepo") private readonly _trainerRepo: ITrainerRepo
+        @inject(I_BOOKING_REPO_TOKEN) private _bookingRepo: IBookingRepo,
+        @inject(I_TRAINER_REPO_TOKEN) private readonly _trainerRepo: ITrainerRepo
     ) {}
 
     async execute(): Promise<AdminDashbardResponseDTO> {

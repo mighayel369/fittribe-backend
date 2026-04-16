@@ -1,6 +1,6 @@
 import { inject, injectable } from "tsyringe";
-import { IBookingRepo } from "domain/repositories/IBookingRepo";
-import { IPaymentService } from "domain/services/IPaymentService";
+import { I_BOOKING_REPO_TOKEN, IBookingRepo } from "domain/repositories/IBookingRepo";
+import { I_PAYMENT_SERVICE_TOKEN, IPaymentService } from "domain/services/IPaymentService";
 import { CreateOnlinePaymentRequestDTO, OnlinePaymentOrderResponseDTO } from "application/dto/payment/online-payment.dto";
 import { AppError } from "domain/errors/AppError";
 
@@ -12,8 +12,8 @@ import { timeToMin } from "utils/generateTimeSlots";
 @injectable()
 export class InitiateOnlinePaymentUseCase implements IInitiateOnlinePayment{
   constructor(
-    @inject("IPaymentService") private _paymentService: IPaymentService,
-    @inject("BookingRepo") private _bookingRepo: IBookingRepo
+    @inject(I_PAYMENT_SERVICE_TOKEN) private _paymentService: IPaymentService,
+    @inject(I_BOOKING_REPO_TOKEN) private _bookingRepo: IBookingRepo
   ) {}
 
   async execute(data: CreateOnlinePaymentRequestDTO): Promise<OnlinePaymentOrderResponseDTO> {
@@ -27,6 +27,9 @@ export class InitiateOnlinePaymentUseCase implements IInitiateOnlinePayment{
     if (isBooked) {
       throw new AppError(ERROR_MESSAGES.SLOT_ALREADY_BOOKED, HttpStatus.CONFLICT);
     }
+
+    
+    
 
 
     const order = await this._paymentService.createOrder(data.amount);

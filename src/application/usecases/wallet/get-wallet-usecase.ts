@@ -1,6 +1,6 @@
 
 import { inject, injectable } from "tsyringe";
-import { IWalletRepo } from "domain/repositories/IWalletRepo";
+import { I_WALLET_REPO_TOKEN, IWalletRepo } from "domain/repositories/IWalletRepo";
 import { PaginationOutputDTO } from "application/dto/common/PaginationDto";
 import { IGetWalletUseCase } from "application/interfaces/wallet/IGetWalletUseCase";
 import { AppError } from "domain/errors/AppError";
@@ -10,7 +10,7 @@ import { WalletTransactionInputDTO,WalletDetailsResponseDTO } from "application/
 @injectable()
 export class GetWalletUseCase implements IGetWalletUseCase {
   constructor(
-    @inject("WalletRepo") private readonly _walletRepo: IWalletRepo
+    @inject(I_WALLET_REPO_TOKEN) private readonly _walletRepo: IWalletRepo
   ) {}
 
   async execute(payload: WalletTransactionInputDTO): Promise<WalletDetailsResponseDTO> {

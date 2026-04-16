@@ -1,5 +1,5 @@
 import { inject, injectable } from "tsyringe";
-import { IProgramRepo } from "domain/repositories/IProgramRepo";
+import { I_PROGRAM_REPO_TOKEN, IProgramRepo } from "domain/repositories/IProgramRepo";
 import { AppError } from "domain/errors/AppError";
 import { HttpStatus } from "utils/HttpStatus";
 import { IFetchProgramInventory } from "application/interfaces/program/i-fetch-program-summary";
@@ -12,7 +12,7 @@ import { ProgramMapper } from "application/mappers/program-mapper";
 @injectable()
 export class FetchProgramInventory implements IFetchProgramInventory{
   constructor(
-    @inject("IProgramRepo")
+    @inject(I_PROGRAM_REPO_TOKEN)
     private _programRepository: IProgramRepo
   ) {}
 

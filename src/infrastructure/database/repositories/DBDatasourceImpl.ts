@@ -4,7 +4,7 @@ import { injectable } from "tsyringe";
 import { IDBDatasource } from 'domain/repositories/IDBDatasource'
 @injectable()
 
-export class IDBDatasourceImpl implements IDBDatasource {
+export class DBDatasourceImpl implements IDBDatasource {
     async connectDb(): Promise<boolean> {
         try {
             const url = config.MONGO_URL

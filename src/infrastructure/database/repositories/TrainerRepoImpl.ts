@@ -72,14 +72,17 @@ async findTrainerById(id: string): Promise<TrainerEntity | null> {
   }
   
 async updateTrainer(id: string, payload: TrainerEntity): Promise<void> {
-  const persistenceData = {
-    ...payload
-  };
+  const persistenceData = TrainerMapper.toPersistence(payload);
 
-   await this.model.findOneAndUpdate(
+  const result = await this.model.findOneAndUpdate(
     { trainerId: id },
-    { $set: persistenceData }
+    { $set: persistenceData },
+    { new: true }
   );
+
+  if (!result) {
+    throw new Error("Trainer update failed: Trainer not found");
+  }
 }
 
 
@@ -169,6 +172,11 @@ async findAccepted(
     data: result[0].docs.map((doc: any) => this.toEntity(doc)),
     totalCount: Math.ceil(totalRowCount/limit)
   };
+}
+
+
+async updatePassword(id: string, hashedPassword: string): Promise<void> {
+  await this.model.findOneAndUpdate({trainerId:id}, { password: hashedPassword });
 }
 
 

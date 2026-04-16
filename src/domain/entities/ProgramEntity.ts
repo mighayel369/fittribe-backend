@@ -20,7 +20,7 @@ export class ProgramEntity {
   }
 
 
-  public updateSpecifications(name?: string, description?: string, duration?: number, pic?: string): void {
+  public updateSpecifications(name?: string, description?: string, pic?: string): void {
     if (name) this.name = name;
     if (description) this.description = description;
     if (pic) this.programPic = pic;
