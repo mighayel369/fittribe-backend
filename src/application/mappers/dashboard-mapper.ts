@@ -8,6 +8,8 @@ import {
 } from "application/dto/dashboard/trainer-dashboard.dto";
 import { AdminDashbardResponseDTO } from "application/dto/dashboard/admin-dashboard.dto";
 import { minutesToTime } from "utils/generateTimeSlots";
+import { ChatEntity } from "domain/entities/ChatEntity";
+import { ChatMapper } from "./chat-mapper";
 
 export class DashboardMapper {
 
@@ -42,26 +44,28 @@ static toTrainerMonthlyPerformanceDTO(data:{month:string,sessionCount:number}): 
     };
   }
 
-  static toTrainerDashboardResponseDTO(
-    earnings: number,
-    pending: BookingEntity[],
-    progress: { completed: number; total: number },
-    performance: { month: string; sessionCount: number }[],
-    upcomingTotal: number,
-    rating: number
-  ): TrainerDashboardResponseDTO {
-    return {
-      metrics: {
-        monthlyEarning: earnings,
-        upcomingTotal: upcomingTotal,
-        todayProgress: `${progress.completed}/${progress.total}`,
-        averageRating: rating
-      },
-      pendingActions: pending.map(this.toPendingActionDTO), 
-      performanceData: performance.map(p=>this.toTrainerMonthlyPerformanceDTO(p)),
-      recentChats: [] 
-    };
-  }
+static toTrainerDashboardResponseDTO(
+  earnings: number,
+  pending: BookingEntity[],
+  progress: { completed: number; total: number },
+  performance: { month: string; sessionCount: number }[],
+  upcomingTotal: number,
+  rating: number,
+  chatList: ChatEntity[],
+  trainerId: string
+): TrainerDashboardResponseDTO {
+  return {
+    metrics: {
+      monthlyEarning: earnings,
+      upcomingTotal: upcomingTotal,
+      todayProgress: `${progress.completed}/${progress.total}`,
+      averageRating: rating
+    },
+    pendingActions: pending.map(p => this.toPendingActionDTO(p)), 
+    performanceData: performance.map(p => this.toTrainerMonthlyPerformanceDTO(p)),
+    recentChats: chatList.map(chat => ChatMapper.toTrainerChatListResponseDTO(chat, trainerId))
+  };
+}
   
   static torainerAppointmentResponseDTO(appointments:BookingEntity[]):TrainerDashboardAppointmentResponseDTO{
     return {

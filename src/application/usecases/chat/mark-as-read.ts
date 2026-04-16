@@ -1,14 +1,14 @@
 import {  IMarkMessageAsRead } from "application/interfaces/chat/i-mark-as-read";
 import { inject, injectable } from "tsyringe";
-import { IChatRepo } from "domain/repositories/IChatRepo";
-import { IMessageRepo } from "domain/repositories/IMessageRepo";
+import { I_CHAT_REPO_TOKEN, IChatRepo } from "domain/repositories/IChatRepo";
+import { I_MESSAGE_REPO_TOKEN, IMessageRepo } from "domain/repositories/IMessageRepo";
 import { AppError } from "domain/errors/AppError";
 import { HttpStatus } from "utils/HttpStatus";
 @injectable()
 export class MarkMessageAsRead implements  IMarkMessageAsRead {
   constructor(
-    @inject("IChatRepo") private _chatRepo: IChatRepo,
-    @inject("IMessageRepo") private _messageRepo: IMessageRepo
+    @inject(I_CHAT_REPO_TOKEN) private _chatRepo: IChatRepo,
+    @inject(I_MESSAGE_REPO_TOKEN) private _messageRepo: IMessageRepo
   ) {}
 
   async execute(chatId: string, receiverId: string): Promise<void> {

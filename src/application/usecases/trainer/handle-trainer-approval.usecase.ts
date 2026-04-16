@@ -1,6 +1,6 @@
 import { injectable, inject } from "tsyringe";
-import { ITrainerRepo } from "domain/repositories/ITrainerRepo";
-import { IOtpService } from "domain/services/IOtpService";
+import { I_TRAINER_REPO_TOKEN, ITrainerRepo } from "domain/repositories/ITrainerRepo";
+import { I_OTP_SERVICE_TOKEN, IOtpService } from "domain/services/IOtpService";
 import { AppError } from "domain/errors/AppError";
 import { HttpStatus } from "utils/HttpStatus";
 import { TrainerApprovalRequestDTO, TrainerApprovalResponseDTO } from "application/dto/trainer/trainer-approval.dto";
@@ -11,8 +11,8 @@ import { ERROR_MESSAGES } from "utils/ErrorMessage";
 @injectable()
 export class HandleTrainerApproval implements IHandleTrainerApproval {
   constructor(
-    @inject("ITrainerRepo") private readonly _repo: ITrainerRepo,
-    @inject("IOtpService") private readonly _mail: IOtpService
+    @inject(I_TRAINER_REPO_TOKEN) private readonly _repo: ITrainerRepo,
+    @inject(I_OTP_SERVICE_TOKEN) private readonly _mail: IOtpService
   ) {}
 
   async execute(data: TrainerApprovalRequestDTO): Promise<TrainerApprovalResponseDTO> {

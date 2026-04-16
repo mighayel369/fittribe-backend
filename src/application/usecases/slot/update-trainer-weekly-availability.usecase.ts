@@ -1,5 +1,5 @@
 import { inject, injectable } from "tsyringe";
-import { ISlotRepo } from "domain/repositories/ISlotRepo";
+import { I_SLOT_REPO_TOKEN, ISlotRepo } from "domain/repositories/ISlotRepo";
 import { IUpdateTrainerWeeklyAvailabilityUseCase } from "application/interfaces/slot/i-update-trainer-weekly-availability.usecase"; 
 import { UpdateTrainerAvailabilityRequestDTO } from "application/dto/slot/update-trainer-availability.dto";
 import { AppError } from "domain/errors/AppError";
@@ -8,7 +8,7 @@ import { HttpStatus } from "utils/HttpStatus";
 @injectable()
 export class UpdateTrainerWeeklyAvailabilityUseCase implements IUpdateTrainerWeeklyAvailabilityUseCase {
   constructor(
-    @inject("ITrainerSlotRepo") private readonly _slotRepo: ISlotRepo
+    @inject(I_SLOT_REPO_TOKEN) private readonly _slotRepo: ISlotRepo
   ) {}
 
   async execute(input: UpdateTrainerAvailabilityRequestDTO): Promise<void> {

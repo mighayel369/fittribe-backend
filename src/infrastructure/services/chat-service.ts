@@ -1,14 +1,14 @@
-import { injectable } from "tsyringe";
-import { SocketService } from "./SocketService";
+import { singleton ,inject} from "tsyringe";
+import { I_SOCKET_SERVICE_TOKEN, ISocketService } from "domain/services/i-socket-service";
 import { IChatService } from "domain/services/i-chat-service";
-import { ChatMessageResponseDTO } from "application/dto/chat/message-dto";
 
-@injectable()
+@singleton()
 export class SocketChatService implements IChatService {
-  
- async sendMessage(recipientId: string, payload: ChatMessageResponseDTO): Promise<void> {
-   let io=SocketService.io
+  constructor(
+    @inject(I_SOCKET_SERVICE_TOKEN) private _socketService: ISocketService
+  ) {}
 
-   io.to(recipientId).emit('message_received',payload)
- }
+  async sendMessage(recipientId: string, payload: any): Promise<void> {
+    this._socketService.emitToRoom(recipientId, 'message_received', payload);
+  }
 }

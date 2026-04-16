@@ -2,16 +2,16 @@ import { Request, Response, NextFunction } from 'express';
 import { inject, injectable } from "tsyringe";
 import { HttpStatus } from 'utils/HttpStatus';
 import { SUCCESS_MESSAGES } from 'utils/SuccessMessages';
-import { IInitiateOnlinePayment } from 'application/interfaces/payment/i-initiate-online-payment.usecase';
+import { I_INITIATE_ONLINE_PAYMENT_TOKEN, IInitiateOnlinePayment } from 'application/interfaces/payment/i-initiate-online-payment.usecase';
 import { CreateOnlinePaymentRequestDTO, OnlinePaymentOrderResponseDTO } from 'application/dto/payment/online-payment.dto';
-import { IVeirfyOnlinePayment } from 'application/interfaces/payment/i-verify-online-payment.usecase';
+import { I_VERIFY_ONLINE_PAYMENT_TOKEN, IVeirfyOnlinePayment } from 'application/interfaces/payment/i-verify-online-payment.usecase';
 import { VerifyOnlinePaymentRequestDTO } from 'application/dto/payment/verify-online-payment.dto';
 
 @injectable()
 export class UserPaymentController {
   constructor(
-    @inject("ICreateOrderUseCase") private _initiatePayment: IInitiateOnlinePayment,
-    @inject("IVerifyPaymentUseCase") private _verifyPayment: IVeirfyOnlinePayment
+    @inject(I_INITIATE_ONLINE_PAYMENT_TOKEN) private _initiatePayment: IInitiateOnlinePayment,
+    @inject(I_VERIFY_ONLINE_PAYMENT_TOKEN) private _verifyPayment: IVeirfyOnlinePayment
   ) {}
 
 initiateOnlinePayment = async (req: Request, res: Response, next: NextFunction) => {

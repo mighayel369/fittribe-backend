@@ -1,5 +1,5 @@
 import { inject, injectable } from "tsyringe";
-import { IBookingRepo } from "domain/repositories/IBookingRepo";
+import { I_BOOKING_REPO_TOKEN, IBookingRepo } from "domain/repositories/IBookingRepo";
 import { ITrainerDashBoardAppointments } from "application/interfaces/dashboard/i-trainer-dashboard-appointment.usecase";
 import { TrainerDashboardAppointmentResponseDTO } from "application/dto/dashboard/trainer-dashboard.dto";
 import { DashboardMapper } from "application/mappers/dashboard-mapper";
@@ -7,7 +7,7 @@ import { DashboardMapper } from "application/mappers/dashboard-mapper";
 @injectable()
 export class TrainerDashboardAppointmentUsecase implements ITrainerDashBoardAppointments {
   constructor(
-    @inject("BookingRepo") private _bookingRepo: IBookingRepo
+    @inject(I_BOOKING_REPO_TOKEN) private _bookingRepo: IBookingRepo
   ) {}
 
   async execute(trainerId: string, date: Date): Promise<TrainerDashboardAppointmentResponseDTO> {

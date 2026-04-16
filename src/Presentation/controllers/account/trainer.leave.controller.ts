@@ -5,20 +5,27 @@ import { HttpStatus } from 'utils/HttpStatus';
 import { AppError } from 'domain/errors/AppError';
 import { SUCCESS_MESSAGES } from 'utils/SuccessMessages';
 
-import { IApplyLeaveRequest } from 'application/interfaces/leave/i-apply-leave-requests.usecase';
+import { IApplyLeaveRequest,I_APPLY_LEAVE_REQUEST_TOKEN } from 'application/interfaces/leave/i-apply-leave-requests.usecase';
 import { RequestLeaveDTO } from 'application/dto/leave/request.leave.dto';
 import { FetchLeaveRequestsInputDTO, FetchTrainerLeaveResponseDTO } from 'application/dto/leave/leave-requests.dto';
-import { IFetchAllLeaveRequests } from 'application/interfaces/leave/i-fetch-all-leave-requests';
-import { IWithdrawLeaveRequest } from 'application/interfaces/leave/i-withdraw-leave-request';
-import { ITrainerLeaveMetrics } from 'application/interfaces/leave/i-trainer-leave-metrics';
+import { IFetchAllLeaveRequests,I_FETCH_ALL_TRAINER_LEAVE_REQUESTS_TOKEN } from 'application/interfaces/leave/i-fetch-all-leave-requests';
+import { IWithdrawLeaveRequest,I_WITHDRAW_LEAVE_REQUEST_TOKEN} from 'application/interfaces/leave/i-withdraw-leave-request';
+import { ITrainerLeaveMetrics,I_GET_TRAINER_LEAVE_METRICS_TOKEN } from 'application/interfaces/leave/i-trainer-leave-metrics';
 import { PAGINATION } from 'utils/Constants';
 @injectable()
 export class LeaveController {
-    constructor(
-        @inject("ApplyLeaveRequests") private _applyLeave: IApplyLeaveRequest,
-        @inject("FetchAllTrainerLeaveRequests") private _getleaveRequestHistory: IFetchAllLeaveRequests<FetchTrainerLeaveResponseDTO>,
-        @inject("GetTrainerLeaveMetrics") private _getMetrics: ITrainerLeaveMetrics,
-        @inject("IWithdrawLeaveRequest") private _withdrawLeaveRequest: IWithdrawLeaveRequest
+constructor(
+        @inject(I_APPLY_LEAVE_REQUEST_TOKEN) 
+        private _applyLeave: IApplyLeaveRequest,
+        
+        @inject(I_FETCH_ALL_TRAINER_LEAVE_REQUESTS_TOKEN) 
+        private _getleaveRequestHistory: IFetchAllLeaveRequests<FetchTrainerLeaveResponseDTO>,
+        
+        @inject(I_GET_TRAINER_LEAVE_METRICS_TOKEN) 
+        private _getMetrics: ITrainerLeaveMetrics,
+        
+        @inject(I_WITHDRAW_LEAVE_REQUEST_TOKEN) 
+        private _withdrawLeaveRequest: IWithdrawLeaveRequest
     ) { }
 
     applyForLeaveRequest = async (req: Request, res: Response, next: NextFunction) => {

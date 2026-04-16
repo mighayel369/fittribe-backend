@@ -1,22 +1,22 @@
 import { inject, injectable } from "tsyringe";
-import { IBookingRepo } from "domain/repositories/IBookingRepo";
-import { IWalletRepo } from "domain/repositories/IWalletRepo";
+import { I_BOOKING_REPO_TOKEN, IBookingRepo } from "domain/repositories/IBookingRepo";
+import { I_WALLET_REPO_TOKEN, IWalletRepo } from "domain/repositories/IWalletRepo";
 import { IConfirmBookingUseCase } from "application/interfaces/booking/i-confirm-booking.usecase";
 import { AppError } from "domain/errors/AppError";
 import config from "config";
 import { ERROR_MESSAGES } from "utils/ErrorMessage";
 import { HttpStatus } from "utils/HttpStatus";
 import { BOOKING_STATUS } from "utils/Constants";
-import { INotificationService } from "domain/services/i-notification.service";
-import { INotificationRepo } from "domain/repositories/INotifctionRepo";
+import { I_NOTIFICATION_SERVICE_TOKEN, INotificationService } from "domain/services/i-notification.service";
+import { I_NOTIFICATION_REPO_TOKEN, INotificationRepo } from "domain/repositories/INotifctionRepo";
 import { NotificationMapper } from "application/mappers/notification-mapper";
 @injectable()
 export class ConfirmBookingUseCase implements IConfirmBookingUseCase {
   constructor(
-    @inject("BookingRepo") private _bookingRepo: IBookingRepo,
-    @inject("WalletRepo") private _walletRepo: IWalletRepo,
-    @inject("SocketNotificationService") private _notificationService: INotificationService,
-    @inject("INotificationRepo") private _notificationRepo: INotificationRepo) { }
+    @inject(I_BOOKING_REPO_TOKEN) private _bookingRepo: IBookingRepo,
+    @inject(I_WALLET_REPO_TOKEN) private _walletRepo: IWalletRepo,
+    @inject(I_NOTIFICATION_SERVICE_TOKEN) private _notificationService: INotificationService,
+    @inject(I_NOTIFICATION_REPO_TOKEN) private _notificationRepo: INotificationRepo) { }
 
   async execute(bookingId: string): Promise<void> {
     const booking = await this._bookingRepo.findBookingById(bookingId);
@@ -43,7 +43,7 @@ export class ConfirmBookingUseCase implements IConfirmBookingUseCase {
 
     await this._walletRepo.convertHoldToBalance(trainerId, bookingId);
 
-    await this._walletRepo.convertHoldToBalance(config.ADMIN_WALLET, bookingId);
+    await this._walletRepo.convertHoldToBalance(config.ADMIN, bookingId);
 
 
     const userNotif = NotificationMapper.toCreateEntity({
@@ -52,8 +52,17 @@ export class ConfirmBookingUseCase implements IConfirmBookingUseCase {
       recipientId: booking.userId,
       senderId: "SYSTEM_SECURITY"
     });
+
+    const adminNotif = NotificationMapper.toCreateEntity({
+      message: `credited ${booking.totalAmount} to your wallet`,
+      title: 'Payment credited',
+      recipientId: config.ADMIN,
+      senderId: "SYSTEM_SECURITY"
+    });
     console.log(userNotif)
     await this._notificationRepo.addNotification(userNotif);
+    await this._notificationRepo.addNotification(adminNotif);
+    await this._notificationService.notifyUser(adminNotif.recipientId, NotificationMapper.toResponseDTO(adminNotif))
     await this._notificationService.notifyUser(userNotif.recipientId, NotificationMapper.toResponseDTO(userNotif))
   }
 }

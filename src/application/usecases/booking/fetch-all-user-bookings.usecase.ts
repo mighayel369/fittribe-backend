@@ -1,6 +1,6 @@
 
 import { inject, injectable } from "tsyringe";
-import { IBookingRepo } from "domain/repositories/IBookingRepo";
+import { I_BOOKING_REPO_TOKEN, IBookingRepo } from "domain/repositories/IBookingRepo";
 import { IFetchAllBookingsUseCase } from "application/interfaces/booking/i-fetch-all-bookings.usecase";
 import { FetchAllUserBookingRequestDTO, FetchAllUserBookingsResponseDTO } from "application/dto/booking/fetch-all-bookings.dto";
 import { BookingMapper } from "application/mappers/booking-mapper";
@@ -9,7 +9,7 @@ import { BookingMapper } from "application/mappers/booking-mapper";
 @injectable()
 export class FetchUserAllBookings implements IFetchAllBookingsUseCase<FetchAllUserBookingRequestDTO, FetchAllUserBookingsResponseDTO> {
   constructor(
-    @inject("BookingRepo") private readonly bookingRepo: IBookingRepo
+    @inject(I_BOOKING_REPO_TOKEN) private readonly bookingRepo: IBookingRepo
   ) {}
 
   async execute(input: FetchAllUserBookingRequestDTO): Promise<FetchAllUserBookingsResponseDTO> {

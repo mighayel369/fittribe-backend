@@ -1,22 +1,22 @@
 
 import { inject, injectable } from "tsyringe";
-import { IUserRepo } from "domain/repositories/IUserRepo";
-import { IPasswordHasher } from "domain/services/IPasswordHasher";
+import { I_USER_REPO_TOKEN, IUserRepo } from "domain/repositories/IUserRepo";
+import { I_PASSWORD_HASHER_TOKEN, IPasswordHasher } from "domain/services/IPasswordHasher";
 import { ILoginUseCase } from "application/interfaces/auth/i-login.usecase";
 import { LoginResponseDTO,LoginRequestDTO, AuthUser } from "application/dto/auth/login.dto";
 import { ERROR_MESSAGES } from "utils/ErrorMessage";
 import { AppError } from "domain/errors/AppError";
 import { HttpStatus } from "utils/HttpStatus";
 import { AuthMapper } from "application/mappers/auth-mapper";
-import { IJwtService } from "domain/services/i-jwt.service";
+import { I_JWT_SERVICE_TOKEN, IJwtService } from "domain/services/i-jwt.service";
 import { UserRole } from "utils/Constants";
 
 @injectable()
 export class UserLoginUseCase implements ILoginUseCase {
   constructor(
-    @inject("IUserRepo") private readonly _userRepo: IUserRepo,
-    @inject("IPasswordHasher") private readonly _passwordHasher: IPasswordHasher,
-    @inject("JwtServiceImpl") private _jwtService: IJwtService
+    @inject(I_USER_REPO_TOKEN) private readonly _userRepo: IUserRepo,
+    @inject(I_PASSWORD_HASHER_TOKEN) private readonly _passwordHasher: IPasswordHasher,
+    @inject(I_JWT_SERVICE_TOKEN) private _jwtService: IJwtService
   ) {}
 
 async execute(input: LoginRequestDTO): Promise<LoginResponseDTO> {

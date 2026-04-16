@@ -1,5 +1,5 @@
 
-import { ILeaveRepo } from "domain/repositories/ILeaveRepo";
+import { I_LEAVE_REPO_TOKEN, ILeaveRepo } from "domain/repositories/ILeaveRepo";
 import { inject,injectable } from "tsyringe";
 import { LeaveMapper } from "application/mappers/leave-mapper";
 import { IFetchAllLeaveRequests } from "application/interfaces/leave/i-fetch-all-leave-requests";
@@ -7,7 +7,7 @@ import { FetchLeaveRequestsInputDTO, FetchAdminLeaveResponseDTO } from "applicat
 @injectable()
 export class FetchAllAdminLeaveRequests implements IFetchAllLeaveRequests<FetchAdminLeaveResponseDTO> {
     constructor(
-        @inject("LeaveRepository") private _leaveRepo: ILeaveRepo,
+        @inject(I_LEAVE_REPO_TOKEN) private _leaveRepo: ILeaveRepo,
     ) {}
 
     async execute(input: FetchLeaveRequestsInputDTO): Promise<FetchAdminLeaveResponseDTO> {

@@ -1,3 +1,4 @@
+
 import mongoose, { Schema, Document } from "mongoose";
 
 export interface ITrainer extends Document {
@@ -10,10 +11,11 @@ export interface ITrainer extends Document {
   verified: "pending" | "accepted" | "rejected";
   pricePerSession: number;
   experience?: number;
-  programs: string[]; 
+  programs: string[];
   certificate?: string;
   bio?: string;
   rating: number;
+  reviewCount: number;
   languages: string[];
   gender?: string;
   age?: number;
@@ -21,32 +23,30 @@ export interface ITrainer extends Document {
   address?: string;
   rejectReason?: string;
   profilePic?: string;
-  createdAt: Date; 
+  createdAt: Date;
   updatedAt: Date;
 }
 
 const TrainerSchema = new Schema<ITrainer>(
   {
-    trainerId: { type: String, required: true, trim: true,unique: true },
+    trainerId: { type: String, required: true, trim: true, unique: true },
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String },
-    status: { type: Boolean, default: false },
+    status: { type: Boolean, default: true }, 
     role: { type: String, default: "trainer" },
-    verified: { 
-      type: String, 
-      enum: ["pending", "accepted", "rejected"], 
-      default: "pending" 
+    verified: {
+      type: String,
+      enum: ["pending", "accepted", "rejected"],
+      default: "pending"
     },
     pricePerSession: { type: Number, required: true },
-    experience: { type: Number },
-    programs: [{
-    type: String, 
-    ref: 'Program'
-}],
+    experience: { type: Number, default: 0 },
+    programs: [{ type: String, ref: 'Program' }],
     certificate: { type: String },
     bio: { type: String },
     rating: { type: Number, default: 0 },
+    reviewCount: { type: Number, default: 0 },
     languages: [{ type: String }],
     gender: { type: String },
     age: { type: Number },

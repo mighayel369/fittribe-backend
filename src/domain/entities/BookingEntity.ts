@@ -35,7 +35,8 @@ export class BookingEntity {
     },
     public readonly rescheduleCount?:number,
     public rejectReason?:string,
-    public meetLink?:string
+    public meetLink?:string,
+    public isReviewed?:boolean
   ) {}
 
   public get trainerId(): string {

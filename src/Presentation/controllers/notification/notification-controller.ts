@@ -1,17 +1,17 @@
 
 import { NextFunction, Request, Response } from "express";
 import { inject, injectable } from "tsyringe";
-import { IGetNotification } from "application/interfaces/notification/i-get-notifications";
+import { I_GET_ALL_NOTIFICATIONS_TOKEN, IGetNotification } from "application/interfaces/notification/i-get-notifications";
 import { HttpStatus } from "../../../utils/HttpStatus";
 import { AppError } from "domain/errors/AppError";
 import { ERROR_MESSAGES } from "utils/ErrorMessage";
-import { IMarkAsRead } from "application/interfaces/notification/i-mark-as-read";
+import { IMarkAsRead,I_MARK_ALL_NOTIFICATIONS_AS_READ_TOKEN,I_MARK_NOTIFICATION_AS_READ_TOKEN } from "application/interfaces/notification/i-mark-as-read";
 @injectable()
 export class NotificationController {
     constructor(
-        @inject("GetAllNotification") private _getAllNotifications: IGetNotification,
-        @inject("IMarkAsRead") private _markAsRead:IMarkAsRead,
-        @inject("MarkAllAsRead") private _markAllAsRead:IMarkAsRead
+        @inject(I_GET_ALL_NOTIFICATIONS_TOKEN) private _getAllNotifications: IGetNotification,
+        @inject(I_MARK_NOTIFICATION_AS_READ_TOKEN) private _markAsRead:IMarkAsRead,
+        @inject(I_MARK_ALL_NOTIFICATIONS_AS_READ_TOKEN) private _markAllAsRead:IMarkAsRead
     ) { }
 
 
@@ -36,7 +36,7 @@ markAsRead = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { id: userId } = req.user as { id: string };
         const { id: notificationId } = req.params;
-
+        console.log(userId,notificationId)
         if (!userId) {
             throw new AppError(ERROR_MESSAGES.UNAUTHORIZED, HttpStatus.UNAUTHORIZED);
         }

@@ -5,6 +5,7 @@ import { upload } from "Presentation/middleware/upload";
 import { validateRequest } from "Presentation/middleware/validate.middleware";
 import { updateTrainerProfileSchema } from "Presentation/validators/trainer-account.schema";
 import { reapplyTrainerSchema } from "Presentation/validators/trainer-account.schema";
+import { changePasswordSchema } from "Presentation/validators/auth.schema";
 const router = express.Router();
 const ctrl = container.resolve(TrainerAccountController );
 
@@ -26,6 +27,10 @@ router.post(
     upload.single('certificate'), 
     validateRequest(reapplyTrainerSchema), 
     ctrl.reapply
+);
+
+router.post(
+  '/change-password',validateRequest(changePasswordSchema), ctrl.changePassword
 );
 
 export default router;

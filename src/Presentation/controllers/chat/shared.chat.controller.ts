@@ -1,21 +1,21 @@
-import { IGetChatId } from 'application/interfaces/chat/i-get-chat-id';
+import { I_GET_CHAT_ID_TOKEN, IGetChatId } from 'application/interfaces/chat/i-get-chat-id';
 import { Request, Response, NextFunction } from 'express';
 import { inject, injectable } from "tsyringe";
 import { HttpStatus } from 'utils/HttpStatus';
 import { SUCCESS_MESSAGES } from 'utils/SuccessMessages';
 import { AppError } from 'domain/errors/AppError';
 import { ERROR_MESSAGES } from 'utils/ErrorMessage';
-import { IgetMessages } from 'application/interfaces/chat/i-get-messages';
-import { IMarkMessageAsRead } from 'application/interfaces/chat/i-mark-as-read';
+import { I_GET_MESSAGES_TOKEN, IgetMessages } from 'application/interfaces/chat/i-get-messages';
+import { I_MARK_MESSAGE_AS_READ_TOKEN, IMarkMessageAsRead } from 'application/interfaces/chat/i-mark-as-read';
 @injectable()
 export class SharedChatController {
     constructor(
-        @inject("GetChatId") private _getChatId: IGetChatId,
+        @inject(I_GET_CHAT_ID_TOKEN) private _getChatId: IGetChatId,
 
-        @inject("IgetMessages")
+        @inject(I_GET_MESSAGES_TOKEN)
         private _fetchMessages: IgetMessages,
 
-        @inject("IMarkMessageAsRead") private _markMessageAsRead: IMarkMessageAsRead
+        @inject(I_MARK_MESSAGE_AS_READ_TOKEN) private _markMessageAsRead: IMarkMessageAsRead
     ) { }
 
     getChatId = async (req: Request, res: Response, next: NextFunction) => {

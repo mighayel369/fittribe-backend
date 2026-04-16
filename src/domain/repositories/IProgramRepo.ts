@@ -1,5 +1,7 @@
 import { ProgramEntity } from "domain/entities/ProgramEntity";
 
+export const I_PROGRAM_REPO_TOKEN = Symbol("I_PROGRAM_REPO_TOKEN");
+
 export interface IProgramRepo {
   saveProgram(payload: ProgramEntity): Promise<void>;
   

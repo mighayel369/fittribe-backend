@@ -8,8 +8,8 @@ export const BookingMapper = {
   toEntity(doc: IBooking): BookingEntity {
     return new BookingEntity(
       doc.bookingId,
-      UserMapper.toEntity(doc.user as any),
-      TrainerMapper.toEntity(doc.trainer as any),
+      typeof doc.user === 'object' ? UserMapper.toEntity(doc.user as any) : doc.user,
+      typeof doc.trainer === 'object' ? TrainerMapper.toEntity(doc.trainer as any) : doc.trainer,
       doc.program,
       doc.date,
       doc.timeSlot,
@@ -23,21 +23,23 @@ export const BookingMapper = {
         status: doc.payment.status,
       },
       doc.rescheduleRequest ? {
-      newDate: doc.rescheduleRequest.newDate,
-      newTimeSlot: doc.rescheduleRequest.newTimeSlot,
-      requestedBy:doc.rescheduleRequest.requestedBy,
-      createdAt: (doc as any).updatedAt || new Date(),
-    } : undefined,
+        newDate: doc.rescheduleRequest.newDate,
+        newTimeSlot: doc.rescheduleRequest.newTimeSlot,
+        requestedBy: doc.rescheduleRequest.requestedBy,
+        createdAt: (doc as any).updatedAt || new Date(),
+      } : undefined,
       doc.rescheduleCount,
       doc.rejectReason,
-      doc.meetLink
+      doc.meetLink,
+      doc.isReviewed
     );
   },
-toPersistence(entity: BookingEntity): Partial<IBooking> {
+
+  toPersistence(entity: BookingEntity): Partial<IBooking> {
     return {
       bookingId: entity.bookingId,
-      user: entity.userId,       
-      trainer: entity.trainerId,
+      user: typeof entity.userId === 'object' ? (entity.userId as any).userId : entity.userId,       
+      trainer: typeof entity.trainerId === 'object' ? (entity.trainerId as any).trainerId : entity.trainerId,
       program: entity.program,
       date: entity.date,
       timeSlot: entity.timeSlot,
@@ -57,7 +59,8 @@ toPersistence(entity: BookingEntity): Partial<IBooking> {
       } : undefined,
       rescheduleCount: entity.rescheduleCount || 0,
       rejectReason: entity.rejectReason,
-      meetLink:entity.meetLink
+      meetLink: entity.meetLink,
+      isReviewed: entity.isReviewed
     };
   }
 };

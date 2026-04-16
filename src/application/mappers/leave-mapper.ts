@@ -94,5 +94,18 @@ toAdminAllLeaveRequests(entity: LeaveEntity): AdminLeaveRequest {
       trainerName: isPopulated ? trainer.name : "Unknown Trainer",
       trainerProfilePic: isPopulated ? trainer.profilePic || "" : ""
     };
-  }
+  },
+
+toPdfRow(entity: LeaveEntity): string[] {
+    const trainer = entity.trainer as TrainerEntity;
+    const isPopulated = typeof entity.trainer !== 'string';
+
+    return [
+        isPopulated ? trainer.name : "Unknown Trainer",
+        entity.type,
+        entity.start.toLocaleDateString(),
+        entity.days.toString(),
+        entity.status
+    ];
+}
 };

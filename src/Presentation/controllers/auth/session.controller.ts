@@ -5,15 +5,15 @@ import { HttpStatus } from 'utils/HttpStatus';
 import { AppError } from 'domain/errors/AppError';
 import config from 'config';
 import { SUCCESS_MESSAGES } from 'utils/SuccessMessages';
-import { IReSendOtpUseCase } from "application/interfaces/public/i-resend-otp.usecase";
+import { I_RESEND_OTP_TOKEN, IReSendOtpUseCase } from "application/interfaces/public/i-resend-otp.usecase";
 import { RefreshTokenResponseDTO } from "application/dto/public/refresh-token.response.dto";
-import { IRefreshAccessTokenUseCase } from "application/interfaces/public/i-refresh-access-token.usecase";
+import { I_REFRESH_ACCESS_TOKEN_TOKEN, IRefreshAccessTokenUseCase } from "application/interfaces/public/i-refresh-access-token.usecase";
 
 @injectable()
 export class SessionController {
     constructor(
-        @inject("IReSendOtpUseCase") private _resendOtp: IReSendOtpUseCase,
-        @inject("IRefreshAccessTokenUseCase") private _refreshToken: IRefreshAccessTokenUseCase,
+        @inject(I_RESEND_OTP_TOKEN) private _resendOtp: IReSendOtpUseCase,
+        @inject(I_REFRESH_ACCESS_TOKEN_TOKEN) private _refreshToken: IRefreshAccessTokenUseCase,
     ) { }
 
     resendOtp = async (req: Request, res: Response, next: NextFunction) => {
@@ -52,4 +52,23 @@ export class SessionController {
             next(error)
         }
     };
+
+        logout = async (req: Request, res: Response) => {
+        try {
+            res.clearCookie("refreshToken", {
+                httpOnly: true,
+                sameSite: 'strict',
+                maxAge: config.COOKIE_MAX_AGE
+            });
+
+            res.status(HttpStatus.OK).json({
+                message: SUCCESS_MESSAGES.AUTH.LOGOUT_SUCCESS
+            });
+        } catch {
+            res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+                success: false,
+                message: ERROR_MESSAGES.INTERNAL_SERVER_ERROR
+            });
+        }
+    }
 }

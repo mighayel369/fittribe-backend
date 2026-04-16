@@ -7,17 +7,20 @@ import config from 'config';
 import { SUCCESS_MESSAGES } from 'utils/SuccessMessages';
 import { UserTrainerViewDTO } from 'application/dto/trainer/fetch-trainer-details.dto';
 import { TrainerFilter } from 'domain/entities/TrainerEntity';
-import { IFetchAllTrainersUseCase } from 'application/interfaces/trainer/i-fetch-all-trainers.usecase';
-import { IFetchTrainerDetails } from 'application/interfaces/trainer/i-fetch-trainer-details.usecase';
+import { I_FETCH_ALL_CLIENT_TRAINERS_TOKEN, IFetchAllTrainersUseCase } from 'application/interfaces/trainer/i-fetch-all-trainers.usecase';
+import { I_FETCH_TRAINER_DETAILS_CLIENT_TOKEN, IFetchTrainerDetails } from 'application/interfaces/trainer/i-fetch-trainer-details.usecase';
 import { FetchAllClientTrainersResponseDTO } from 'application/dto/trainer/fetch-all-trainers.dto';
-import { IFetchTrainerAvailableSlotsUseCase } from 'application/interfaces/slot/i-fetch-trainer-available-slots.usecase';
+import { I_FETCH_TRAINER_AVAILABLE_SLOTS_TOKEN, IFetchTrainerAvailableSlotsUseCase } from 'application/interfaces/slot/i-fetch-trainer-available-slots.usecase';
 import { FetchAvailableSlotResponseDTO, FetchAvailableSlotsRequestDTO } from 'application/dto/slot/fetch-trainer-available-slots.dto';
+import { I_GET_TRAINER_REVIEW_LISTS_TOKEN, IGetTrainerReviewLists } from 'application/interfaces/review/i-get-trainer-review-lists';
+
 @injectable()
 export class TrainerDiscoveryController {
     constructor(
-        @inject("FindAllClientTrainersUseCase") private _getList: IFetchAllTrainersUseCase<FetchAllClientTrainersResponseDTO>,
-        @inject("FetchTrainerDetailsForClient") private _getDetails: IFetchTrainerDetails<UserTrainerViewDTO>,
-        @inject("FetchAvailableSlotUseCase") private _fetchSlots: IFetchTrainerAvailableSlotsUseCase,
+        @inject(I_FETCH_ALL_CLIENT_TRAINERS_TOKEN) private _getList: IFetchAllTrainersUseCase<FetchAllClientTrainersResponseDTO>,
+        @inject(I_FETCH_TRAINER_DETAILS_CLIENT_TOKEN) private _getDetails: IFetchTrainerDetails<UserTrainerViewDTO>,
+        @inject(I_FETCH_TRAINER_AVAILABLE_SLOTS_TOKEN) private _fetchSlots: IFetchTrainerAvailableSlotsUseCase,
+            @inject(I_GET_TRAINER_REVIEW_LISTS_TOKEN) private _getReviewList:IGetTrainerReviewLists
     ) { }
 
     exploreTrainers = async (req: Request, res: Response, next: NextFunction) => {
@@ -65,5 +68,22 @@ getAvailability = async (req: Request, res: Response, next: NextFunction) => {
         next(err);
     }
 };
+
+
+     getReviewList=async(req: Request, res: Response,next:NextFunction)=>{
+        try {
+            const trainerId=req.params.id
+            
+            let reviews=await this._getReviewList.execute(trainerId)
+
+            res.status(HttpStatus.OK).json({
+                success: true,
+                message: "Review fetched successfully",
+                data:reviews
+            });
+        } catch (error) {
+            next(error)
+        }
+    }
 
 }

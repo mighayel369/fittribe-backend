@@ -6,15 +6,17 @@ import { AppError } from 'domain/errors/AppError';
 import { SUCCESS_MESSAGES } from 'utils/SuccessMessages';
 
 import { TrainerDashboardAppointmentResponseDTO, TrainerDashboardResponseDTO } from "application/dto/dashboard/trainer-dashboard.dto";
-import { ITrainerDashBoard } from "application/interfaces/dashboard/i-trainer-dashboard.usecase";
-import { ITrainerDashBoardAppointments } from "application/interfaces/dashboard/i-trainer-dashboard-appointment.usecase";
+import { ITrainerDashBoard,I_TRAINER_DASHBOARD_TOKEN } from "application/interfaces/dashboard/i-trainer-dashboard.usecase";
+import { ITrainerDashBoardAppointments,I_TRAINER_DASHBOARD_APPOINTMENTS_TOKEN } from "application/interfaces/dashboard/i-trainer-dashboard-appointment.usecase";
 @injectable()
 export class TrainerDashboardController {
-    constructor(
-        @inject("ITrainerDashBoard") private _getMetrics: ITrainerDashBoard,
-        @inject("ITrainerDashBoardAppointments") private _getAgenda: ITrainerDashBoardAppointments,
+constructor(
+        @inject(I_TRAINER_DASHBOARD_TOKEN) 
+        private _getMetrics: ITrainerDashBoard,
+        
+        @inject(I_TRAINER_DASHBOARD_APPOINTMENTS_TOKEN) 
+        private _getAgenda: ITrainerDashBoardAppointments,
     ) { }
-
     getPerformanceMetrics = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { id: trainerId } = req.user as { id: string };

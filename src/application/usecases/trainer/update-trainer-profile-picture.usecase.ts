@@ -1,7 +1,7 @@
 import { inject, injectable } from "tsyringe";
 import { IUpdateProfilePicture } from "application/interfaces/common/i-update-profile-picture.usecase";
-import { ITrainerRepo } from "domain/repositories/ITrainerRepo";
-import { ICloudinaryService } from "domain/services/ICloudinaryService";
+import { I_TRAINER_REPO_TOKEN, ITrainerRepo } from "domain/repositories/ITrainerRepo";
+import { I_CLOUDINARY_SERVICE_TOKEN, ICloudinaryService } from "domain/services/ICloudinaryService";
 import { AppError } from "domain/errors/AppError";
 import { HttpStatus } from "utils/HttpStatus";
 import { UpdateProfilePictureRequestDTO } from "application/dto/common/update-profile-picture.dto.";
@@ -10,8 +10,8 @@ import { ERROR_MESSAGES } from "utils/ErrorMessage";
 @injectable()
 export class UpdateTrainerProfilePicture implements IUpdateProfilePicture {
   constructor(
-    @inject("ITrainerRepo") private readonly _trainerRepo: ITrainerRepo,
-    @inject("ICloudinaryService") private readonly _cloudinary: ICloudinaryService
+    @inject(I_TRAINER_REPO_TOKEN) private readonly _trainerRepo: ITrainerRepo,
+    @inject(I_CLOUDINARY_SERVICE_TOKEN) private readonly _cloudinary: ICloudinaryService
   ) {}
 
   async execute(input: UpdateProfilePictureRequestDTO): Promise<string> {

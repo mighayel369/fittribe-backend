@@ -1,19 +1,19 @@
 import { inject, injectable } from "tsyringe";
 import { OnlineBookingRequestDTO } from "application/dto/booking/book-trainer.dto.";
 import { VerifyOnlinePaymentUsecase } from "../payment/verify-online-payment.usecase";
-import { IBookingRepo } from "domain/repositories/IBookingRepo";
-import { IWalletRepo } from "domain/repositories/IWalletRepo";
+import { I_BOOKING_REPO_TOKEN, IBookingRepo } from "domain/repositories/IBookingRepo";
+import { I_WALLET_REPO_TOKEN, IWalletRepo } from "domain/repositories/IWalletRepo";
 import { BookingMapper } from "application/mappers/booking-mapper";
 import { AppError } from "domain/errors/AppError";
 import { ERROR_MESSAGES } from "utils/ErrorMessage";
 import { HttpStatus } from "utils/HttpStatus";
 import config from "config";
-import { IPaymentService } from "domain/services/IPaymentService";
+import { I_PAYMENT_SERVICE_TOKEN, IPaymentService } from "domain/services/IPaymentService";
 import { IBookSessionWithTrainer } from "application/interfaces/booking/i-book-session-with-trainer.usecase";
 import { BookingResponseDTO } from "application/dto/booking/fetch-all-bookings.dto";
 import { timeToMin } from "utils/generateTimeSlots";
-import { INotificationService } from "domain/services/i-notification.service";
-import { INotificationRepo } from "domain/repositories/INotifctionRepo";
+import { I_NOTIFICATION_SERVICE_TOKEN, INotificationService } from "domain/services/i-notification.service";
+import { I_NOTIFICATION_REPO_TOKEN, INotificationRepo } from "domain/repositories/INotifctionRepo";
 import { NotificationMapper } from "application/mappers/notification-mapper";
 @injectable()
 export class OnlineBookingUseCase
@@ -21,11 +21,11 @@ export class OnlineBookingUseCase
     implements IBookSessionWithTrainer {
 
     constructor(
-        @inject("IPaymentService") paymentService: IPaymentService,
-        @inject("BookingRepo") private _bookingRepo: IBookingRepo,
-        @inject("WalletRepo") private _walletRepo: IWalletRepo,
-        @inject("SocketNotificationService") private _notificationService: INotificationService,
-        @inject("INotificationRepo") private _notificationRepo: INotificationRepo
+        @inject(I_PAYMENT_SERVICE_TOKEN) paymentService: IPaymentService,
+        @inject(I_BOOKING_REPO_TOKEN) private _bookingRepo: IBookingRepo,
+        @inject(I_WALLET_REPO_TOKEN) private _walletRepo: IWalletRepo,
+        @inject(I_NOTIFICATION_SERVICE_TOKEN) private _notificationService: INotificationService,
+        @inject(I_NOTIFICATION_REPO_TOKEN) private _notificationRepo: INotificationRepo
     ) {
         super(paymentService);
     }
@@ -53,7 +53,7 @@ export class OnlineBookingUseCase
             throw new AppError('Booking Creation Got Faled', HttpStatus.BAD_REQUEST)
         }
         await this._walletRepo.holdAmount(bookingEntity.trainer as string, bookingEntity.bookingId, bookingEntity.trainerEarning);
-        await this._walletRepo.holdAmount(config.ADMIN_WALLET, bookingEntity.bookingId, bookingEntity.adminCommission);
+        await this._walletRepo.holdAmount(config.ADMIN, bookingEntity.bookingId, bookingEntity.adminCommission);
         const data = {
             message: `We've received your payment. Your trainer has been notified and will confirm your session shortly.`,
             title: 'Payment Confirmed',

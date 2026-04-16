@@ -1,7 +1,7 @@
 
 import { inject, injectable } from "tsyringe";
-import { IBookingRepo } from "domain/repositories/IBookingRepo";
-import { IWalletRepo } from "domain/repositories/IWalletRepo";
+import { I_BOOKING_REPO_TOKEN, IBookingRepo } from "domain/repositories/IBookingRepo";
+import { I_WALLET_REPO_TOKEN, IWalletRepo } from "domain/repositories/IWalletRepo";
 import { IDeclineBookingUseCase } from "application/interfaces/booking/i-decline-booking-request.usecase";
 import { AppError } from "domain/errors/AppError";
 import config from "config";
@@ -12,8 +12,8 @@ import { HttpStatus } from "utils/HttpStatus";
 @injectable()
 export class DeclineBookingUseCase implements IDeclineBookingUseCase {
   constructor(
-    @inject("BookingRepo") private _bookingRepo: IBookingRepo,
-    @inject("WalletRepo") private _walletRepo: IWalletRepo
+    @inject(I_BOOKING_REPO_TOKEN) private _bookingRepo: IBookingRepo,
+    @inject(I_WALLET_REPO_TOKEN) private _walletRepo: IWalletRepo
   ) {}
 
   async execute(bookingId: string, reason: string): Promise<void> {
@@ -30,7 +30,7 @@ export class DeclineBookingUseCase implements IDeclineBookingUseCase {
     }
 
     await this._walletRepo.releaseHoldWithoutBalance(booking.trainerId, bookingId);
-    await this._walletRepo.releaseHoldWithoutBalance(config.ADMIN_WALLET, bookingId);
+    await this._walletRepo.releaseHoldWithoutBalance(config.ADMIN, bookingId);
 
     await this._walletRepo.credit(
       booking.userId,

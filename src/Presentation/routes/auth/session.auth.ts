@@ -6,5 +6,5 @@ const ctrl = container.resolve(SessionController);
 
 router.post('/resend-otp', ctrl.resendOtp);
 router.get('/refresh-token', ctrl.refreshAccessToken);
-
+router.post('/logout', ctrl.logout);
 export default router;

@@ -1,5 +1,5 @@
 import { inject, injectable } from "tsyringe";
-import { IProgramRepo } from "domain/repositories/IProgramRepo";
+import { I_PROGRAM_REPO_TOKEN, IProgramRepo } from "domain/repositories/IProgramRepo";
 import { AppError } from "domain/errors/AppError";
 import { HttpStatus } from "utils/HttpStatus";
 import { IExplorePrograms } from "application/interfaces/program/i-explore-programs";
@@ -9,7 +9,7 @@ import { ExploreProgramsResponseDTO } from "application/dto/programs/program-sum
 @injectable()
 export class ExplorePrograms implements IExplorePrograms {
   constructor(
-    @inject("IProgramRepo")
+    @inject(I_PROGRAM_REPO_TOKEN)
     private _programRepository: IProgramRepo
   ) {}
 

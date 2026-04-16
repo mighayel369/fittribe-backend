@@ -5,23 +5,23 @@ import { HttpStatus } from 'utils/HttpStatus';
 import { AppError } from 'domain/errors/AppError';
 import config from 'config';
 import { SUCCESS_MESSAGES } from 'utils/SuccessMessages';
-import { ILoginUseCase } from 'application/interfaces/auth/i-login.usecase';
+import { I_CLIENT_LOGIN_USECASE_TOKEN, ILoginUseCase } from 'application/interfaces/auth/i-login.usecase';
 import { LoginRequestDTO, LoginResponseDTO } from 'application/dto/auth/login.dto';
-import { IRegisterUseCase } from 'application/interfaces/auth/i-register.usecase';
+import { I_CLIENT_REGISTER_USECASE_TOKEN, IRegisterUseCase } from 'application/interfaces/auth/i-register.usecase';
 import { RegisterResponseDTO, UserRegisterRequestDTO, TrainerRegisterRequestDTO } from 'application/dto/auth/register.dto';
 import { ISendPasswordResetLinkUseCase } from 'application/interfaces/auth/i-send-password-reset-link.usecase';
 import { ResetPasswordTokenBasedDTO } from 'application/dto/auth/change-password.dto';
-import { IChangePasswordUseCase } from 'application/interfaces/auth/i-change-password.usecase';
-import { IVerifyAccountUseCase } from 'application/interfaces/public/i-verify-otp.usecase';
+import { I_RESET_PASSWORD_TOKEN, IChangePasswordUseCase } from 'application/interfaces/auth/i-change-password.usecase';
+import { I_VERIFY_USER_ACCOUNT_TOKEN, IVerifyAccountUseCase } from 'application/interfaces/public/i-verify-otp.usecase';
 import { VerifyAccountRequestDTO } from 'application/dto/public/verify-account.dto';
 @injectable()
 export class UserAuthController {
     constructor(
-        @inject("UserRegisterUseCase") private _register: IRegisterUseCase<UserRegisterRequestDTO>,
-        @inject("UserLoginUseCase") private _login: ILoginUseCase,
-        @inject("ISendResetMailUseCase") private _sendResetMail: ISendPasswordResetLinkUseCase,
-        @inject("IResetPasswordUseCase") private _resetPassword: IChangePasswordUseCase<ResetPasswordTokenBasedDTO>,
-        @inject("VerifyUserAccountUseCase") private _verify: IVerifyAccountUseCase,
+        @inject(I_CLIENT_REGISTER_USECASE_TOKEN) private _register: IRegisterUseCase<UserRegisterRequestDTO>,
+        @inject(I_CLIENT_LOGIN_USECASE_TOKEN) private _login: ILoginUseCase,
+        @inject(I_RESET_PASSWORD_TOKEN) private _sendResetMail: ISendPasswordResetLinkUseCase,
+        @inject(I_RESET_PASSWORD_TOKEN) private _resetPassword: IChangePasswordUseCase<ResetPasswordTokenBasedDTO>,
+        @inject(I_VERIFY_USER_ACCOUNT_TOKEN) private _verify: IVerifyAccountUseCase,
     ) { }
 
 login = async (req: Request, res: Response, next: NextFunction) => {
@@ -111,5 +111,4 @@ login = async (req: Request, res: Response, next: NextFunction) => {
             next(error);
         }
     };
-
 }

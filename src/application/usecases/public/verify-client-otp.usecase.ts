@@ -1,18 +1,18 @@
 import { inject,injectable } from "tsyringe";
-import { IUserRepo } from "domain/repositories/IUserRepo";
-import { IWalletRepo } from "domain/repositories/IWalletRepo";
+import { I_USER_REPO_TOKEN, IUserRepo } from "domain/repositories/IUserRepo";
+import { I_WALLET_REPO_TOKEN, IWalletRepo } from "domain/repositories/IWalletRepo";
 import { IVerifyAccountUseCase } from "application/interfaces/public/i-verify-otp.usecase";
 import { VerifyAccountRequestDTO } from "application/dto/public/verify-account.dto";
 import { AppError } from "domain/errors/AppError";
-import { IOtpService } from "domain/services/IOtpService";
+import { I_OTP_SERVICE_TOKEN, IOtpService } from "domain/services/IOtpService";
 import { UserRole } from "utils/Constants";
 import { HttpStatus } from "utils/HttpStatus";
 @injectable()
 export class VerifyUserAccountUseCase implements IVerifyAccountUseCase {
   constructor(
-    @inject('IOtpService') private readonly _otpService: IOtpService,
-    @inject('IUserRepo') private readonly _userRepo: IUserRepo,
-    @inject("WalletRepo") private readonly _walletRepo: IWalletRepo,
+    @inject(I_OTP_SERVICE_TOKEN) private readonly _otpService: IOtpService,
+    @inject(I_USER_REPO_TOKEN) private readonly _userRepo: IUserRepo,
+    @inject(I_WALLET_REPO_TOKEN) private readonly _walletRepo: IWalletRepo,
   ) {}
 
   async execute(input: VerifyAccountRequestDTO): Promise<boolean> {

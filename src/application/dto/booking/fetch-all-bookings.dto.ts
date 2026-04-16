@@ -3,6 +3,7 @@ import { PaginationOutputDTO } from "../common/PaginationDto"
 export interface BookingResponseDTO{
     bookingId:string
     trainerName:string
+    trainerId:string,
     bookedDate:string
     bookedTime:string
     bookedProgram:string
@@ -10,6 +11,7 @@ export interface BookingResponseDTO{
     bookingStatus:string
     trainerProfilePic:string
     meetLink?:string
+    isReviewed?:boolean
 }
 
 export interface FetchAllUserBookingRequestDTO extends PaginationInputDTO{
@@ -27,7 +29,8 @@ export interface TrainserBookingResponseDTO{
   bookedTime: string;
   sessionAmount: number;
   bookingStatus: string;
-  meetLink?:string
+  meetLink?:string,
+  isReviewed?:boolean
 }
 
 
@@ -50,3 +53,30 @@ export interface FetchAllTrainerBookingRequestDTO extends PaginationInputDTO{
 export interface FetchAllTrainerBookingsResponseDTO extends PaginationOutputDTO<TrainserBookingResponseDTO>{}
 export interface FetchAllTrainerPendingBookingsResponseDTO extends PaginationOutputDTO<TrainerPendingBookingDTO>{}
 export interface FetchAllTrainerRescheduleBookingsResponseDTO extends PaginationOutputDTO<TrainerRescheduleRequestDTO>{}
+
+
+export interface AdminBookingListDTO {
+  id: string;
+  client: string;
+  trainer: string;
+  date: string;
+  total: number;
+  fee: number;
+  status: string;
+  payment: string;
+}
+export interface FetchAllBookingsListRequestDTO extends PaginationInputDTO{}
+export interface FetchAllBookingsListResponseDTO extends PaginationOutputDTO<AdminBookingListDTO>{}
+
+export interface FetchAdminBookingDashboardResponseDTO {
+  stats: {
+    todaySessions: number;
+    pendingRequests: number;
+    totalBookings: number;
+    successRate: string;
+  };
+  charts: {
+    bookingTrend: { label: string; bookings: number }[];
+    statusDistribution: { label: string; count: number }[];
+  };
+}

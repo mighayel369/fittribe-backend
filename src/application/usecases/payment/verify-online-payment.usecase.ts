@@ -1,7 +1,7 @@
 import { inject, injectable } from "tsyringe";
 import { VerifyOnlinePaymentRequestDTO } from "application/dto/payment/verify-online-payment.dto";
 import { IVeirfyOnlinePayment } from "application/interfaces/payment/i-verify-online-payment.usecase";
-import { IPaymentService } from "domain/services/IPaymentService";
+import { I_PAYMENT_SERVICE_TOKEN, IPaymentService } from "domain/services/IPaymentService";
 import { AppError } from "domain/errors/AppError";
 import { ERROR_MESSAGES } from "utils/ErrorMessage";
 import { HttpStatus } from "utils/HttpStatus";
@@ -9,7 +9,7 @@ import { HttpStatus } from "utils/HttpStatus";
 @injectable()
 export class VerifyOnlinePaymentUsecase implements IVeirfyOnlinePayment {
   constructor(
-    @inject("IPaymentService") private _paymentService: IPaymentService
+    @inject(I_PAYMENT_SERVICE_TOKEN) private _paymentService: IPaymentService
   ) { }
 
   async execute(input: VerifyOnlinePaymentRequestDTO): Promise<boolean> {

@@ -1,5 +1,7 @@
+// domain/entities/TrainerEntity.ts
 import { ProgramEntity } from "./ProgramEntity";
 import { STATUS } from "utils/Constants";
+
 export class TrainerEntity {
   constructor(
     public trainerId: string,
@@ -15,6 +17,7 @@ export class TrainerEntity {
     public certificate: string | null,
     public gender: string,
     public rating: number = 0,
+    public reviewCount: number = 0, 
     public status?: boolean,
     public createdAt?: Date,
     public bio?: string | null,
@@ -27,7 +30,6 @@ export class TrainerEntity {
   public isBlocked(): boolean {
     return !this.status;
   }
-
 }
 
 

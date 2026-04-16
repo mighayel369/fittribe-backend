@@ -1,7 +1,7 @@
 
 import { IUpdateStatus } from "application/interfaces/common/i-update-status.usecase";
 import { inject, injectable } from "tsyringe";
-import { IUserRepo } from "domain/repositories/IUserRepo";
+import { I_USER_REPO_TOKEN, IUserRepo } from "domain/repositories/IUserRepo";
 import { AppError } from "domain/errors/AppError";
 import { HttpStatus } from "utils/HttpStatus";
 import logger from "utils/logger";
@@ -10,7 +10,7 @@ import { UpdateStatusRequestDTO,UpdateStatusResponseDTO } from "application/dto/
 @injectable()
 export class UpdateUserStatusUseCase implements IUpdateStatus {
   constructor(
-    @inject("IUserRepo") private readonly _userRepo: IUserRepo
+    @inject(I_USER_REPO_TOKEN) private readonly _userRepo: IUserRepo
   ) {}
 
   async execute(input: UpdateStatusRequestDTO): Promise<UpdateStatusResponseDTO> {

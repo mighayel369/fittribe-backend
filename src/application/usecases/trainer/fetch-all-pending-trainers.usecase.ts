@@ -1,5 +1,5 @@
 import { inject, injectable } from "tsyringe";
-import { ITrainerRepo } from "domain/repositories/ITrainerRepo";
+import { I_TRAINER_REPO_TOKEN, ITrainerRepo } from "domain/repositories/ITrainerRepo";
 import { IFetchAllTrainersUseCase } from "application/interfaces/trainer/i-fetch-all-trainers.usecase";
 import { FetchAllPendingTrainersResponseDTO, FetchAllTrainersRequestDTO } from "application/dto/trainer/fetch-all-trainers.dto";
 import { TrainerMapper } from "application/mappers/trainer-mapper";
@@ -8,7 +8,7 @@ import { AppError } from "domain/errors/AppError";
 @injectable()
 export class FetchAllPendingTrainers implements IFetchAllTrainersUseCase<FetchAllPendingTrainersResponseDTO> {
   constructor(
-    @inject("ITrainerRepo")
+    @inject(I_TRAINER_REPO_TOKEN)
     private readonly _trainerRepo: ITrainerRepo
   ) {}
 

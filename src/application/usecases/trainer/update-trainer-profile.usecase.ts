@@ -5,16 +5,16 @@ import { HttpStatus } from "utils/HttpStatus";
 import { UpdateTrainerProfileRequestDTO } from "application/dto/trainer/update-trainer-profile.dto";
 import { TrainerEntity } from "domain/entities/TrainerEntity";
 import { ERROR_MESSAGES } from "utils/ErrorMessage";
-import { ITrainerRepo } from "domain/repositories/ITrainerRepo";
+import { I_TRAINER_REPO_TOKEN, ITrainerRepo } from "domain/repositories/ITrainerRepo";
 import { NotificationMapper } from "application/mappers/notification-mapper";
-import { INotificationRepo } from "domain/repositories/INotifctionRepo";
-import { INotificationService } from "domain/services/i-notification.service";
+import { I_NOTIFICATION_REPO_TOKEN, INotificationRepo } from "domain/repositories/INotifctionRepo";
+import { I_NOTIFICATION_SERVICE_TOKEN, INotificationService } from "domain/services/i-notification.service";
 @injectable()
 export class UpdateTrainerProfileUseCase implements IUpdateTrainerProfileUseCase {
   constructor(
-    @inject("ITrainerRepo") private readonly _trainerRepo: ITrainerRepo,
-    @inject("SocketNotificationService") private _notificationService: INotificationService,
-    @inject("INotificationRepo") private _notificationRepo: INotificationRepo
+    @inject(I_TRAINER_REPO_TOKEN) private readonly _trainerRepo: ITrainerRepo,
+    @inject(I_NOTIFICATION_SERVICE_TOKEN) private _notificationService: INotificationService,
+    @inject(I_NOTIFICATION_REPO_TOKEN) private _notificationRepo: INotificationRepo
   ) { }
 
   async execute(input: UpdateTrainerProfileRequestDTO): Promise<void> {
@@ -39,6 +39,7 @@ export class UpdateTrainerProfileUseCase implements IUpdateTrainerProfileUseCase
       existing.certificate,
       data.gender ?? existing.gender,
       existing.rating,
+      existing.reviewCount,
       existing.status,
       existing.createdAt,
       data.bio ?? existing.bio,

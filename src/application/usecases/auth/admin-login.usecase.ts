@@ -1,7 +1,7 @@
 import { inject, injectable } from "tsyringe";
-import { IAdminRepo } from "domain/repositories/IAdminRepo";
-import { IPasswordHasher } from "domain/services/IPasswordHasher";
-import { IJwtService } from "domain/services/i-jwt.service";
+import { IAdminRepo,I_ADMIN_REPO_TOKEN } from "domain/repositories/IAdminRepo";
+import { I_PASSWORD_HASHER_TOKEN, IPasswordHasher } from "domain/services/IPasswordHasher";
+import { I_JWT_SERVICE_TOKEN, IJwtService } from "domain/services/i-jwt.service";
 import { ILoginUseCase } from "application/interfaces/auth/i-login.usecase";
 import { LoginResponseDTO, LoginRequestDTO, AuthUser } from "application/dto/auth/login.dto";
 import { AppError } from "domain/errors/AppError";
@@ -12,9 +12,9 @@ import { ERROR_MESSAGES } from "utils/ErrorMessage";
 @injectable()
 export class AdminLoginUsecase implements ILoginUseCase {
   constructor(
-    @inject("IAdminRepo") private _AdminRepo: IAdminRepo,
-    @inject("IPasswordHasher") private _passwordHasher: IPasswordHasher,
-    @inject("JwtServiceImpl") private _jwtService: IJwtService 
+    @inject(I_ADMIN_REPO_TOKEN) private _AdminRepo: IAdminRepo,
+    @inject(I_PASSWORD_HASHER_TOKEN) private _passwordHasher: IPasswordHasher,
+    @inject(I_JWT_SERVICE_TOKEN) private _jwtService: IJwtService 
   ) {}
 
   async execute(input: LoginRequestDTO): Promise<LoginResponseDTO> {

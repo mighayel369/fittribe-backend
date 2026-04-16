@@ -3,29 +3,32 @@ import { Request, Response, NextFunction } from 'express';
 import { inject, injectable } from "tsyringe";
 import { HttpStatus } from 'utils/HttpStatus';
 import { SUCCESS_MESSAGES } from 'utils/SuccessMessages';
-import { IFetchChatList } from 'application/interfaces/chat/i-fetch-chat-list';
-import { ChatListResponseDTO, NonEstablishedChatListResponseDTO } from "application/dto/chat/chat-list.dto";
-import { IgetMessages } from 'application/interfaces/chat/i-get-messages';
+import { I_FETCH_ESTABLISHED_TRAINER_CHAT_LIST_TOKEN, I_FETCH_NON_ESTABLISHED_TRAINER_CHAT_LIST_TOKEN, IFetchChatList } from 'application/interfaces/chat/i-fetch-chat-list';
+import { ChatListResponseDTO, NonEstablishedChatListResponseDTO, TrainerChatListRequestDTO } from "application/dto/chat/chat-list.dto";
+import { PAGINATION } from 'utils/Constants';
 
 @injectable()
 export class TrainerChatController {
     constructor(
-        @inject("FetchEstablishedTrainerChatList")
-        private _fetchEstablishedChats: IFetchChatList<ChatListResponseDTO>,
+        @inject(I_FETCH_ESTABLISHED_TRAINER_CHAT_LIST_TOKEN)
+        private _fetchEstablishedChats: IFetchChatList<TrainerChatListRequestDTO, ChatListResponseDTO>,
 
-        @inject("FetchNonEstablishedTrainerChatList")
-        private _fetchNonEstablishedChats: IFetchChatList<NonEstablishedChatListResponseDTO>,
-
-        @inject("IgetMessages")
-        private _fetchMessages: IgetMessages
+        @inject(I_FETCH_NON_ESTABLISHED_TRAINER_CHAT_LIST_TOKEN)
+        private _fetchNonEstablishedChats: IFetchChatList<TrainerChatListRequestDTO, NonEstablishedChatListResponseDTO>,
     ) { }
 
-    getEstablishedChats = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    getEstablishedChats = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const { id } = req.user as { id: string };
+            const { id: trainerId } = req.user as { id: string };
 
-            const chatList = await this._fetchEstablishedChats.execute(id);
-            console.log(chatList)
+            let input: TrainerChatListRequestDTO = {
+                trainerId,
+                limit: PAGINATION.CHAT_DASHBOARD_LIMIT,
+                searchQuery: String(req.query.search || '')
+            };
+
+            const chatList = await this._fetchEstablishedChats.execute(input);
+
             res.status(HttpStatus.OK).json({
                 success: true,
                 message: "Established chats fetched successfully",
@@ -36,11 +39,17 @@ export class TrainerChatController {
         }
     }
 
-    getDiscoveryClients = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    getDiscoveryClients = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const { id } = req.user as { id: string };
+            const { id: trainerId } = req.user as { id: string };
 
-            const discoveryList = await this._fetchNonEstablishedChats.execute(id);
+            let input: TrainerChatListRequestDTO = {
+                trainerId,
+                limit: PAGINATION.CHAT_DASHBOARD_LIMIT,
+                searchQuery: String(req.query.search || '')
+            };
+
+            const discoveryList = await this._fetchNonEstablishedChats.execute(input);
 
             res.status(HttpStatus.OK).json({
                 success: true,

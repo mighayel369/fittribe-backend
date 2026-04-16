@@ -1,6 +1,6 @@
 
 import { inject, injectable } from "tsyringe";
-import { IBookingRepo } from "domain/repositories/IBookingRepo";
+import { I_BOOKING_REPO_TOKEN, IBookingRepo } from "domain/repositories/IBookingRepo";
 import { IFetchAllBookingsUseCase } from "application/interfaces/booking/i-fetch-all-bookings.usecase";
 import { FetchAllTrainerPendingBookingsResponseDTO,FetchAllTrainerBookingRequestDTO } from "application/dto/booking/fetch-all-bookings.dto";
 import { BookingMapper } from "application/mappers/booking-mapper";
@@ -9,7 +9,7 @@ import { BOOKING_STATUS } from "utils/Constants";
 export class FetchTrainerAllPendingBookings 
   implements IFetchAllBookingsUseCase<FetchAllTrainerBookingRequestDTO, FetchAllTrainerPendingBookingsResponseDTO> {
   
-  constructor(@inject("BookingRepo") private _repo: IBookingRepo) {}
+  constructor(@inject(I_BOOKING_REPO_TOKEN) private _repo: IBookingRepo) {}
 
   async execute(input: FetchAllTrainerBookingRequestDTO): Promise<FetchAllTrainerPendingBookingsResponseDTO> {
     const { trainerId, currentPage, limit, searchQuery } = input;

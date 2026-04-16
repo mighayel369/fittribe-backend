@@ -1,5 +1,5 @@
 import { inject, injectable } from "tsyringe";
-import { IBookingRepo } from "domain/repositories/IBookingRepo";
+import { I_BOOKING_REPO_TOKEN, IBookingRepo } from "domain/repositories/IBookingRepo";
 import { IProcessTrainerRescheduleUseCase } from "application/interfaces/booking/i-process-trainer-reschedule.usecase";
 import { AppError } from "domain/errors/AppError";
 import { HttpStatus } from "utils/HttpStatus";
@@ -9,7 +9,7 @@ import { BOOKING_STATUS } from "utils/Constants";
 @injectable()
 export class RejectRescheduleUseCase implements IProcessTrainerRescheduleUseCase {
   constructor(
-    @inject("BookingRepo") private readonly _bookingRepo: IBookingRepo
+    @inject(I_BOOKING_REPO_TOKEN) private readonly _bookingRepo: IBookingRepo
   ) {}
 
   async execute(data: ProcessRescheduleRequestDTO): Promise<void> {

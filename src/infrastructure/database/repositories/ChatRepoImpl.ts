@@ -19,8 +19,8 @@ export class ChatRepoImpl extends BaseRepository<ChatDocument, ChatEntity> imple
         return this.toEntity(doc)
     }
 
-    async getChatListForTrainer(trainerId: string): Promise<any[]> {
-        return await this.model.aggregate([
+    async getChatListForTrainer(trainerId: string, searchQuery: string = ""): Promise<any[]> {
+        const pipeline: any[] = [
             { $match: { participants: trainerId, isActive: true } },
             {
                 $lookup: {
@@ -42,34 +42,54 @@ export class ChatRepoImpl extends BaseRepository<ChatDocument, ChatEntity> imple
                 }
             },
             { $unwind: "$clientInfo" }
-        ]);
+        ];
+
+        if (searchQuery) {
+            pipeline.push({
+                $match: {
+                    "clientInfo.name": { $regex: searchQuery, $options: "i" }
+                }
+            });
+        }
+
+        return await this.model.aggregate(pipeline);
     }
 
-    async getChatListForUser(userId: string): Promise<any[]> {
-        return await this.model.aggregate([
-            { $match: { participants: userId, isActive: true } },
-            {
-                $lookup: {
-                    from: "messages",
-                    localField: "lastMessage",
-                    foreignField: "messageId",
-                    as: "lastMsg"
-                }
-            },
-            { $unwind: { path: "$lastMsg", preserveNullAndEmptyArrays: true } },
-            { $addFields: { trainerId: { $filter: { input: "$participants", as: "p", cond: { $ne: ["$$p", userId] } } } } },
-            { $unwind: "$trainerId" },
-            {
-                $lookup: {
-                    from: "trainers",
-                    localField: "trainerId",
-                    foreignField: "trainerId",
-                    as: "trainerInfo"
-                }
-            },
-            { $unwind: "$trainerInfo" }
-        ]);
+async getChatListForUser(userId: string, searchQuery: string = ""): Promise<any[]> {
+    const pipeline: any[] = [
+        { $match: { participants: userId, isActive: true } },
+        {
+            $lookup: {
+                from: "messages",
+                localField: "lastMessage",
+                foreignField: "messageId",
+                as: "lastMsg"
+            }
+        },
+        { $unwind: { path: "$lastMsg", preserveNullAndEmptyArrays: true } },
+        { $addFields: { trainerId: { $filter: { input: "$participants", as: "p", cond: { $ne: ["$$p", userId] } } } } },
+        { $unwind: "$trainerId" },
+        {
+            $lookup: {
+                from: "trainers",
+                localField: "trainerId",
+                foreignField: "trainerId",
+                as: "trainerInfo"
+            }
+        },
+        { $unwind: "$trainerInfo" }
+    ];
+
+    if (searchQuery) {
+        pipeline.push({
+            $match: {
+                "trainerInfo.name": { $regex: searchQuery, $options: 'i' }
+            }
+        });
     }
+
+    return await this.model.aggregate(pipeline);
+}
 
     async getChatId(senderId: string, receiverId: string): Promise<string | null> {
         const chat = await this.model.findOne({

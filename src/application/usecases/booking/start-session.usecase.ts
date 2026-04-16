@@ -1,5 +1,5 @@
 import { inject, injectable } from "tsyringe";
-import { IBookingRepo } from "domain/repositories/IBookingRepo";
+import { I_BOOKING_REPO_TOKEN, IBookingRepo } from "domain/repositories/IBookingRepo";
 import { AppError } from "domain/errors/AppError";
 import { ERROR_MESSAGES } from "utils/ErrorMessage";
 import { HttpStatus } from "utils/HttpStatus";
@@ -7,7 +7,7 @@ import { IGetMeetLink } from "application/interfaces/booking/i-get-meetlink.usec
 
 @injectable()
 export class StartSessionUseCase implements IGetMeetLink {
-  constructor(@inject("BookingRepo") private bookingRepo: IBookingRepo) { }
+  constructor(@inject(I_BOOKING_REPO_TOKEN) private bookingRepo: IBookingRepo) { }
 
   async execute(bookingId: string): Promise<string> {
     let bookingEntity = await this.bookingRepo.findBookingById(bookingId);

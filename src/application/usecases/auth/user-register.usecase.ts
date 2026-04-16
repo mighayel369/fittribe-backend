@@ -1,12 +1,12 @@
 import { inject, injectable } from "tsyringe";
 import { randomUUID } from "crypto";
-import { IUserRepo } from "domain/repositories/IUserRepo";
-import { IPasswordHasher } from "domain/services/IPasswordHasher";
+import { I_USER_REPO_TOKEN, IUserRepo } from "domain/repositories/IUserRepo";
+import { I_PASSWORD_HASHER_TOKEN, IPasswordHasher } from "domain/services/IPasswordHasher";
 import { IRegisterUseCase } from "application/interfaces/auth/i-register.usecase";
 import { ERROR_MESSAGES } from "utils/ErrorMessage";
 import { AppError } from "domain/errors/AppError";
 import { HttpStatus } from "utils/HttpStatus";
-import { IOtpService } from "domain/services/IOtpService";
+import { I_OTP_SERVICE_TOKEN, IOtpService } from "domain/services/IOtpService";
 import { UserRegisterRequestDTO, RegisterResponseDTO } from "application/dto/auth/register.dto";
 import { UserRole } from "utils/Constants";
 import { UserEntity } from "domain/entities/UserEntity";
@@ -14,9 +14,9 @@ import { UserEntity } from "domain/entities/UserEntity";
 @injectable()
 export class UserRegisterUseCase implements IRegisterUseCase<UserRegisterRequestDTO> {
   constructor(
-    @inject("IUserRepo") private readonly _userRepo: IUserRepo,
-    @inject("IPasswordHasher") private readonly _passwordHasher: IPasswordHasher,
-    @inject("IOtpService") private readonly _otpService: IOtpService 
+    @inject(I_USER_REPO_TOKEN) private readonly _userRepo: IUserRepo,
+    @inject(I_PASSWORD_HASHER_TOKEN) private readonly _passwordHasher: IPasswordHasher,
+    @inject(I_OTP_SERVICE_TOKEN) private readonly _otpService: IOtpService 
   ) {}
 
   async execute(payload: UserRegisterRequestDTO): Promise<RegisterResponseDTO> {

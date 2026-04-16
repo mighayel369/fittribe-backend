@@ -1,22 +1,22 @@
 import { inject, injectable } from "tsyringe";
-import { IMessageRepo } from "domain/repositories/IMessageRepo";
-import { IChatRepo } from "domain/repositories/IChatRepo";
+import { I_MESSAGE_REPO_TOKEN, IMessageRepo } from "domain/repositories/IMessageRepo";
+import { I_CHAT_REPO_TOKEN, IChatRepo } from "domain/repositories/IChatRepo";
 import { ISendMessage } from "application/interfaces/chat/i-send-message";
 import { ChatMessageRequestDTO } from "application/dto/chat/message-dto";
-import { IChatService } from "domain/services/i-chat-service";
+import { I_CHAT_SERVICE_TOKEN, IChatService } from "domain/services/i-chat-service";
 import { ChatMapper } from "application/mappers/chat-mapper";
 import { AppError } from "domain/errors/AppError";
 @injectable()
 export class SendMessage implements ISendMessage {
   constructor(
-    @inject("IMessageRepo") private _messageRepo: IMessageRepo,
-    @inject("IChatRepo") private _chatRepo: IChatRepo,
-    @inject("IChatService") private _chatService: IChatService
+    @inject(I_MESSAGE_REPO_TOKEN) private _messageRepo: IMessageRepo,
+    @inject(I_CHAT_REPO_TOKEN) private _chatRepo: IChatRepo,
+    @inject(I_CHAT_SERVICE_TOKEN) private _chatService: IChatService
   ) { }
 
   async execute(input: ChatMessageRequestDTO): Promise<void> {
     let { chatId, receiverId } = input;
-
+    console.log('hello chat id here',chatId)
     if (!chatId) {
       const newChat = ChatMapper.toChatEntity(input);
       await this._chatRepo.establishChat(newChat);

@@ -5,12 +5,12 @@ import { HttpStatus } from 'utils/HttpStatus';
 import { AppError } from 'domain/errors/AppError';
 import config from 'config';
 import { SUCCESS_MESSAGES } from 'utils/SuccessMessages';
-import { ILoginUseCase } from 'application/interfaces/auth/i-login.usecase';
+import { I_ADMIN_LOGIN_USECASE_TOKEN, ILoginUseCase } from 'application/interfaces/auth/i-login.usecase';
 import { LoginRequestDTO, LoginResponseDTO } from 'application/dto/auth/login.dto';
 @injectable()
 export class AdminAuthController {
     constructor(
-        @inject("AdminLoginUsecase") private _adminLogin: ILoginUseCase
+        @inject(I_ADMIN_LOGIN_USECASE_TOKEN) private _adminLogin: ILoginUseCase
     ) { }
 
     login = async (req: Request, res: Response, next: NextFunction) => {

@@ -5,18 +5,18 @@ import { HttpStatus } from 'utils/HttpStatus';
 import { AppError } from 'domain/errors/AppError';
 import config from 'config';
 import { SUCCESS_MESSAGES } from 'utils/SuccessMessages';
-import { ILoginUseCase } from 'application/interfaces/auth/i-login.usecase';
+import { I_TRAINER_LOGIN_USECASE_TOKEN, ILoginUseCase } from 'application/interfaces/auth/i-login.usecase';
 import { LoginRequestDTO, LoginResponseDTO } from 'application/dto/auth/login.dto';
-import { IRegisterUseCase } from 'application/interfaces/auth/i-register.usecase';
+import { I_TRAINER_REGISTER_USECASE_TOKEN, IRegisterUseCase } from 'application/interfaces/auth/i-register.usecase';
 import { RegisterResponseDTO, TrainerRegisterRequestDTO } from 'application/dto/auth/register.dto';
-import { IVerifyAccountUseCase } from 'application/interfaces/public/i-verify-otp.usecase';
+import { I_VERIFY_TRAINER_ACCOUNT_TOKEN, IVerifyAccountUseCase } from 'application/interfaces/public/i-verify-otp.usecase';
 import { VerifyAccountRequestDTO } from 'application/dto/public/verify-account.dto';
 @injectable()
 export class TrainerAuthController {
     constructor(
-        @inject("TrainerRegisterUseCase") private _register: IRegisterUseCase<TrainerRegisterRequestDTO>,
-        @inject("TrainerLoginUseCase") private _login: ILoginUseCase,
-        @inject("VerifyTrainerAccountUseCase") private _verify: IVerifyAccountUseCase,
+        @inject(I_TRAINER_REGISTER_USECASE_TOKEN) private _register: IRegisterUseCase<TrainerRegisterRequestDTO>,
+        @inject(I_TRAINER_LOGIN_USECASE_TOKEN) private _login: ILoginUseCase,
+        @inject(I_VERIFY_TRAINER_ACCOUNT_TOKEN) private _verify: IVerifyAccountUseCase,
     ) { }
 
 

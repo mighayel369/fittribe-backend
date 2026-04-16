@@ -1,17 +1,17 @@
 import { RequestLeaveDTO } from "application/dto/leave/request.leave.dto";
 import { IApplyLeaveRequest } from "application/interfaces/leave/i-apply-leave-requests.usecase";
-import { ILeaveRepo } from "domain/repositories/ILeaveRepo";
+import { I_LEAVE_REPO_TOKEN, ILeaveRepo } from "domain/repositories/ILeaveRepo";
 import { inject, injectable } from "tsyringe";
 import { LeaveMapper } from "application/mappers/leave-mapper";
-import { ICloudinaryService } from "domain/services/ICloudinaryService";
+import { I_CLOUDINARY_SERVICE_TOKEN, ICloudinaryService } from "domain/services/ICloudinaryService";
 import { MAX_LEAVE_COUNT } from "utils/Constants";
 import { AppError } from "domain/errors/AppError";
 import { HttpStatus } from "utils/HttpStatus";
 @injectable()
 export class ApplyLeaveRequests implements IApplyLeaveRequest {
     constructor(
-        @inject("LeaveRepository") private _leaveRepo: ILeaveRepo,
-        @inject("ICloudinaryService") private readonly _cloudinary: ICloudinaryService
+        @inject(I_LEAVE_REPO_TOKEN) private _leaveRepo: ILeaveRepo,
+        @inject(I_CLOUDINARY_SERVICE_TOKEN) private readonly _cloudinary: ICloudinaryService
     ) { }
 
     async execute(input: RequestLeaveDTO): Promise<void> {
