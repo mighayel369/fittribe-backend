@@ -1,6 +1,5 @@
-
-import 'reflect-metadata';
 import 'dotenv/config';
+import 'reflect-metadata';
 import logger from 'utils/logger';
 import 'infrastructure/config/container';
 import { container } from "tsyringe";
