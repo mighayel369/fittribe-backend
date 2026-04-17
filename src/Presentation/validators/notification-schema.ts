@@ -1,5 +1,5 @@
 import { z } from 'zod';
 
 export const notificationIdParamSchema = z.object({
-  id: z.string().uuid("Invalid Notification ID format"),
+  notificationId: z.string().min(1,"Invalid Notification ID format"),
 });

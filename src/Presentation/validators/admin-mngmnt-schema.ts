@@ -8,6 +8,7 @@ export const updateLeaveStatusSchema = z.object({
   adminComment: z.string()
     .max(500, "Comment cannot exceed 500 characters")
     .optional(),
+    leaveId:z.string("invalid leaveId format")
 });
 
 export const adminQuerySchema = z.object({

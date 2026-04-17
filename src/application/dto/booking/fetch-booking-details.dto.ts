@@ -70,7 +70,7 @@ export interface AdminBookingDetailsResponseDTO{
   scheduledDate:string
   scheduledTime:string
   duration:number
-  sssionType:string
+  sessionType:string
   bookingStatus:string
   payment:{
     baseRate:number

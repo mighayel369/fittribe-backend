@@ -47,7 +47,8 @@ export class TrainerManagementController {
 
     getTrainerDetails = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const result = await this._getDetails.execute(req.params.id);
+            const { trainerId } = req.params
+            const result = await this._getDetails.execute(trainerId);
             res.status(HttpStatus.OK).json({ success: true, trainer: result });
         } catch (error) { next(error); }
     };
@@ -56,7 +57,7 @@ export class TrainerManagementController {
     updateAccountStatus = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const payload: UpdateStatusRequestDTO = {
-                id: req.params.id,
+                id: req.body.trainerId,
                 isActive: req.body.status
             };
             const result = await this._toggleStatus.execute(payload);
@@ -67,7 +68,7 @@ export class TrainerManagementController {
     approveOrRejectTrainer = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const input: TrainerApprovalRequestDTO = {
-                trainerId: req.params.id,
+                trainerId: req.body.trainerId,
                 action: req.body.action,
                 reason: req.body.reason
             };

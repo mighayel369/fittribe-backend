@@ -79,7 +79,6 @@ constructor(
     };
     getLeaveMetrics = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            console.log('hello')
             const { id } = req.user as { id: string };
             const metrics = await this._getMetrics.execute(id);
 
@@ -94,9 +93,10 @@ constructor(
 
     withdrawLeaveRequest = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const { id } = req.user as { id: string };
-            if (!id) throw new AppError(ERROR_MESSAGES.UNAUTHORIZED, HttpStatus.UNAUTHORIZED);
-            let leaveId = req.params.id
+            let leaveId= req.params.id
+            if(!leaveId){
+                throw new AppError("leave id missing",HttpStatus.BAD_REQUEST)
+            }
             await this._withdrawLeaveRequest.execute(leaveId)
             res.status(HttpStatus.OK).json({
                 success: true,

@@ -37,9 +37,14 @@ export const forgotPasswordSchema=z.object({
   email:z.email("Invalid email format")
 })
 
-export const resetPasswordSchema=z.object({
-  token:z.string(),
-  newPassword:z.string()
+export const resetPasswordSchema = z.object({
+  token: z.string().min(1, "Token is missing"), 
+  password: z.string()
+    .min(8, "New password must be at least 8 characters")
+    .regex(/[A-Z]/, "New password must contain at least one uppercase letter")
+    .regex(/[a-z]/, "New password must contain at least one lowercase letter")
+    .regex(/[0-9]/, "New password must contain at least one number")
+    .regex(/[^A-Za-z0-9]/, "New password must contain at least one special character")
 })
 
 export const changePasswordSchema = z.object({

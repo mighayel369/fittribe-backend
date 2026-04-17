@@ -14,9 +14,14 @@ export const modifyProgramSchema = onboardProgramSchema.partial();
 
 export const toggleVisibilitySchema = z.object({
   status: z.boolean("Status required"),
+  programId:z.string().min(1,"invalid programId")
 });
 
 export const inventoryQuerySchema = z.object({
   pageNo: z.coerce.number().min(1).default(1),
   search: z.string().optional().default(""),
+});
+
+export const ProgramIdSchema = z.object({
+  programId: z.string("Invalid Program ID format")
 });

@@ -17,7 +17,7 @@ export class GoogleAuthServiceImpl implements IGoogleAuthService {
         {
           clientID: config.GOOGLE_CLIENT_ID,
           clientSecret: config.GOOGLE_CLIENT_SECRET,
-          callbackURL: 'http://localhost:5000/user/auth/google/callback'
+          callbackURL: config.GOOGLE_CALLBACK
         },
         async (accessToken, refreshToken, profile, done) => {
           try {
