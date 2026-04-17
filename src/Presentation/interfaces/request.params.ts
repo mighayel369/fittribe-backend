@@ -1,38 +1,38 @@
 
 export interface BookingParams {
-    bookingId: string;
+    bookingId?: string;
 }
 
 export interface LeaveParams {
-    leaveId: string;
+    leaveId?: string;
 }
 
 export interface ReceiverParams {
-    receiverId: string;
+    receiverId?: string;
 }
 
 export interface trainerParams {
-    trainerId: string;
+    trainerId?: string;
 }
 
 export interface ChatParams {
-    chatId: string;
+    chatId?: string;
 }
 
 export interface ReviewParams {
-    reviewId: string;
+    reviewId?: string;
 }
 
 export interface NotificationParams {
-    notificationId: string;
+    notificationId?: string;
 }
 
 
 export interface UserParams {
-    userId: string;
+    userId?: string;
 }
 
 
 export interface ProgramParams {
-    ProgramId: string;
+    ProgramId?: string;
 }

@@ -45,6 +45,9 @@ export class UserManagementController {
     getUserDetails = async (req:Request<UserParams>, res: Response, next: NextFunction) => {
         try {
             const {userId}=req.params
+            if (!userId) {
+            throw new AppError(ERROR_MESSAGES.MISSING_REQUIRED_DATA, HttpStatus.BAD_REQUEST);
+        }
             const userData = await this._findDetails.execute(userId);
             res.status(HttpStatus.OK).json({
                 success: true,

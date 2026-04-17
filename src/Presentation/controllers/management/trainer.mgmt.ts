@@ -49,6 +49,9 @@ export class TrainerManagementController {
     getTrainerDetails = async (req:Request<trainerParams>, res: Response, next: NextFunction) => {
         try {
             const { trainerId } = req.params
+            if (!trainerId) {
+            throw new AppError(ERROR_MESSAGES.MISSING_REQUIRED_DATA, HttpStatus.BAD_REQUEST);
+        }
             const result = await this._getDetails.execute(trainerId);
             res.status(HttpStatus.OK).json({ success: true, trainer: result });
         } catch (error) { next(error); }
