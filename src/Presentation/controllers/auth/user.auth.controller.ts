@@ -78,24 +78,24 @@ login = async (req: Request, res: Response, next: NextFunction) => {
         }
     };
 
-    resetPassword = async (req: Request, res: Response, next: NextFunction) => {
-        try {
-            const { token } = req.params;
-            const { password } = req.body;
-            let payload: ResetPasswordTokenBasedDTO = {
-                token,
-                newPassword: password
-            }
-            await this._resetPassword.execute(payload);
+resetPassword = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { password, token } = req.body; 
+        let payload: ResetPasswordTokenBasedDTO = {
+            token: token, 
+            newPassword: password
+        };
 
-            res.status(HttpStatus.OK).json({
-                success: true,
-                message: SUCCESS_MESSAGES.USER.PASSWORD_UPDATED,
-            });
-        } catch (error) {
-            next(error);
-        }
-    };
+        await this._resetPassword.execute(payload);
+
+        res.status(HttpStatus.OK).json({
+            success: true,
+            message: SUCCESS_MESSAGES.USER.PASSWORD_UPDATED,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
 
     verifyOtp = async (req: Request, res: Response, next: NextFunction) => {
         try {

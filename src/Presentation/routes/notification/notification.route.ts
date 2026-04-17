@@ -7,7 +7,7 @@ const router = express.Router();
 const ctrl = container.resolve(NotificationController);
 router.get('/get',ctrl.getNotifications)
 router.patch(
-  '/mark-as-read/:id', 
+  '/mark-as-read/:notificationId', 
   validateRequest(notificationIdParamSchema, "params"), 
   ctrl.markAsRead
 );

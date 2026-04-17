@@ -11,7 +11,7 @@ router.post('/register', validateRequest(userRegisterSchema), ctrl.register);
 router.post('/login', validateRequest(loginSchema), ctrl.login);
 
 router.post('/forgot-password', validateRequest(forgotPasswordSchema), ctrl.forgotPassword);
-router.post('/reset-password/:token', validateRequest(loginSchema), ctrl.resetPassword);
+router.post('/reset-password', validateRequest(resetPasswordSchema), ctrl.resetPassword);
 
 
 router.get('/google', passport.authenticate('google', {

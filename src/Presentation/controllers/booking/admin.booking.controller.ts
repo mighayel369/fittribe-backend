@@ -3,7 +3,7 @@ import { NextFunction, Request, Response } from "express";
 import { injectable, inject } from "tsyringe";
 import { IFetchAllBookingsUseCase, I_FETCH_ADMIN_ALL_BOOKINGS_TOKEN } from "application/interfaces/booking/i-fetch-all-bookings.usecase";
 import { HttpStatus } from "utils/HttpStatus";
-import { FetchAdminBookingDashboardResponseDTO, FetchAllBookingsListRequestDTO, FetchAllBookingsListResponseDTO, FetchAllTrainerRescheduleBookingsResponseDTO } from "application/dto/booking/fetch-all-bookings.dto";
+import { FetchAdminBookingDashboardResponseDTO, FetchAllBookingsListRequestDTO, FetchAllBookingsListResponseDTO } from "application/dto/booking/fetch-all-bookings.dto";
 import { PAGINATION } from "utils/Constants";
 import { I_ADMIN_BOOKING_DASHBOARD_METRICS, IFetchAdminBookingsMetrics } from "application/interfaces/booking/i-fetch-admin-bookings.metrics";
 import { IFetchBookingDetails, I_FETCH_ADMIN_BOOKING_DETAILS_TOKEN } from "application/interfaces/booking/i-fetch-booking-details.usecase";
@@ -40,7 +40,7 @@ export class AdminBookingController {
     getBookingMetrics = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const range = (req.query.range as '7days' | '6months') || '7days';
-            const data = await this._fetchBookingMetrics.execute(range);
+            const data:FetchAdminBookingDashboardResponseDTO = await this._fetchBookingMetrics.execute(range);
 
             res.status(200).json({
                 success: true,
@@ -53,8 +53,8 @@ export class AdminBookingController {
 
     getBookingDetails = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            let bookingId=req.params.id
-           let result=await this._fetchBookingDetails.execute(bookingId)
+            let bookingId=req.params.bookingId
+           let result:AdminBookingDetailsResponseDTO=await this._fetchBookingDetails.execute(bookingId)
            res.status(HttpStatus.OK).json({
             success:true,
             data:result

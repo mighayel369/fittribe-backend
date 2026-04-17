@@ -6,11 +6,11 @@ import { AppError } from 'domain/errors/AppError';
 import config from 'config';
 import { SUCCESS_MESSAGES } from 'utils/SuccessMessages';
 import { I_FETCH_TRAINER_ALL_BOOKINGS_TOKEN, I_FETCH_TRAINER_PENDING_BOOKINGS_TOKEN, I_FETCH_TRAINER_RESCHEDULE_REQUESTS_TOKEN, IFetchAllBookingsUseCase } from 'application/interfaces/booking/i-fetch-all-bookings.usecase';
-import { IFetchBookingDetails,I_FETCH_TRAINER_BOOKING_DETAILS_TOKEN } from 'application/interfaces/booking/i-fetch-booking-details.usecase';
+import { IFetchBookingDetails, I_FETCH_TRAINER_BOOKING_DETAILS_TOKEN } from 'application/interfaces/booking/i-fetch-booking-details.usecase';
 import { FetchAllTrainerBookingRequestDTO, FetchAllTrainerBookingsResponseDTO, FetchAllTrainerPendingBookingsResponseDTO, FetchAllTrainerRescheduleBookingsResponseDTO } from "application/dto/booking/fetch-all-bookings.dto";
 import { TrainerBookingDetailsResponseDTO } from "application/dto/booking/fetch-booking-details.dto";
-import { IConfirmBookingUseCase,I_CONFIRM_BOOKING_USE_CASE_TOKEN } from "application/interfaces/booking/i-confirm-booking.usecase";
-import { IDeclineBookingUseCase,I_DECLINE_BOOKING_USE_CASE_TOKEN } from "application/interfaces/booking/i-decline-booking-request.usecase";
+import { IConfirmBookingUseCase, I_CONFIRM_BOOKING_USE_CASE_TOKEN } from "application/interfaces/booking/i-confirm-booking.usecase";
+import { IDeclineBookingUseCase, I_DECLINE_BOOKING_USE_CASE_TOKEN } from "application/interfaces/booking/i-decline-booking-request.usecase";
 import { ProcessRescheduleRequestDTO } from "application/dto/booking/process-reschedule.dto";
 import { I_ACCEPT_RESCHEDULE_REQUEST_TOKEN, I_DECLINE_RESCHEDULE_REQUEST_TOKEN, IProcessTrainerRescheduleUseCase } from "application/interfaces/booking/i-process-trainer-reschedule.usecase";
 import { RescheduleRequestDTO } from 'application/dto/booking/reschedule-request.dto';
@@ -27,7 +27,7 @@ export class TrainerBookingController {
         @inject(I_DECLINE_RESCHEDULE_REQUEST_TOKEN) private _declineReschedule: IProcessTrainerRescheduleUseCase,
         @inject(I_FETCH_TRAINER_ALL_BOOKINGS_TOKEN) private _fetchAll: IFetchAllBookingsUseCase<FetchAllTrainerBookingRequestDTO, FetchAllTrainerBookingsResponseDTO>,
         @inject(I_FETCH_TRAINER_PENDING_BOOKINGS_TOKEN) private _fetchPending: IFetchAllBookingsUseCase<FetchAllTrainerBookingRequestDTO, FetchAllTrainerPendingBookingsResponseDTO>,
-        @inject(I_FETCH_TRAINER_BOOKING_DETAILS_TOKEN ) private _findDetails: IFetchBookingDetails<TrainerBookingDetailsResponseDTO>,
+        @inject(I_FETCH_TRAINER_BOOKING_DETAILS_TOKEN) private _findDetails: IFetchBookingDetails<TrainerBookingDetailsResponseDTO>,
         @inject(I_FETCH_TRAINER_RESCHEDULE_REQUESTS_TOKEN) private _fetchReschedule: IFetchAllBookingsUseCase<FetchAllTrainerBookingRequestDTO, FetchAllTrainerRescheduleBookingsResponseDTO>,
         @inject(I_TRAINER_RESCHEDULE_BOOKING_TOKEN) private _rescheduleBookingByTrainer: IRequestBookingRescheduleUseCase,
         @inject(I_GET_MEET_LINK_TOKEN) private _getmeetlink: IGetMeetLink,
@@ -208,7 +208,10 @@ export class TrainerBookingController {
 
     getMeetLink = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            let bookingId = req.params.id
+            let bookingId = req.params.bookingId
+            if (!bookingId) {
+                throw new AppError(ERROR_MESSAGES.BOOKING_NOT_FOUND, HttpStatus.BAD_REQUEST)
+            }
             let meetLink = await this._getmeetlink.execute(bookingId)
 
             res.status(HttpStatus.OK).json({
@@ -223,7 +226,10 @@ export class TrainerBookingController {
 
     markAsComplete = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            let bookingId = req.params.id
+            let bookingId = req.params.bookingId
+            if (!bookingId) {
+                throw new AppError(ERROR_MESSAGES.BOOKING_NOT_FOUND, HttpStatus.BAD_REQUEST)
+            }
             await this._markAsComplete.execute(bookingId)
 
             res.status(HttpStatus.OK).json({

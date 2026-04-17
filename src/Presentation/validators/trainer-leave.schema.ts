@@ -30,3 +30,6 @@ export const leaveHistorySchema = z.object({
     limit: z.coerce.number().min(1).max(50).default(5),
     search: z.string().optional().default(""),
 });
+export const withdrawLeaveSchema = z.object({
+  id: z.string().uuid("Invalid UUID format"),
+});

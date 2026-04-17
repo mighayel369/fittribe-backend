@@ -31,7 +31,7 @@ export class CancelUserBookingUseCase implements ICancelBooking {
     
 
     await this._walletRepo.releaseHoldWithoutBalance(booking.trainerId, bookingId);
-    await this._walletRepo.releaseHoldWithoutBalance(config.ADMIN_WALLET, bookingId);
+    await this._walletRepo.releaseHoldWithoutBalance(config.ADMIN, bookingId);
 
     await this._walletRepo.credit(
       userId, 

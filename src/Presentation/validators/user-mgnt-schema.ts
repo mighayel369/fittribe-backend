@@ -3,6 +3,7 @@ import { z } from 'zod';
 
 export const updateUserStatusSchema = z.object({
   status: z.boolean("Status is required"),
+  userId: z.string().min(1,"Invalid User ID format")
 });
 
 export const userQuerySchema = z.object({
@@ -13,5 +14,5 @@ export const userQuerySchema = z.object({
 
 
 export const adminUserIdParamSchema = z.object({
-  id: z.string("Invalid User ID format"),
+  userId: z.string().min(1,"Invalid User ID format")
 });

@@ -15,13 +15,14 @@ interface Env {
   CLOUDINARY_CLOUD_NAME: string;
   CLOUDINARY_API_KEY: string;
   CLOUDINARY_API_SECRET: string;
-  CLIENT_URL:string;
+  CLIENT_URL: string;
   COOKIE_MAX_AGE: number;
-  ADMIN_PERCENT:number;
-  RAZORPAY_ID:string;
-  RAZORPAY_SECRET:string;
-  ADMIN:string;
-  SESSION_DURATION:number;
+  ADMIN_PERCENT: number;
+  RAZORPAY_ID: string;
+  RAZORPAY_SECRET: string;
+  ADMIN: string;
+  SESSION_DURATION: number;
+  GOOGLE_CALLBACK: string;
 }
 
 const ensureEnv = (key: string): string => {
@@ -46,13 +47,14 @@ const getConfig = (): Env => {
     CLOUDINARY_CLOUD_NAME: ensureEnv('CLOUDINARY_CLOUD_NAME'),
     CLOUDINARY_API_KEY: ensureEnv('CLOUDINARY_API_KEY'),
     CLOUDINARY_API_SECRET: ensureEnv('CLOUDINARY_API_SECRET'),
-    CLIENT_URL:ensureEnv('CLIENT_URL'),
+    CLIENT_URL: ensureEnv('CLIENT_URL'),
     COOKIE_MAX_AGE: Number(ensureEnv("COOKIE_MAX_AGE")),
-    ADMIN_PERCENT:Number(ensureEnv("ADMIN_PERCENT")),
-    RAZORPAY_ID:ensureEnv("RAZORPAY_KEYID"),
-    RAZORPAY_SECRET:ensureEnv("RAZORPAY_KEYSECRET"),
-    ADMIN:ensureEnv("ADMIN"),
-    SESSION_DURATION:Number(ensureEnv("SESSION_DURATION"))
+    ADMIN_PERCENT: Number(ensureEnv("ADMIN_PERCENT")),
+    RAZORPAY_ID: ensureEnv("RAZORPAY_KEYID"),
+    RAZORPAY_SECRET: ensureEnv("RAZORPAY_KEYSECRET"),
+    ADMIN: ensureEnv("ADMIN"),
+    SESSION_DURATION: Number(ensureEnv("SESSION_DURATION")),
+    GOOGLE_CALLBACK: ensureEnv("GOOGLE_CALLBACK")
   };
 };
 

@@ -9,7 +9,7 @@ router.get('/platform-overview', ctrl.getPlatformInsights);
 router.get('/leave-metrics', ctrl.getLeaveMetrics);
 router.get('/history', validateRequest(adminQuerySchema, "query"), ctrl.getLeaveRequestsHistory);
 router.patch(
-  '/update-status/:id', 
+  '/update-status', 
   validateRequest(updateLeaveStatusSchema), 
   ctrl.updateLeaveStatus
 );

@@ -21,8 +21,10 @@ export class SharedChatController {
     getChatId = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const userId = (req.user as { id: string })?.id;
-            const receiverId = req.params.id;
-
+            const receiverId = req.params.receiverId;
+            if (!receiverId) {
+                throw new AppError(ERROR_MESSAGES.MISSING_REQUIRED_DATA, HttpStatus.BAD_REQUEST)
+            }
             if (!userId) {
                 throw new AppError(ERROR_MESSAGES.UNAUTHORIZED, HttpStatus.UNAUTHORIZED);
             }
@@ -50,8 +52,10 @@ export class SharedChatController {
 
     getMessages = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const { id } = req.user as { id: string };
-            const chatId = req.params.id
+            const chatId = req.params.chatId
+            if (!chatId) {
+                throw new AppError("ChatId Missing", HttpStatus.BAD_REQUEST)
+            }
             const messages = await this._fetchMessages.execute(chatId)
             console.log(messages)
             res.status(HttpStatus.OK).json({
@@ -68,8 +72,11 @@ export class SharedChatController {
     markMessageAsRead = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { id } = req.user as { id: string };
-            const chatId = req.params.id
-            await this._markMessageAsRead.execute(chatId,id)
+            const chatId = req.params.chatId
+            if (!chatId) {
+                throw new AppError("ChatId Missing", HttpStatus.BAD_REQUEST)
+            }
+            await this._markMessageAsRead.execute(chatId, id)
 
             res.status(HttpStatus.OK).json({
                 success: true,

@@ -83,6 +83,9 @@ export class UserBookingController {
             if (!userId) throw new AppError("Unauthorized", 401);
 
             const { bookingId } = req.params;
+            if (!bookingId) {
+                throw new AppError(ERROR_MESSAGES.BOOKING_NOT_FOUND, HttpStatus.NOT_FOUND)
+            }
             await this._cancelBooking.execute(bookingId);
 
             res.status(200).json({
@@ -129,9 +132,11 @@ export class UserBookingController {
     };
     getBookingDetails = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const { id } = req.params;
-
-            const booking: UserBookingDetailsResponseDTO = await this._getDetails.execute(id);
+            const { bookingId } = req.params;
+            if (!bookingId) {
+                throw new AppError(ERROR_MESSAGES.BOOKING_NOT_FOUND, HttpStatus.NOT_FOUND)
+            }
+            const booking: UserBookingDetailsResponseDTO = await this._getDetails.execute(bookingId);
 
             if (!booking) {
                 res.status(404).json({ success: false, message: "Booking not found" });

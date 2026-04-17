@@ -66,13 +66,11 @@ export class ProgramsManagementController {
 
     modifyProgramSpecifications = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const { id } = req.params;
-            const { name, description, duration } = req.body;
-
-            if (!id) throw new AppError(ERROR_MESSAGES.INVALID_CREDENTIALS, HttpStatus.BAD_REQUEST);
+           
+            const { name, description, programId } = req.body;
 
             const updateDto: ModifyProgramSpecsRequestDTO = {
-                programId: id,
+                programId,
                 name,
                 description,
                 file: req.file
@@ -91,10 +89,10 @@ export class ProgramsManagementController {
 
     archiveProgram = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const { id } = req.params;
-            if (!id) throw new AppError(ERROR_MESSAGES.MISSING_REQUIRED_DATA, HttpStatus.BAD_REQUEST);
+            const { programId } = req.params;
+            if (!programId) throw new AppError(ERROR_MESSAGES.MISSING_REQUIRED_DATA, HttpStatus.BAD_REQUEST);
 
-            await this._archiveProgram.execute(id);
+            await this._archiveProgram.execute(programId);
 
             res.status(HttpStatus.OK).json({
                 success: true,
@@ -107,10 +105,10 @@ export class ProgramsManagementController {
 
     toggleProgramVisibility = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const { id } = req.params;
-            const { status } = req.body;
 
-            const payload: ToggleProgramVisibilityRequestDTO = { programId: id, isPublished: status };
+            const { status,programId } = req.body;
+
+            const payload: ToggleProgramVisibilityRequestDTO = { programId, isPublished: status };
             const response = await this._toggleVisibility.execute(payload);
 
             res.status(HttpStatus.OK).json({

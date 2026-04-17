@@ -13,7 +13,6 @@ export class UserReviewController {
      addReview=async(req: Request, res: Response,next:NextFunction)=>{
         try {
             const { rating, comment, trainerId, bookingId } = req.body;
-            console.log(req.body)
             const { id: userId } = req.user as { id: string };
             let input: AddReviewDTO = {
                 rating,
@@ -22,7 +21,6 @@ export class UserReviewController {
                 bookingId,
                 userId
             }
-            console.log(input)
             await this._addReviewUseCase.execute(input);
 
             res.status(HttpStatus.CREATED).json({

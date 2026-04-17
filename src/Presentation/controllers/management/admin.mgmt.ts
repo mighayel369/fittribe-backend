@@ -82,10 +82,9 @@ export class AdminManagementController {
 
     updateLeaveStatus = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const { id: leaveId } = req.params;
 
             const input: UpdateLeaveStatusRequestDTO = {
-                leaveId,
+                leaveId:req.body.leaveId,
                 status: req.body.status,
                 adminComment: req.body.adminComment
             };
