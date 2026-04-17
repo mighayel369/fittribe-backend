@@ -13,6 +13,7 @@ import { FetchAllClientTrainersResponseDTO } from 'application/dto/trainer/fetch
 import { I_FETCH_TRAINER_AVAILABLE_SLOTS_TOKEN, IFetchTrainerAvailableSlotsUseCase } from 'application/interfaces/slot/i-fetch-trainer-available-slots.usecase';
 import { FetchAvailableSlotResponseDTO, FetchAvailableSlotsRequestDTO } from 'application/dto/slot/fetch-trainer-available-slots.dto';
 import { I_GET_TRAINER_REVIEW_LISTS_TOKEN, IGetTrainerReviewLists } from 'application/interfaces/review/i-get-trainer-review-lists';
+import { trainerParams } from 'Presentation/interfaces/request.params';
 
 @injectable()
 export class TrainerDiscoveryController {
@@ -40,7 +41,7 @@ export class TrainerDiscoveryController {
         } catch (error) { next(error); }
     };
 
-    getTrainerDetails = async (req: Request, res: Response, next: NextFunction) => {
+    getTrainerDetails = async (req: Request<trainerParams>, res: Response, next: NextFunction) => {
         try {
             const { trainerId } = req.params
             if (!trainerId) throw new AppError(ERROR_MESSAGES.MISSING_REQUIRED_DATA, HttpStatus.BAD_REQUEST)
@@ -71,7 +72,7 @@ export class TrainerDiscoveryController {
     };
 
 
-    getReviewList = async (req: Request, res: Response, next: NextFunction) => {
+    getReviewList = async (req: Request<trainerParams>, res: Response, next: NextFunction) => {
         try {
             const {trainerId}=req.params
             if (!trainerId) throw new AppError(ERROR_MESSAGES.MISSING_REQUIRED_DATA, HttpStatus.BAD_REQUEST)

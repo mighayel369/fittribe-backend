@@ -12,6 +12,7 @@ import { I_UPDATE_USER_STATUS_TOKEN, IUpdateStatus } from 'application/interface
 import { FetchAllUsersRequestDTO, FetchAllUsersResponseDTO } from 'application/dto/user/fetch-all-users.dto';
 import { UpdateStatusRequestDTO, UpdateStatusResponseDTO } from 'application/dto/common/update-status.dto';
 import { PAGINATION } from 'utils/Constants';
+import { UserParams } from 'Presentation/interfaces/request.params';
 @injectable()
 export class UserManagementController {
     constructor(
@@ -41,9 +42,10 @@ export class UserManagementController {
         } catch (error) { next(error); }
     };
 
-    getUserDetails = async (req: Request, res: Response, next: NextFunction) => {
+    getUserDetails = async (req:Request<UserParams>, res: Response, next: NextFunction) => {
         try {
-            const userData = await this._findDetails.execute(req.params.id);
+            const {userId}=req.params
+            const userData = await this._findDetails.execute(userId);
             res.status(HttpStatus.OK).json({
                 success: true,
                 message: SUCCESS_MESSAGES.USER.USER_DETAILS_FETCHED,
@@ -54,7 +56,7 @@ export class UserManagementController {
     toggleUserStatus = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const payload: UpdateStatusRequestDTO = {
-                id: req.params.id,
+                id: req.body.userId,
                 isActive: req.body.status
             };
 

@@ -22,7 +22,7 @@ router.get(
 
 router.get('/metrics', ctrl.getLeaveMetrics);
 router.patch(
-    '/withdraw/:id', 
+    '/withdraw/:leaveId', 
     validateRequest(withdrawLeaveSchema, "params"), 
     ctrl.withdrawLeaveRequest
 );

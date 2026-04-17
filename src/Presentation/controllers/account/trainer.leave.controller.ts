@@ -12,6 +12,7 @@ import { IFetchAllLeaveRequests,I_FETCH_ALL_TRAINER_LEAVE_REQUESTS_TOKEN } from 
 import { IWithdrawLeaveRequest,I_WITHDRAW_LEAVE_REQUEST_TOKEN} from 'application/interfaces/leave/i-withdraw-leave-request';
 import { ITrainerLeaveMetrics,I_GET_TRAINER_LEAVE_METRICS_TOKEN } from 'application/interfaces/leave/i-trainer-leave-metrics';
 import { PAGINATION } from 'utils/Constants';
+import { LeaveParams } from 'Presentation/interfaces/request.params';
 @injectable()
 export class LeaveController {
 constructor(
@@ -91,9 +92,9 @@ constructor(
         }
     }
 
-    withdrawLeaveRequest = async (req: Request, res: Response, next: NextFunction) => {
+    withdrawLeaveRequest = async (req: Request<LeaveParams>, res: Response, next: NextFunction) => {
         try {
-            let leaveId= req.params.id
+            let leaveId= req.params.leaveId
             if(!leaveId){
                 throw new AppError("leave id missing",HttpStatus.BAD_REQUEST)
             }

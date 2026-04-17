@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const bookingIdSchema=z.object({
-    bookingId: z.string("Invalid booking ID format"),
+    bookingId: z.string().min(1,"Invalid booking ID format"),
 });
 
 

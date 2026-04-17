@@ -14,6 +14,7 @@ import { FetchAllPendingTrainersResponseDTO, FetchAllTrainersRequestDTO, FetchAl
 import { I_FETCH_TRAINER_DETAILS_ADMIN_TOKEN, IFetchTrainerDetails } from 'application/interfaces/trainer/i-fetch-trainer-details.usecase';
 import { TrainerDetailsResponseDTO } from 'application/dto/trainer/fetch-trainer-details.dto';
 import { PAGINATION } from 'utils/Constants';
+import { trainerParams } from 'Presentation/interfaces/request.params';
 @injectable()
 export class TrainerManagementController {
     constructor(
@@ -45,7 +46,7 @@ export class TrainerManagementController {
         } catch (error) { next(error); }
     };
 
-    getTrainerDetails = async (req: Request, res: Response, next: NextFunction) => {
+    getTrainerDetails = async (req:Request<trainerParams>, res: Response, next: NextFunction) => {
         try {
             const { trainerId } = req.params
             const result = await this._getDetails.execute(trainerId);

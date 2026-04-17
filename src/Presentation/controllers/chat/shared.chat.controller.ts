@@ -7,6 +7,7 @@ import { AppError } from 'domain/errors/AppError';
 import { ERROR_MESSAGES } from 'utils/ErrorMessage';
 import { I_GET_MESSAGES_TOKEN, IgetMessages } from 'application/interfaces/chat/i-get-messages';
 import { I_MARK_MESSAGE_AS_READ_TOKEN, IMarkMessageAsRead } from 'application/interfaces/chat/i-mark-as-read';
+import { ChatParams, ReceiverParams } from 'Presentation/interfaces/request.params';
 @injectable()
 export class SharedChatController {
     constructor(
@@ -18,7 +19,7 @@ export class SharedChatController {
         @inject(I_MARK_MESSAGE_AS_READ_TOKEN) private _markMessageAsRead: IMarkMessageAsRead
     ) { }
 
-    getChatId = async (req: Request, res: Response, next: NextFunction) => {
+    getChatId = async (req: Request<ReceiverParams>, res: Response, next: NextFunction) => {
         try {
             const userId = (req.user as { id: string })?.id;
             const receiverId = req.params.receiverId;
@@ -50,7 +51,7 @@ export class SharedChatController {
         }
     }
 
-    getMessages = async (req: Request, res: Response, next: NextFunction) => {
+    getMessages = async (req: Request<ChatParams>, res: Response, next: NextFunction) => {
         try {
             const chatId = req.params.chatId
             if (!chatId) {
@@ -69,7 +70,7 @@ export class SharedChatController {
     }
 
 
-    markMessageAsRead = async (req: Request, res: Response, next: NextFunction) => {
+    markMessageAsRead = async (req: Request<ChatParams>, res: Response, next: NextFunction) => {
         try {
             const { id } = req.user as { id: string };
             const chatId = req.params.chatId

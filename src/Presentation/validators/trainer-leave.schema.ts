@@ -31,5 +31,5 @@ export const leaveHistorySchema = z.object({
     search: z.string().optional().default(""),
 });
 export const withdrawLeaveSchema = z.object({
-  id: z.string().uuid("Invalid UUID format"),
+  leaveId: z.string().min(1,"Invalid UUID format"),
 });

@@ -7,6 +7,7 @@ import { HttpStatus } from "utils/HttpStatus";
 import { I_FLAG_REVIEW_TOKEN, IFlagReview } from "application/interfaces/review/i-flag-review";
 import { AppError } from "domain/errors/AppError";
 import { ERROR_MESSAGES } from "utils/ErrorMessage";
+import { ReviewParams } from "Presentation/interfaces/request.params";
 
 @injectable()
 export class AdminReviewController {
@@ -29,7 +30,7 @@ export class AdminReviewController {
         }
     }
 
-    flagReview = async (req: Request, res: Response, next: NextFunction) => {
+    flagReview = async (req: Request<ReviewParams>, res: Response, next: NextFunction) => {
         try {
             let {reviewId}=req.params
             if(!reviewId){

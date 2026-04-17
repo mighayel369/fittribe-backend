@@ -6,6 +6,7 @@ import { HttpStatus } from "../../../utils/HttpStatus";
 import { AppError } from "domain/errors/AppError";
 import { ERROR_MESSAGES } from "utils/ErrorMessage";
 import { IMarkAsRead, I_MARK_ALL_NOTIFICATIONS_AS_READ_TOKEN, I_MARK_NOTIFICATION_AS_READ_TOKEN } from "application/interfaces/notification/i-mark-as-read";
+import { NotificationParams } from "Presentation/interfaces/request.params";
 @injectable()
 export class NotificationController {
     constructor(
@@ -32,7 +33,7 @@ export class NotificationController {
         }
     }
 
-    markAsRead = async (req: Request, res: Response, next: NextFunction) => {
+    markAsRead = async (req: Request<NotificationParams>, res: Response, next: NextFunction) => {
         try {
             const { id: userId } = req.user as { id: string };
             const { notificationId } = req.params;

@@ -18,6 +18,7 @@ import { I_TRAINER_RESCHEDULE_BOOKING_TOKEN, IRequestBookingRescheduleUseCase } 
 import { PAGINATION, UserRole } from 'utils/Constants';
 import { I_GET_MEET_LINK_TOKEN, IGetMeetLink } from 'application/interfaces/booking/i-get-meetlink.usecase';
 import { I_MARK_AS_COMPLETE_TOKEN, IMarkAsComplete } from 'application/interfaces/booking/i-mark-as-complete';
+import { BookingParams } from 'Presentation/interfaces/request.params';
 @injectable()
 export class TrainerBookingController {
     constructor(
@@ -188,7 +189,7 @@ export class TrainerBookingController {
         } catch (err) { next(err); }
     };
 
-    getBookingDetails = async (req: Request, res: Response, next: NextFunction) => {
+    getBookingDetails = async (req: Request<BookingParams>, res: Response, next: NextFunction) => {
         try {
             const { bookingId } = req.params;
             if (!bookingId) {
@@ -206,7 +207,7 @@ export class TrainerBookingController {
         }
     };
 
-    getMeetLink = async (req: Request, res: Response, next: NextFunction) => {
+    getMeetLink = async (req: Request<BookingParams>, res: Response, next: NextFunction) => {
         try {
             let bookingId = req.params.bookingId
             if (!bookingId) {
@@ -224,7 +225,7 @@ export class TrainerBookingController {
         }
     }
 
-    markAsComplete = async (req: Request, res: Response, next: NextFunction) => {
+    markAsComplete = async (req: Request<BookingParams>, res: Response, next: NextFunction) => {
         try {
             let bookingId = req.params.bookingId
             if (!bookingId) {

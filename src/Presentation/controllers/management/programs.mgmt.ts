@@ -17,6 +17,7 @@ import { ToggleProgramVisibilityRequestDTO, ToggleProgramVisibilityResponseDTO }
 import { ProgramDetailsResponseDTO } from 'application/dto/programs/program-details.dto';
 import { I_FETCH_PROGRAM_DETAILS_TOKEN, IFetchProgramDetails } from 'application/interfaces/program/i-program-details';
 import { PAGINATION } from 'utils/Constants';
+import { ProgramParams } from 'Presentation/interfaces/request.params';
 @injectable()
 export class ProgramsManagementController {
     constructor(
@@ -87,12 +88,12 @@ export class ProgramsManagementController {
         }
     };
 
-    archiveProgram = async (req: Request, res: Response, next: NextFunction) => {
+    archiveProgram = async (req: Request<ProgramParams>, res: Response, next: NextFunction) => {
         try {
-            const { programId } = req.params;
-            if (!programId) throw new AppError(ERROR_MESSAGES.MISSING_REQUIRED_DATA, HttpStatus.BAD_REQUEST);
+            const { ProgramId } = req.params;
+            if (!ProgramId) throw new AppError(ERROR_MESSAGES.MISSING_REQUIRED_DATA, HttpStatus.BAD_REQUEST);
 
-            await this._archiveProgram.execute(programId);
+            await this._archiveProgram.execute(ProgramId);
 
             res.status(HttpStatus.OK).json({
                 success: true,
@@ -118,12 +119,12 @@ export class ProgramsManagementController {
             });
         } catch (error) { next(error); }
     };
-    getProgramFullDetails = async (req: Request, res: Response, next: NextFunction) => {
+    getProgramFullDetails = async (req:Request<ProgramParams>, res: Response, next: NextFunction) => {
         try {
-            const { id } = req.params;
-            if (!id) throw new AppError(ERROR_MESSAGES.INVALID_CREDENTIALS, HttpStatus.BAD_REQUEST);
+            const { ProgramId } = req.params;
+            if (!ProgramId) throw new AppError(ERROR_MESSAGES.INVALID_CREDENTIALS, HttpStatus.BAD_REQUEST);
 
-            const programData: ProgramDetailsResponseDTO = await this._getDetails.execute(id);
+            const programData: ProgramDetailsResponseDTO = await this._getDetails.execute(ProgramId);
 
             res.status(HttpStatus.OK).json({
                 success: true,

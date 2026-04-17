@@ -17,6 +17,7 @@ import { OnlineBookingRequestDTO } from 'application/dto/booking/book-trainer.dt
 import { I_ACCEPT_RESCHEDULE_REQUEST_TOKEN, I_DECLINE_RESCHEDULE_REQUEST_TOKEN, IProcessTrainerRescheduleUseCase } from 'application/interfaces/booking/i-process-trainer-reschedule.usecase';
 import { UserRole } from 'utils/Constants';
 import { ProcessRescheduleRequestDTO } from 'application/dto/booking/process-reschedule.dto';
+import { BookingParams } from 'Presentation/interfaces/request.params';
 @injectable()
 export class UserBookingController {
     constructor(
@@ -77,7 +78,7 @@ export class UserBookingController {
         }
     }
 
-    cancelSession = async (req: Request, res: Response, next: NextFunction) => {
+    cancelSession = async (req: Request<BookingParams>, res: Response, next: NextFunction) => {
         try {
             const { id: userId } = req.user as { id: string };
             if (!userId) throw new AppError("Unauthorized", 401);
@@ -130,7 +131,7 @@ export class UserBookingController {
             next(err);
         }
     };
-    getBookingDetails = async (req: Request, res: Response, next: NextFunction) => {
+    getBookingDetails = async (req: Request<BookingParams>, res: Response, next: NextFunction) => {
         try {
             const { bookingId } = req.params;
             if (!bookingId) {
@@ -153,7 +154,7 @@ export class UserBookingController {
             next(err);
         }
     }
-    acceptReschedule = async (req: Request, res: Response, next: NextFunction) => {
+    acceptReschedule = async (req: Request<BookingParams>, res: Response, next: NextFunction) => {
         try {
             const { bookingId } = req.params;
 
@@ -178,7 +179,7 @@ export class UserBookingController {
         }
     }
 
-    declineReschedule = async (req: Request, res: Response, next: NextFunction) => {
+    declineReschedule = async (req: Request<BookingParams>, res: Response, next: NextFunction) => {
         try {
             console.log(req.body)
             const bookingId = req.params.bookingId
