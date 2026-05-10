@@ -2,6 +2,6 @@ import { TrainerDashboardAppointmentResponseDTO } from "application/dto/dashboar
 
 export const I_TRAINER_DASHBOARD_APPOINTMENTS_TOKEN = Symbol("I_TRAINER_DASHBOARD_APPOINTMENTS_TOKEN");
 
-export interface ITrainerDashBoardAppointments{
-    execute(trainerId:string,date:Date):Promise<TrainerDashboardAppointmentResponseDTO>
+export interface ITrainerDashBoardAppointments {
+    execute(trainerId: string, date: Date): Promise<TrainerDashboardAppointmentResponseDTO>
 }

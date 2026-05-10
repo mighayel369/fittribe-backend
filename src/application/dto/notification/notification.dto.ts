@@ -5,5 +5,5 @@ export interface NotificationResponseDTO {
   title: string;
   message: string;
   isRead: boolean;
-  time: string; 
+  time: string;
 }

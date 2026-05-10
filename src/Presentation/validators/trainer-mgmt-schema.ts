@@ -1,3 +1,4 @@
+import { ACTIONS } from 'utils/Constants';
 import { z } from 'zod';
 
 export const updateTrainerStatusSchema = z.object({
@@ -6,13 +7,13 @@ export const updateTrainerStatusSchema = z.object({
 });
 
 export const trainerApprovalSchema = z.object({
-    action: z.enum(["accept", "reject"], "Action must be either 'accept' or 'reject'"),
+    action: z.enum(ACTIONS, "Action must be either 'accept' or 'reject'"),
     trainerId: z.string().min(1, "invalid trainerId format"),
     reason: z.string()
         .max(500, "Reason cannot exceed 500 characters")
         .optional(),
 }).superRefine((data, ctx) => {
-    if (data.action === 'reject' && (!data.reason || data.reason.trim().length < 5)) {
+    if (data.action === ACTIONS.REJECT && (!data.reason || data.reason.trim().length < 5)) {
         ctx.addIssue({
             code: "custom",
             message: "A valid reason (min 5 chars) is required for rejection",

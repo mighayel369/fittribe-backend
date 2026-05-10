@@ -1,7 +1,7 @@
 export interface ChangePasswordRequestDTO {
   oldPassword: string;
   newPassword: string;
-  userId:string;
+  userId: string;
 }
 
 export interface ResetPasswordTokenBasedDTO {

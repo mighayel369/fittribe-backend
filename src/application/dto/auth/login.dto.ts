@@ -1,16 +1,18 @@
-export interface LoginRequestDTO{
-    email:string,
-    password:string
+import { UserRole } from "domain/constants/user-role";
+
+export interface LoginRequestDTO {
+  email: string,
+  password: string
 }
 
-export interface AuthUser{
-  id:string,
-  name:string,
-  email:string
+export interface AuthUser {
+  id: string,
+  name: string,
+  email: string
 }
 export interface LoginResponseDTO {
   accessToken: string;
   refreshToken: string;
-  role: string;
-  user:AuthUser
+  role: UserRole;
+  user: AuthUser
 }

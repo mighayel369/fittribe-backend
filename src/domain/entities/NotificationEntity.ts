@@ -6,8 +6,8 @@ export class NotificationEntity {
     public readonly title: string,
     public readonly message: string,
     public readonly recipientId: string,
-    public readonly isRead: boolean = false,
+    public readonly isRead = false,
     public readonly senderId: string,
-    public readonly createdAt?:Date
-  ) {}
+    public readonly createdAt?: Date
+  ) { }
 }

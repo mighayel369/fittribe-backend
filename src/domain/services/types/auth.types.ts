@@ -1,4 +1,4 @@
-import { UserRole } from "utils/Constants";
+import { UserRole } from "domain/constants/user-role";
 
 export interface IJwtPayload {
   id: string;

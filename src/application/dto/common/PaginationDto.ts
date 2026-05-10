@@ -1,6 +1,5 @@
-export interface PaginationInputDTO {
-  searchQuery: string;
-  filter: Record<string, any>
+export interface PaginationInputDTO<F = unknown> {
+  filter?: F;
   currentPage: number;
   limit: number;
 }

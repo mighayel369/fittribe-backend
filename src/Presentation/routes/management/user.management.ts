@@ -3,6 +3,7 @@ import { UserManagementController } from "Presentation/controllers/management/us
 import { container } from "tsyringe";
 import { validateRequest } from "Presentation/middleware/validate.middleware";
 import { adminUserIdParamSchema, updateUserStatusSchema, userQuerySchema } from "Presentation/validators/user-mgnt-schema";
+import { churnUserQuerySchema } from "Presentation/validators/admin-mngmnt-schema";
 const router = express.Router();
 const ctrl = container.resolve(UserManagementController);
 
@@ -10,7 +11,10 @@ const ctrl = container.resolve(UserManagementController);
 
 router.get('/', validateRequest(userQuerySchema, "query"), ctrl.getAllUsers);
 
+router.get('/export-churn-user',validateRequest(churnUserQuerySchema,"query"),ctrl.exportChurnUsers)
+
 router.get('/:userId', validateRequest(adminUserIdParamSchema, "params"), ctrl.getUserDetails);
 
 router.patch('/status',validateRequest(updateUserStatusSchema), ctrl.toggleUserStatus);
+
 export default router;

@@ -1,7 +1,7 @@
 import { SlotEntity } from "domain/entities/SlotEntity";
 import { TrainerSlotResponseDTO } from "application/dto/slot/trainer-slot-response.dto";
-export class SlotMapper{
-    static toTrainerSlotResponseDTO(entity: SlotEntity): TrainerSlotResponseDTO {
+export class SlotMapper {
+  static toTrainerSlotResponseDTO(entity: SlotEntity): TrainerSlotResponseDTO {
     return {
       trainerId: entity.trainerId,
       weeklyAvailability: {
@@ -13,12 +13,6 @@ export class SlotMapper{
         saturday: entity.weeklyAvailability.saturday.map(r => ({ start: r.start, end: r.end })),
         sunday: entity.weeklyAvailability.sunday.map(r => ({ start: r.start, end: r.end })),
       },
-      blockedSlots: entity.blockedSlots.map(b => ({
-        date: b.date,
-        start: b.start,
-        end: b.end,
-        reason: b.reason
-      }))
-    };
-  }
+    }
+  };
 }

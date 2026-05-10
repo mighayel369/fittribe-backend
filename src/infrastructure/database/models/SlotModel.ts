@@ -1,30 +1,7 @@
-import mongoose, { Document,Schema } from "mongoose";
+import mongoose, { Document, Schema } from "mongoose";
+import { SlotEntity } from "domain/entities/SlotEntity";
 
-export interface ITimeRange {
-    start: string; 
-    end: string;  
-}
-
-export interface IBlockedSlot {
-    date: string;
-    start: string;
-    end: string;
-    reason?: string;
-}
-
-export interface ISlot extends Document {
-    trainerId: string;
-    weeklyAvailability: {
-        monday: ITimeRange[];
-        tuesday: ITimeRange[];
-        wednesday: ITimeRange[];
-        thursday: ITimeRange[];
-        friday: ITimeRange[];
-        saturday: ITimeRange[];
-        sunday: ITimeRange[];
-    };
-    blockedSlots: IBlockedSlot[];
-}
+export interface ISlot extends Document, SlotEntity { }
 
 
 const TimeRangeSchema = new Schema(
@@ -35,15 +12,6 @@ const TimeRangeSchema = new Schema(
     { _id: false }
 );
 
-const BlockedSlotSchema = new Schema(
-    {
-        date: { type: String, required: true },
-        start: { type: String, required: true },
-        end: { type: String, required: true },
-        reason: { type: String }
-    },
-    { _id: false }
-);
 
 const SlotSchema = new Schema<ISlot>(
     {
@@ -62,12 +30,13 @@ const SlotSchema = new Schema<ISlot>(
             friday: { type: [TimeRangeSchema], default: [] },
             saturday: { type: [TimeRangeSchema], default: [] },
             sunday: { type: [TimeRangeSchema], default: [] }
-        },
-        blockedSlots: { type: [BlockedSlotSchema], default: [] }
+        }
     },
     {
         timestamps: true
     }
 );
+
+SlotSchema.loadClass(SlotEntity)
 
 export const SlotModel = mongoose.model<ISlot>("Slot", SlotSchema);

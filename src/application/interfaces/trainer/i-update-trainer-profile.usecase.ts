@@ -2,6 +2,6 @@ import { UpdateTrainerProfileRequestDTO } from "application/dto/trainer/update-t
 
 export const I_UPDATE_TRAINER_PROFILE_TOKEN = Symbol("I_UPDATE_TRAINER_PROFILE_TOKEN");
 
-export interface IUpdateTrainerProfileUseCase{
-    execute(input:UpdateTrainerProfileRequestDTO):Promise<void>
+export interface IUpdateTrainerProfileUseCase {
+    execute(input: UpdateTrainerProfileRequestDTO): Promise<void>
 }

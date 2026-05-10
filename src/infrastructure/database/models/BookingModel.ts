@@ -1,44 +1,14 @@
 import mongoose, { Schema, Document } from "mongoose";
-import { BOOKING_STATUS, UserRole } from "utils/Constants";
+import { BOOKING_STATUS } from "domain/constants/booking-status";
+import { UserRole } from "domain/constants/user-role";
+import { BookingEntity } from "domain/entities/BookingEntity";
 
-export interface IBooking extends Document {
-  bookingId:string
-  user: string;
-  trainer: string;
-  program: string;
-
-  date: Date;
-  timeSlot: number;
-  duration: number;
-
-  totalAmount: number;
-  adminCommission: number;
-  trainerEarning: number;
-
-  status: BOOKING_STATUS
-
-  payment: {
-    method: "wallet" | "online";
-    status: "hold" | "paid" | "refunded";
-  };
-
-  rescheduleRequest?: {
-    newDate: Date;
-    newTimeSlot: number;
-    requestedBy: UserRole
-    reason?: string;
-  };
-  rescheduleCount?:number
-  sessionRating?:number,
-  rejectReason?:string,
-  meetLink?:string,
-  isReviewed?:boolean,
-}
+export interface IBooking extends Document, BookingEntity { }
 
 const BookingSchema = new Schema<IBooking>({
-   bookingId: { type: String, required: true, trim: true,unique: true },
-  user: { type: String, ref: "User", required: true },
-  trainer: { type: String, ref: "Trainer", required: true },
+  bookingId: { type: String, required: true, trim: true, unique: true },
+  userId: { type: String, ref: "User", required: true },
+  trainerId: { type: String, ref: "Trainer", required: true },
   program: { type: String, required: true },
 
   date: Date,
@@ -50,10 +20,10 @@ const BookingSchema = new Schema<IBooking>({
   trainerEarning: Number,
 
   status: {
-  type: String,
-  enum: Object.values(BOOKING_STATUS),
-  default: BOOKING_STATUS.PENDING      
-},
+    type: String,
+    enum: Object.values(BOOKING_STATUS),
+    default: BOOKING_STATUS.PENDING
+  },
 
 
   payment: {
@@ -63,13 +33,16 @@ const BookingSchema = new Schema<IBooking>({
   rescheduleRequest: {
     newDate: Date,
     newTimeSlot: Number,
-    requestedBy:{type:String,enum:Object.values(UserRole)}
+    requestedBy: { type: String, enum: Object.values(UserRole) },
+    createdAt: { type: Date, default: Date.now },
+    reason: String
   },
-  rescheduleCount:Number,
-  sessionRating:Number,
-  rejectReason:String,
-  meetLink:{type:String},
-  isReviewed:{type:Boolean,default:false},
-}, { timestamps: true});
+  rescheduleCount: Number,
+  rejectReason: String,
+  meetLink: { type: String },
+  isReviewed: { type: Boolean, default: false },
+}, { timestamps: true });
+
+BookingSchema.loadClass(BookingEntity)
 
 export default mongoose.model<IBooking>("Booking", BookingSchema);

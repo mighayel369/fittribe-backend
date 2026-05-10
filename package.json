@@ -6,7 +6,11 @@
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only -r tsconfig-paths/register src/server.ts",
     "build": "tsc && tsc-alias",
-    "start": "node dist/server.js"
+    "start": "node dist/server.js",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "type-check": "tsc --noEmit",
+    "clean": "rimraf dist"
   },
   "keywords": [],
   "author": "",
@@ -23,7 +27,7 @@
     "dotenv": "^16.6.1",
     "express": "^5.1.0",
     "express-session": "^1.18.1",
-    "inversify": "^7.5.2",
+    "jiti": "^2.6.1",
     "json2csv": "^6.0.0-alpha.2",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.15.2",
@@ -37,14 +41,15 @@
     "pdfmake": "^0.3.7",
     "pdfmake-unicode": "^0.0.1",
     "razorpay": "^2.9.6",
+    "reflect-metadata": "^0.2.2",
     "socket.io": "^4.8.3",
     "streamifier": "^0.1.1",
     "tsyringe": "^4.10.0",
-    "uuid": "^8.3.2",
     "winston": "^3.17.0",
     "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@types/cookie-parser": "^1.4.9",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
@@ -52,17 +57,20 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/morgan": "^1.9.10",
     "@types/multer": "^2.0.0",
-    "@types/node": "^24.0.0",
+    "@types/node": "^24.12.2",
     "@types/nodemailer": "^6.4.17",
     "@types/passport": "^1.0.17",
     "@types/passport-google-oauth20": "^2.0.16",
     "@types/pdfkit": "^0.17.5",
     "@types/pdfmake": "^0.3.2",
     "@types/streamifier": "^0.1.2",
-    "@types/uuid": "^11.0.0",
+    "eslint": "^10.2.1",
+    "eslint-import-resolver-typescript": "^4.4.4",
+    "globals": "^17.5.0",
     "ts-node-dev": "^2.0.0",
     "tsc-alias": "^1.8.16",
     "tsconfig-paths": "^4.2.0",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.58.2"
   }
 }

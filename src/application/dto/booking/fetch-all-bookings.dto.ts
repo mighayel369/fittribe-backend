@@ -1,72 +1,75 @@
+import { IBookingFilters } from "domain/filters/IBookingFilters"
 import { PaginationInputDTO } from "../common/PaginationDto"
 import { PaginationOutputDTO } from "../common/PaginationDto"
-export interface BookingResponseDTO{
-    bookingId:string
-    trainerName:string
-    trainerId:string,
-    bookedDate:string
-    bookedTime:string
-    bookedProgram:string
-    sessionAmount:number
-    bookingStatus:string
-    trainerProfilePic:string
-    meetLink?:string
-    isReviewed?:boolean
+import { BOOKING_STATUS } from "domain/constants/booking-status" 
+
+export interface BookingResponseDTO {
+  bookingId: string
+  trainerName: string
+  trainerId: string
+  bookedDate: string
+  bookedTime: number
+  bookedProgram: string
+  sessionAmount: number
+  bookingStatus: BOOKING_STATUS
+  trainerProfilePic: string
+  meetLink?: string
+  isReviewed?: boolean
 }
 
-export interface FetchAllUserBookingRequestDTO extends PaginationInputDTO{
-    userId:string
+export interface FetchAllUserBookingRequestDTO extends PaginationInputDTO<IBookingFilters> {
+  userId: string
 }
 
-export interface FetchAllUserBookingsResponseDTO extends PaginationOutputDTO<BookingResponseDTO>{}
+export type FetchAllUserBookingsResponseDTO = PaginationOutputDTO<BookingResponseDTO>
 
-export interface TrainserBookingResponseDTO{
+export interface TrainserBookingResponseDTO {
   bookingId: string;
   clientName: string;
   clientEmail: string;
   bookedProgram: string;
-  bookedDate: string;
-  bookedTime: string;
+  bookedDate: string
+  bookedTime: number;
   sessionAmount: number;
-  bookingStatus: string;
-  meetLink?:string,
-  isReviewed?:boolean
+  bookingStatus: BOOKING_STATUS
+  meetLink?: string,
+  isReviewed?: boolean
 }
 
 
-export interface TrainerPendingBookingDTO extends  TrainserBookingResponseDTO {
+export interface TrainerPendingBookingDTO extends TrainserBookingResponseDTO {
   paymentMethod: string;
   paymentStatus: string;
 }
 
-export interface TrainerRescheduleRequestDTO extends  TrainserBookingResponseDTO {
+export interface TrainerRescheduleRequestDTO extends TrainserBookingResponseDTO {
   requestedNewDate: string;
-  requestedNewTime: string;
-  requestedBy:string
+  requestedNewTime: number;
+  requestedBy: string
 }
 
 
-export interface FetchAllTrainerBookingRequestDTO extends PaginationInputDTO{
-    trainerId:string
+export interface FetchAllTrainerBookingRequestDTO extends PaginationInputDTO<IBookingFilters> {
+  trainerId: string
 }
 
-export interface FetchAllTrainerBookingsResponseDTO extends PaginationOutputDTO<TrainserBookingResponseDTO>{}
-export interface FetchAllTrainerPendingBookingsResponseDTO extends PaginationOutputDTO<TrainerPendingBookingDTO>{}
-export interface FetchAllTrainerRescheduleBookingsResponseDTO extends PaginationOutputDTO<TrainerRescheduleRequestDTO>{}
+export type FetchAllTrainerBookingsResponseDTO = PaginationOutputDTO<TrainserBookingResponseDTO>
+export type FetchAllTrainerPendingBookingsResponseDTO = PaginationOutputDTO<TrainerPendingBookingDTO>
+export type FetchAllTrainerRescheduleBookingsResponseDTO = PaginationOutputDTO<TrainerRescheduleRequestDTO>
 
 
 export interface AdminBookingListDTO {
   id: string;
   client: string;
   trainer: string;
-  date: string;
+  date: string
   total: number;
   fee: number;
-  status: string;
+  status: BOOKING_STATUS;
   payment: string;
 }
-export interface FetchAllBookingsListRequestDTO extends PaginationInputDTO{}
-export interface FetchAllBookingsListResponseDTO extends PaginationOutputDTO<AdminBookingListDTO>{}
+export type FetchAllBookingsListRequestDTO = PaginationInputDTO<IBookingFilters>
+export type FetchAllBookingsListResponseDTO = PaginationOutputDTO<AdminBookingListDTO>
 
 export interface FetchAdminBookingDashboardResponseDTO {
   stats: {

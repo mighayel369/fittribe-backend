@@ -2,13 +2,13 @@ export interface CreateOnlinePaymentRequestDTO {
   trainerId: string;
   programId: string;
   date: string;
-  time: string;
+  time: number;
   amount: number;
 }
 
 export interface OnlinePaymentOrderResponseDTO {
   orderId: string;
-  amount: string|number;
+  amount: string | number;
   currency: string;
   key: string;
 }
@@ -21,7 +21,7 @@ export interface VerifyPaymentRequestDTO {
     trainerId: string;
     program: string;
     date: string;
-    time: string;
+    time: number;
     price: number;
   };
 }

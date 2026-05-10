@@ -1,3 +1,4 @@
+import { TRANSACTION_SOURCE } from "domain/constants/wallet-constants";
 import { WalletEntity } from "domain/entities/WalletEntity";
 
 export const I_WALLET_REPO_TOKEN = Symbol("I_WALLET_REPO_TOKEN");
@@ -5,14 +6,14 @@ export const I_WALLET_REPO_TOKEN = Symbol("I_WALLET_REPO_TOKEN");
 export interface IWalletRepo {
   createWallet(ownerId: string): Promise<WalletEntity>;
   getWalletWithPaginatedTransactions(
-    ownerId: string, 
-    page: number, 
+    ownerId: string,
+    page: number,
     limit: number
-  ): Promise<{ wallet: WalletEntity; totalTransactions: number }| null>;
+  ): Promise<{ wallet: WalletEntity; totalTransactions: number } | null>;
   credit(
     ownerId: string,
     amount: number,
-    source: "booking" | "refund",
+    source: TRANSACTION_SOURCE,
     bookingId?: string
   ): Promise<WalletEntity | null>;
 
@@ -28,7 +29,7 @@ export interface IWalletRepo {
   ): Promise<WalletEntity | null>;
 
   releaseHoldWithoutBalance(
-    ownerId: string, 
+    ownerId: string,
     bookingId: string
   ): Promise<WalletEntity | null>;
 }

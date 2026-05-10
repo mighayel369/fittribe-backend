@@ -1,31 +1,9 @@
 
 import mongoose, { Schema, Document } from "mongoose";
-
-export interface ITrainer extends Document {
-  trainerId: string;
-  name: string;
-  email: string;
-  password?: string;
-  status: boolean;
-  role: string;
-  verified: "pending" | "accepted" | "rejected";
-  pricePerSession: number;
-  experience?: number;
-  programs: string[];
-  certificate?: string;
-  bio?: string;
-  rating: number;
-  reviewCount: number;
-  languages: string[];
-  gender?: string;
-  age?: number;
-  phone?: string;
-  address?: string;
-  rejectReason?: string;
-  profilePic?: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
+import { TRAINER_STATUS } from "domain/constants/trainer-status";
+import { TrainerEntity } from "domain/entities/TrainerEntity";
+import { UserRole } from "domain/constants/user-role";
+export interface ITrainer extends Document, TrainerEntity { }
 
 const TrainerSchema = new Schema<ITrainer>(
   {
@@ -33,12 +11,13 @@ const TrainerSchema = new Schema<ITrainer>(
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String },
-    status: { type: Boolean, default: true }, 
-    role: { type: String, default: "trainer" },
+    status: { type: Boolean, default: true },
+    role: { type: String, default: UserRole.TRAINER },
     verified: {
       type: String,
-      enum: ["pending", "accepted", "rejected"],
-      default: "pending"
+      enum: Object.values(TRAINER_STATUS),
+      default: TRAINER_STATUS.PENDING,
+      index: true
     },
     pricePerSession: { type: Number, required: true },
     experience: { type: Number, default: 0 },
@@ -49,7 +28,6 @@ const TrainerSchema = new Schema<ITrainer>(
     reviewCount: { type: Number, default: 0 },
     languages: [{ type: String }],
     gender: { type: String },
-    age: { type: Number },
     phone: { type: String },
     address: { type: String },
     rejectReason: { type: String },
@@ -57,5 +35,7 @@ const TrainerSchema = new Schema<ITrainer>(
   },
   { timestamps: true }
 );
+
+TrainerSchema.loadClass(TrainerEntity)
 
 export default mongoose.model<ITrainer>("Trainer", TrainerSchema);

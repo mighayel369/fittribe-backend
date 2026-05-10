@@ -1,4 +1,5 @@
-import { STATUS } from "utils/Constants";
+import { TRAINER_STATUS } from "domain/constants/trainer-status";
+
 interface BaseSessionDTO {
     name: string;
     role: string;
@@ -6,8 +7,8 @@ interface BaseSessionDTO {
     status: boolean;
 }
 
-export interface ClientSessionDTO extends BaseSessionDTO {}
+export type ClientSessionDTO = BaseSessionDTO
 
 export interface TrainerSessionDTO extends BaseSessionDTO {
-    verified: STATUS
+    verified: TRAINER_STATUS
 }

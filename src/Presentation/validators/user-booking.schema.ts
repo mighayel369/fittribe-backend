@@ -6,35 +6,41 @@ export const checkoutSchema = z.object({
 
     trainerId: z.string().min(1, "Trainer ID is required"),
     program: z.string().min(1, "Program name is required"),
-    
+
     date: z.coerce.date().refine((date) => {
         const today = new Date();
-        today.setHours(0, 0, 0, 0); 
-        return date >= today; 
+        today.setHours(0, 0, 0, 0);
+        return date >= today;
     }, {
         message: "Booking date cannot be in the past",
     }),
 
-    time: z.string().min(1, "Time slot is required"),
+    time: z.number().int().min(0, "Invalid time slot"),
     price: z.number().positive("Price must be greater than 0"),
 });
 
 
 export const userRescheduleSchema = z.object({
     bookingId: z.string().min(1, "Booking ID is required"),
-    newDate: z.coerce.date().refine((date) => date.getTime() > Date.now(), {
-        message: "New date must be in the future",
+
+    newDate: z.coerce.date().refine((date) => {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        return date >= today;
+    }, {
+        message: "New date cannot be in the past",
     }),
-    newTimeSlot: z.object({
-        start: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, "Invalid start time"),
-        end: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, "Invalid end time"),
-    }).refine((data) => data.end > data.start, {
-        message: "End time must be after start time",
-        path: ["end"]
-    }),
+
+    newTimeSlot: z.number().int().min(0, "Invalid time slot"),
+
+    reason: z.string()
+        .trim()
+        .min(3, "Reason must be at least 3 characters")
+        .max(500, "Reason is too long")
 });
 
 export const userBookingQuerySchema = z.object({
     pageNo: z.coerce.number().min(1).default(1),
     search: z.string().optional().default(""),
 });
+

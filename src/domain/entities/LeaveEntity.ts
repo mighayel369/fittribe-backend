@@ -1,24 +1,26 @@
-import { LEAVE_TYPES,LEAVE_STATUS } from "utils/Constants";
-import { TrainerEntity } from "./TrainerEntity";
+import { LEAVE_STATUS, LEAVE_TYPES } from "domain/constants/leave-status";
 import { AppError } from "domain/errors/AppError";
-export class LeaveEntity{
-    constructor(
+
+export class LeaveEntity {
+  constructor(
     public leaveId: string,
-    public trainer: (TrainerEntity|string),
-    public type:LEAVE_TYPES,
+    public trainerId: string,
+    public type: LEAVE_TYPES,
     public start: Date,
     public end: Date,
-    public days:number,
-    public reason:string,
+    public days: number,
+    public reason: string,
     public status: LEAVE_STATUS,
-    public documents?:string,
-    public adminComment?:string,
-    public createdAt?:string
-   ){}
+    public documents?: string,
+    public adminComment?: string,
+    public createdAt?: string
+  ) { }
 
-   public updateStatus(newStatus: LEAVE_STATUS, comment?: string): void {
+  public updateStatus(newStatus: LEAVE_STATUS, comment?: string): void {
     if (this.status !== LEAVE_STATUS.PENDING) {
-      throw new AppError(`Cannot update leave that is already ${this.status.toLowerCase()}`);
+      throw new AppError(
+        `Cannot update leave that is already ${this.status.toLowerCase()}`
+      );
     }
 
     if (newStatus === LEAVE_STATUS.REJECTED && (!comment || comment.trim() === "")) {
@@ -31,9 +33,11 @@ export class LeaveEntity{
 
   public withdraw(): void {
     if (this.status !== LEAVE_STATUS.PENDING) {
-        throw new AppError(`Cannot withdraw a leave request that is already ${this.status}`);
+      throw new AppError(
+        `Cannot withdraw a leave request that is already ${this.status}`
+      );
     }
-    
+
     this.status = LEAVE_STATUS.WITHDRAWN;
-}
+  }
 }

@@ -14,7 +14,7 @@ export const modifyProgramSchema = onboardProgramSchema.partial();
 
 export const toggleVisibilitySchema = z.object({
   status: z.boolean("Status required"),
-  programId:z.string().min(1,"invalid programId")
+  programId: z.string().min(1, "invalid programId")
 });
 
 export const inventoryQuerySchema = z.object({

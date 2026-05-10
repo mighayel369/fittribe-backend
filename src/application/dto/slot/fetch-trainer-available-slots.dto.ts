@@ -3,8 +3,8 @@ export interface FetchAvailableSlotsRequestDTO {
   date: string;
 }
 
-export  interface FetchAvailableSlotResponseDTO{
-  status:string,
-  slots:string[]
-  message?:string
+export interface FetchAvailableSlotResponseDTO {
+  status: string,
+  slots: number[]
+  message?: string
 }

@@ -7,12 +7,12 @@ import { IJwtPayload } from 'domain/services/types/auth.types';
 @injectable()
 export class JwtService implements IJwtService {
   generateAccessToken(payload: IJwtPayload): string {
-    console.log(payload)
+
     return jwt.sign(payload, config.JWT_SECRET, { expiresIn: '15m' });
   }
 
   generateRefreshToken(payload: IJwtPayload): string {
-    console.log(payload)
+
     return jwt.sign(payload, config.JWT_REFRESH_SECRET, { expiresIn: '7d' });
   }
 

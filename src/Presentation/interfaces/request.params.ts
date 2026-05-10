@@ -34,5 +34,5 @@ export interface UserParams {
 
 
 export interface ProgramParams {
-    ProgramId?: string;
+    programId?: string;
 }

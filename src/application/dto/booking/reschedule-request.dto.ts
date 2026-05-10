@@ -1,5 +1,7 @@
 export interface RescheduleRequestDTO {
   bookingId: string;
   newDate: Date;
-  newTimeSlot: string;
+  newTimeSlot: number;
+  reason: string;
+  trainerId: string
 }

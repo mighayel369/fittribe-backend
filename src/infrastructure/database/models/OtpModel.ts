@@ -1,9 +1,10 @@
+import { UserRole } from 'domain/constants/user-role';
 import mongoose from 'mongoose';
 
 const otpSchema = new mongoose.Schema({
   email: { type: String, required: true },
   otp: { type: String, required: true },
-  role:{type:String},
+  role: { type: String, enum:Object.values(UserRole),default:UserRole.USER },
   createdAt: { type: Date, default: Date.now, expires: 60 }
 });
 

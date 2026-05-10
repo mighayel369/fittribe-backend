@@ -1,34 +1,41 @@
 import { Request, Response, NextFunction } from 'express';
-import jwt, { JwtPayload } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 import config from 'config';
-import { UserRole } from 'utils/Constants';
-
+import { UserRole } from 'domain/constants/user-role';
+import logger from 'utils/logger';
+import { ERROR_MESSAGES } from 'utils/ErrorMessage';
+import { HttpStatus } from 'utils/HttpStatus';
 export const authorizeRoles = (...allowedRoles: UserRole[]) => {
   return (req: Request, res: Response, next: NextFunction) => {
     const authHeader = req.headers.authorization;
+    const token = authHeader?.split(' ')[1];
 
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      res.status(401).json({ message: "Access Denied. No token provided." });
+    if (!token) {
+      res.status(HttpStatus.UNAUTHORIZED).json({ message: ERROR_MESSAGES.UNAUTHORIZED });
       return;
     }
 
-    const token = authHeader.split(' ')[1];
-
     try {
-      const decoded = jwt.verify(token, config.JWT_SECRET) as JwtPayload & { id: string; role: UserRole };
-  
+      const decoded = jwt.verify(token, config.JWT_SECRET) as { id: string; email: string; role: UserRole };
+
       if (!allowedRoles.includes(decoded.role)) {
-        res.status(403).json({ 
-          message: `Access Denied. Role '${decoded.role}' is not authorized for this resource.` 
-        });
+        res.status(HttpStatus.FORBIDDEN).json({ message: ERROR_MESSAGES.ACCESS_DENIED });
         return;
       }
 
-      req.user = decoded; 
+      req.user = {
+        accessToken: token,
+        user: {
+          id: decoded.id,
+          email: decoded.email,
+          role: decoded.role
+        }
+      };
+
       next();
     } catch (err) {
-      res.status(401).json({ message: 'Invalid or expired token.' });
-      return;
+      logger.warn("Token verification failed:", err instanceof Error ? err.message : "Unknown");
+      res.status(HttpStatus.UNAUTHORIZED).json({ success: false, message: ERROR_MESSAGES.UNAUTHORIZED });
     }
   };
 };

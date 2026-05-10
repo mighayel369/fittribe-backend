@@ -9,39 +9,39 @@ import { VerifyOnlinePaymentRequestDTO } from 'application/dto/payment/verify-on
 
 @injectable()
 export class UserPaymentController {
-  constructor(
-    @inject(I_INITIATE_ONLINE_PAYMENT_TOKEN) private _initiatePayment: IInitiateOnlinePayment,
-    @inject(I_VERIFY_ONLINE_PAYMENT_TOKEN) private _verifyPayment: IVeirfyOnlinePayment
-  ) {}
+    constructor(
+        @inject(I_INITIATE_ONLINE_PAYMENT_TOKEN) private _initiatePayment: IInitiateOnlinePayment,
+        @inject(I_VERIFY_ONLINE_PAYMENT_TOKEN) private _verifyPayment: IVeirfyOnlinePayment
+    ) { }
 
-initiateOnlinePayment = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        const input: CreateOnlinePaymentRequestDTO = { ...req.body };
+    initiateOnlinePayment = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const input: CreateOnlinePaymentRequestDTO = { ...req.body };
 
-        const orderData = await this._initiatePayment.execute(input);
+            const orderData: OnlinePaymentOrderResponseDTO = await this._initiatePayment.execute(input);
 
-        res.status(HttpStatus.CREATED).json({
-            success: true,
-            message: SUCCESS_MESSAGES.PAYMENT.PAYMENT_REQUEST_INITIATED,
-            ...orderData
-        });
-    } catch (error) {
-        next(error);
-    }
-};
+            res.status(HttpStatus.CREATED).json({
+                success: true,
+                message: SUCCESS_MESSAGES.PAYMENT.PAYMENT_REQUEST_INITIATED,
+                ...orderData
+            });
+        } catch (error) {
+            next(error);
+        }
+    };
 
-verifyOnlinePayment = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        const input: VerifyOnlinePaymentRequestDTO = { ...req.body };
+    verifyOnlinePayment = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const input: VerifyOnlinePaymentRequestDTO = { ...req.body };
 
-        await this._verifyPayment.execute(input);
+            await this._verifyPayment.execute(input);
 
-        res.status(HttpStatus.OK).json({
-            success: true,
-            message: SUCCESS_MESSAGES.PAYMENT.PAYMENT_SUCCESS
-        });
-    } catch (error) {
-        next(error);
-    }
-};
+            res.status(HttpStatus.OK).json({
+                success: true,
+                message: SUCCESS_MESSAGES.PAYMENT.PAYMENT_SUCCESS
+            });
+        } catch (error) {
+            next(error);
+        }
+    };
 }

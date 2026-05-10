@@ -5,29 +5,39 @@ import { HttpStatus } from "utils/HttpStatus";
 import { Request, Response, NextFunction } from 'express';
 import { ERROR_MESSAGES } from "utils/ErrorMessage";
 import { PAGINATION } from "utils/Constants";
+import { SUCCESS_MESSAGES } from "utils/SuccessMessages";
+import { AppError } from "domain/errors/AppError";
 
 @injectable()
 export class UserChatController {
-    constructor(@inject(I_FETCH_ESTABLISHED_CLIENT_CHAT_LIST_TOKEN) private _fetchEstablishedChats: IFetchChatList<ClientChatListRequestDTO, ChatListResponseDTO>) {}
+    constructor(
+        @inject(I_FETCH_ESTABLISHED_CLIENT_CHAT_LIST_TOKEN)
+        private readonly _fetchEstablishedChatsUseCase: IFetchChatList<ClientChatListRequestDTO, ChatListResponseDTO>
+    ) { }
 
     getEstablishedChats = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const { id: userId } = req.user as { id: string };
-            
-            let input: ClientChatListRequestDTO = {
+            const userId = req.user?.user.id;
+
+            if (!userId) {
+                throw new AppError(ERROR_MESSAGES.UNAUTHORIZED, HttpStatus.UNAUTHORIZED);
+            }
+
+            const fetchPayload: ClientChatListRequestDTO = {
                 clientId: userId,
                 limit: PAGINATION.CHAT_DASHBOARD_LIMIT,
                 searchQuery: String(req.query.search || '')
             };
 
-            const chatList = await this._fetchEstablishedChats.execute(input);
+            const establishedChatList = await this._fetchEstablishedChatsUseCase.execute(fetchPayload);
 
             res.status(HttpStatus.OK).json({
                 success: true,
-                message: "Established chats fetched successfully",
-                data: chatList
+                message: SUCCESS_MESSAGES.CHAT.ESTABLISHED_CLIENTS_CHATS_FETCHED,
+                data: establishedChatList
             });
         } catch (error) {
+
             next(error);
         }
     }

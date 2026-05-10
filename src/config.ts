@@ -23,6 +23,7 @@ interface Env {
   ADMIN: string;
   SESSION_DURATION: number;
   GOOGLE_CALLBACK: string;
+  MEETING_URL: string
 }
 
 const ensureEnv = (key: string): string => {
@@ -54,7 +55,8 @@ const getConfig = (): Env => {
     RAZORPAY_SECRET: ensureEnv("RAZORPAY_KEYSECRET"),
     ADMIN: ensureEnv("ADMIN"),
     SESSION_DURATION: Number(ensureEnv("SESSION_DURATION")),
-    GOOGLE_CALLBACK: ensureEnv("GOOGLE_CALLBACK")
+    GOOGLE_CALLBACK: ensureEnv("GOOGLE_CALLBACK"),
+    MEETING_URL: ensureEnv("MEETING_URL")
   };
 };
 

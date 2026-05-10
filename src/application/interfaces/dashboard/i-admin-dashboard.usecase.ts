@@ -2,6 +2,6 @@ import { AdminDashbardResponseDTO } from "application/dto/dashboard/admin-dashbo
 
 export const I_ADMIN_DASHBOARD_TOKEN = Symbol("I_ADMIN_DASHBOARD_TOKEN");
 
-export interface IAdminDashboard{
-    execute():Promise<AdminDashbardResponseDTO>
+export interface IAdminDashboard {
+    execute(): Promise<AdminDashbardResponseDTO>
 }

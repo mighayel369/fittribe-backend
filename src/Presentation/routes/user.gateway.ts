@@ -1,5 +1,5 @@
 import express from 'express';
-import { UserRole } from 'utils/Constants';
+import { UserRole } from 'domain/constants/user-role';
 import { authorizeRoles } from 'Presentation/middleware/authMiddleware';
 import notification from './notification/notification.route'
 

@@ -1,5 +1,5 @@
 import { PaginationInputDTO, PaginationOutputDTO } from "../common/PaginationDto";
-
+import { IProgramFilters } from "domain/filters/IProgramFilters";
 export interface ProgramSummaryDTO {
   programId: string;
   name: string;
@@ -8,12 +8,12 @@ export interface ProgramSummaryDTO {
   isPublished: boolean;
 }
 
-export type FetchProgramInventoryRequestDTO = PaginationInputDTO;
+export type FetchProgramInventoryRequestDTO = PaginationInputDTO<IProgramFilters>;
 
 export type FetchProgramInventoryResponseDTO = PaginationOutputDTO<ProgramSummaryDTO>;
 
-export interface ExploreProgramsDTO extends Omit<ProgramSummaryDTO, 'isPublished'> {}
+export type ExploreProgramsDTO = Omit<ProgramSummaryDTO, 'isPublished'>
 
 export interface ExploreProgramsResponseDTO {
-    data: ExploreProgramsDTO[];
+  data: ExploreProgramsDTO[];
 }

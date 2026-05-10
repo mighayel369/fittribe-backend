@@ -1,58 +1,43 @@
 import mongoose, { Schema, Document } from 'mongoose';
-import { LEAVE_TYPES,LEAVE_STATUS } from 'utils/Constants';
-
-export interface ILeave extends Document {
-  leaveId: string;
-  trainer: string; 
-  type: LEAVE_TYPES; 
-  reason: string;
-  start: Date;
-  end: Date;
-  days: number;
-  status: LEAVE_STATUS;
-  documents?: string;
-  adminComment?: string;
-}
+import { LEAVE_STATUS, LEAVE_TYPES } from 'domain/constants/leave-status';
+import { LeaveEntity } from 'domain/entities/LeaveEntity';
+export interface ILeave extends Document, LeaveEntity { }
 
 const LeaveSchema = new Schema<ILeave>({
   leaveId: { type: String, required: true, unique: true },
-  trainer: { 
-    type: String, 
-    ref: "Trainer", 
+  trainerId: {
+    type: String,
+    ref: "Trainer",
     required: true,
-    index: true 
+    index: true
   },
-  type: { 
-    type: String, 
-    enum: Object.values(LEAVE_TYPES), 
-    required: true 
+  type: {
+    type: String,
+    enum: Object.values(LEAVE_TYPES),
+    required: true
   },
   reason: { type: String, required: true, trim: true },
   start: { type: Date, required: true },
-  end: { 
-    type: Date, 
-    required: true,
-    validate: {
-      validator: function(this: ILeave, value: Date) {
-        return value >= this.start;
-      },
-      message: "End date must be after or equal to start date."
-    }
+  end: {
+    type: Date,
+    required: true
   },
   days: { type: Number, required: true, min: 0.5 },
-  status: { 
-    type: String, 
-    enum: Object.values(LEAVE_STATUS), 
+  status: {
+    type: String,
+    enum: Object.values(LEAVE_STATUS),
     default: LEAVE_STATUS.PENDING,
-    index: true 
+    index: true
   },
   documents: { type: String },
   adminComment: { type: String, trim: true }
-}, { 
-  timestamps: true 
+}, {
+  timestamps: true
 });
 
 
 LeaveSchema.index({ trainer: 1, start: 1, end: 1 });
+
+LeaveSchema.loadClass(LeaveEntity)
 
 export default mongoose.model<ILeave>("Leave", LeaveSchema);

@@ -1,31 +1,25 @@
-export interface TimeRange {
-  start: string;  
-  end: string;   
-}
-
-export interface WeeklyAvailability {
-  monday: TimeRange[];
-  tuesday: TimeRange[];
-  wednesday: TimeRange[];
-  thursday: TimeRange[];
-  friday: TimeRange[];
-  saturday: TimeRange[];
-  sunday: TimeRange[];
-}
-
-export interface BlockedSlot {
-  date: string;
-  start: string;
-  end: string;
-  reason?: string;
-}
-
-
+import { WeeklyAvailability, TimeRange } from "./types/slot.types";
+import { AppError } from "../errors/AppError";
 
 export class SlotEntity {
   constructor(
     public readonly trainerId: string,
     public readonly weeklyAvailability: WeeklyAvailability,
-    public readonly blockedSlots: BlockedSlot[]
-  ) {}
+  ) { }
+
+
+  public isAvailable(day: keyof WeeklyAvailability, time: string): boolean {
+    const daySlots = this.weeklyAvailability[day];
+    return daySlots.some(slot => time >= slot.start && time < slot.end);
+  }
+
+  public validateSlots(): void {
+    Object.values(this.weeklyAvailability).forEach((slots: TimeRange[]) => {
+      slots.forEach(slot => {
+        if (slot.start >= slot.end) {
+          throw new AppError(`Invalid slot: ${slot.start} must be before ${slot.end}`, 400);
+        }
+      });
+    });
+  }
 }

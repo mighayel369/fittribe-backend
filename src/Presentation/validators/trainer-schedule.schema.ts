@@ -5,7 +5,7 @@ const timeRangeSchema = z.object({
   end: z.string().regex(/^(1[0-2]|0?[1-9]):[0-5][0-9] (AM|PM)$/i, "Invalid end time format (h:mm AM/PM)"),
 }).refine((data) => {
 
-  
+
   const toMinutes = (time: string) => {
     const [h, mAndAffix] = time.split(':');
     const [m, affix] = mAndAffix.split(' ');

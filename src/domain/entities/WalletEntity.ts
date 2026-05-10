@@ -1,22 +1,4 @@
-
-export type TransactionType = "credit" | "debit";
-export type TransactionSource = "booking" | "refund" | "admin";
-export type HoldStatus = "active" | "released" | "converted";
-
-export interface WalletHold {
-  bookingId: string;
-  amount: number;
-  status: HoldStatus;
-  createdAt: Date;
-}
-
-export interface WalletTransaction {
-  type: TransactionType;
-  amount: number;
-  source: TransactionSource;
-  bookingId: string,
-  createdAt: Date;
-}
+import { WalletHold, WalletTransaction } from "./types/wallet.types";
 
 export class WalletEntity {
   constructor(
@@ -24,6 +6,6 @@ export class WalletEntity {
     public balance: number,
     public holds: WalletHold[],
     public transactions: WalletTransaction[],
-  ) {}
+  ) { }
 
 }

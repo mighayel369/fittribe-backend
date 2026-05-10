@@ -10,11 +10,11 @@ export const rejectBookingSchema = bookingIdSchema.extend({
   reason: z.string().min(5, "Please provide a reason (min 5 characters)").max(200),
 });
 
-
 export const trainerRescheduleSchema = bookingIdSchema.extend({
   newDate: z.coerce.date().refine((date) => date.getTime() > Date.now(), {
     message: "Reschedule date must be in the future",
   }),
+
   newTimeSlot: z.object({
     start: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, "Invalid start time"),
     end: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, "Invalid end time"),
@@ -22,6 +22,10 @@ export const trainerRescheduleSchema = bookingIdSchema.extend({
     message: "End time must be after start time",
     path: ["end"]
   }),
+
+  reason: z.string()
+    .min(5, "Reason must be at least 5 characters")
+    .max(200, "Reason too long")
 });
 
 

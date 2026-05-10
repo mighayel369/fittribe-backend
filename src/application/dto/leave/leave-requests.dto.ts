@@ -1,9 +1,9 @@
-import { LEAVE_STATUS, LEAVE_TYPES } from "utils/Constants";
+import { LEAVE_TYPES,LEAVE_STATUS } from "domain/constants/leave-status";
 import { PaginationInputDTO, PaginationOutputDTO } from "../common/PaginationDto";
-
+import { ILeaveFilters } from "domain/filters/ILeaveFilters";
 
 export interface LeaveRequestBase {
-    leaveId: string; 
+    leaveId: string;
     type: LEAVE_TYPES;
     startDate: string;
     endDate: string;
@@ -25,11 +25,10 @@ export interface AdminLeaveRequest extends LeaveRequestBase {
 }
 
 
-export interface FetchLeaveRequestsInputDTO extends PaginationInputDTO {
-    status?: LEAVE_STATUS; 
-    trainerId?: string;    
+export interface FetchLeaveRequestsInputDTO extends PaginationInputDTO<ILeaveFilters> {
+    trainerId?: string;
 }
 
-export interface FetchTrainerLeaveResponseDTO extends PaginationOutputDTO<TrainerLeaveRequest> {}
+export type FetchTrainerLeaveResponseDTO = PaginationOutputDTO<TrainerLeaveRequest>
 
-export interface FetchAdminLeaveResponseDTO extends PaginationOutputDTO<AdminLeaveRequest> {}
+export type FetchAdminLeaveResponseDTO = PaginationOutputDTO<AdminLeaveRequest>

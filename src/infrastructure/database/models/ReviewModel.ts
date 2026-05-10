@@ -1,22 +1,12 @@
 import mongoose, { Schema, Document } from "mongoose";
-
-export interface IReview extends Document {
-    reviewId:string,
-    trainerId: string;
-    userId: string;
-    bookingId: string;
-    comment: string;
-    rating: number;
-    isDeleted: boolean;
-    createdAt: Date;
-    updatedAt: Date;
-}
+import { ReviewEntity } from "domain/entities/ReviewEntity";
+export interface IReview extends Document, ReviewEntity { }
 
 const reviewSchema = new Schema<IReview>({
     reviewId: { type: String, required: true, index: true },
     trainerId: { type: String, required: true, index: true },
     userId: { type: String, required: true },
-    bookingId: { type: String, required: true, unique: true }, 
+    bookingId: { type: String, required: true, unique: true },
     comment: {
         type: String,
         required: true,
@@ -34,9 +24,11 @@ const reviewSchema = new Schema<IReview>({
         default: false
     }
 }, {
-    timestamps: true 
+    timestamps: true
 });
 
 reviewSchema.index({ trainerId: 1, isDeleted: 1 });
+
+reviewSchema.loadClass(ReviewEntity)
 
 export default mongoose.model<IReview>('Review', reviewSchema);

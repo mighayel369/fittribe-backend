@@ -1,6 +1,9 @@
+import { GENDER } from 'domain/constants/gender';
+import { LANGUAGE } from 'domain/constants/language-type';
+import { UserRole } from 'domain/constants/user-role';
 import { z } from 'zod';
 
-const arrayProcess = (val: any) => {
+const arrayProcess = (val: string | string) => {
   if (Array.isArray(val)) return val
   if (typeof val === 'string' && val.trim() !== '') return [val];
   return [];
@@ -10,11 +13,11 @@ export const trainerRegisterSchema = z.object({
   name: z.string().min(2, "Name is too short"),
   email: z.email("Invalid email format"),
   password: z.string().min(6, "Password must be at least 6 characters"),
-  gender: z.enum(["male", "female", "other"]),
+  gender: z.enum(GENDER),
   experience: z.coerce.number().min(0),
   pricePerSession: z.coerce.number().positive(),
   programs: z.preprocess(arrayProcess, z.array(z.string()).min(1, "Select at least one program")),
-  languages: z.preprocess(arrayProcess, z.array(z.string()).min(1, "Select at least one language")),
+  languages: z.preprocess(arrayProcess, z.array(z.enum(LANGUAGE)).min(1, "Select at least one language")),
 });
 
 export const loginSchema = z.object({
@@ -23,8 +26,8 @@ export const loginSchema = z.object({
 });
 
 export const verifyOtpSchema = z.object({
-    email: z.email("Invalid email format"),
-    otp: z.string().length(6, "OTP must be 6 digits"),
+  email: z.email("Invalid email format"),
+  otp: z.string().length(6, "OTP must be 6 digits"),
 });
 
 export const userRegisterSchema = z.object({
@@ -33,12 +36,12 @@ export const userRegisterSchema = z.object({
   password: z.string().min(1, "Password is required")
 })
 
-export const forgotPasswordSchema=z.object({
-  email:z.email("Invalid email format")
+export const forgotPasswordSchema = z.object({
+  email: z.email("Invalid email format")
 })
 
 export const resetPasswordSchema = z.object({
-  token: z.string().min(1, "Token is missing"), 
+  token: z.string().min(1, "Token is missing"),
   password: z.string()
     .min(8, "New password must be at least 8 characters")
     .regex(/[A-Z]/, "New password must contain at least one uppercase letter")
@@ -49,7 +52,7 @@ export const resetPasswordSchema = z.object({
 
 export const changePasswordSchema = z.object({
   oldPassword: z.string().min(1, "Current password is required"),
-  
+
   newPassword: z.string()
     .min(8, "New password must be at least 8 characters")
     .regex(/[A-Z]/, "New password must contain at least one uppercase letter")
@@ -59,4 +62,13 @@ export const changePasswordSchema = z.object({
 }).refine((data) => data.newPassword !== data.oldPassword, {
   message: "New password cannot be the same as the old password",
   path: ["newPassword"],
+});
+
+export const googleDataSchema = z.object({
+  accessToken: z.string().min(1, "Access token is missing"),
+  user: z.object({
+    id: z.string().min(1, "User ID is missing"),
+    email: z.email(),
+    role: z.enum(UserRole)
+  })
 });

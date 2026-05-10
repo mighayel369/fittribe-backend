@@ -1,6 +1,6 @@
-import { WeeklyAvailabilityDTO } from "./trainer-slot-response.dto";
+import { WeeklyAvailability } from "domain/entities/types/slot.types";
 
 export interface UpdateTrainerAvailabilityRequestDTO {
   trainerId: string;
-  availability: WeeklyAvailabilityDTO;
+  availability: WeeklyAvailability;
 }

@@ -1,14 +1,16 @@
+import { LEAVE_STATUS } from 'domain/constants/leave-status';
+import { DATE_RANGES } from 'utils/Constants';
 import { z } from 'zod';
 
 export const updateLeaveStatusSchema = z.object({
   status: z.preprocess(
     (val) => (typeof val === "string" ? val.toLowerCase() : val),
-    z.enum(["approved", "rejected", "pending"])
+    z.enum(LEAVE_STATUS)
   ),
   adminComment: z.string()
     .max(500, "Comment cannot exceed 500 characters")
     .optional(),
-    leaveId:z.string("invalid leaveId format")
+  leaveId: z.string("invalid leaveId format")
 });
 
 export const adminQuerySchema = z.object({
@@ -16,3 +18,7 @@ export const adminQuerySchema = z.object({
   limit: z.coerce.number().min(1).max(100).default(10),
   search: z.string().optional().default(""),
 });
+
+export const churnUserQuerySchema = z.object({
+  range: z.enum(DATE_RANGES)
+})

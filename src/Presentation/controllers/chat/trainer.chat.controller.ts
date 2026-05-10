@@ -6,60 +6,69 @@ import { SUCCESS_MESSAGES } from 'utils/SuccessMessages';
 import { I_FETCH_ESTABLISHED_TRAINER_CHAT_LIST_TOKEN, I_FETCH_NON_ESTABLISHED_TRAINER_CHAT_LIST_TOKEN, IFetchChatList } from 'application/interfaces/chat/i-fetch-chat-list';
 import { ChatListResponseDTO, NonEstablishedChatListResponseDTO, TrainerChatListRequestDTO } from "application/dto/chat/chat-list.dto";
 import { PAGINATION } from 'utils/Constants';
-
+import { AppError } from 'domain/errors/AppError';
+import { ERROR_MESSAGES } from 'utils/ErrorMessage';
 @injectable()
 export class TrainerChatController {
     constructor(
         @inject(I_FETCH_ESTABLISHED_TRAINER_CHAT_LIST_TOKEN)
-        private _fetchEstablishedChats: IFetchChatList<TrainerChatListRequestDTO, ChatListResponseDTO>,
+        private readonly _fetchEstablishedChatsUseCase: IFetchChatList<TrainerChatListRequestDTO, ChatListResponseDTO>,
 
         @inject(I_FETCH_NON_ESTABLISHED_TRAINER_CHAT_LIST_TOKEN)
-        private _fetchNonEstablishedChats: IFetchChatList<TrainerChatListRequestDTO, NonEstablishedChatListResponseDTO>,
+        private readonly _fetchNonEstablishedChatsUseCase: IFetchChatList<TrainerChatListRequestDTO, NonEstablishedChatListResponseDTO>,
     ) { }
 
     getEstablishedChats = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const { id: trainerId } = req.user as { id: string };
+            const trainerId = req.user?.user.id;
 
-            let input: TrainerChatListRequestDTO = {
+            if (!trainerId) {
+                throw new AppError(ERROR_MESSAGES.UNAUTHORIZED, HttpStatus.UNAUTHORIZED);
+            }
+
+
+            const fetchPayload: TrainerChatListRequestDTO = {
                 trainerId,
                 limit: PAGINATION.CHAT_DASHBOARD_LIMIT,
                 searchQuery: String(req.query.search || '')
             };
 
-            const chatList = await this._fetchEstablishedChats.execute(input);
+            const establishedChatList = await this._fetchEstablishedChatsUseCase.execute(fetchPayload);
 
             res.status(HttpStatus.OK).json({
                 success: true,
-                message: "Established chats fetched successfully",
-                data: chatList
+                message: SUCCESS_MESSAGES.CHAT.CHAT_ESTABLIASHED,
+                data: establishedChatList
             });
         } catch (error) {
+
             next(error);
         }
     }
 
     getDiscoveryClients = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const { id: trainerId } = req.user as { id: string };
+            const trainerId = req.user?.user.id;
 
-            let input: TrainerChatListRequestDTO = {
+            if (!trainerId) {
+                throw new AppError(ERROR_MESSAGES.UNAUTHORIZED, HttpStatus.UNAUTHORIZED);
+            }
+
+            const fetchPayload: TrainerChatListRequestDTO = {
                 trainerId,
                 limit: PAGINATION.CHAT_DASHBOARD_LIMIT,
                 searchQuery: String(req.query.search || '')
             };
 
-            const discoveryList = await this._fetchNonEstablishedChats.execute(input);
+            const discoveryChatList = await this._fetchNonEstablishedChatsUseCase.execute(fetchPayload);
 
             res.status(HttpStatus.OK).json({
                 success: true,
-                message: "Discovery clients fetched successfully",
-                data: discoveryList
+                message: SUCCESS_MESSAGES.CHAT.NON_ESTABLISHED_CLIENTS_FETCHED,
+                data: discoveryChatList
             });
         } catch (error) {
             next(error);
         }
     }
-
-
 }

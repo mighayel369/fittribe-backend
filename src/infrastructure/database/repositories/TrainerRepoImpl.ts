@@ -1,244 +1,195 @@
 
-
 import { injectable } from "tsyringe";
-import TrainerModel,{ITrainer} from "../models/TrainerModel";
+import TrainerModel, { ITrainer } from "../models/TrainerModel";
 import { BaseRepository } from "./BaseRepository";
-import { TrainerEntity, TrainerFilter } from "domain/entities/TrainerEntity";
-import { TrainerMapper } from "../mappers/TrainerMapper";
+import { TrainerEntity } from "domain/entities/TrainerEntity";
 import { ITrainerRepo } from "domain/repositories/ITrainerRepo";
-import { STATUS } from "utils/Constants";
+import { TRAINER_STATUS } from "domain/constants/trainer-status";
+import { UserRole } from "domain/constants/user-role";
+import { TrainerType } from "domain/repositories/types/trainer-type";
+import { FilterQuery, PipelineStage } from "mongoose";
+import { ITrainerFilters } from "domain/filters/ITrainerFilters";
+import { AppError } from "domain/errors/AppError";
+import { ERROR_MESSAGES } from "utils/ErrorMessage";
+import { HttpStatus } from "utils/HttpStatus";
 @injectable()
-export class TrainerRepoImpl extends BaseRepository<ITrainer, TrainerEntity> implements ITrainerRepo{
-  protected model = TrainerModel;
-  protected toEntity = TrainerMapper.toEntity;
+export class TrainerRepoImpl extends BaseRepository<ITrainer> implements ITrainerRepo {
+    protected model = TrainerModel;
 
-async RegisterTrainer(payload: TrainerEntity): Promise<void> {
-  await this.model.create({ ...payload });
-}
-async updateTrainerStatus(id: string, newStatus: boolean): Promise<void> {
-  await this.model.findOneAndUpdate(
-    {trainerId:id}, 
-    { $set: { status: newStatus } }
-  );
-}
 
-async findTrainerById(id: string): Promise<TrainerEntity | null> {
-  const pipeline = [
-    { 
-      $match: { 
-        trainerId: id, 
-        role: "trainer" 
-      } 
-    },
-    {
-      $lookup: {
-        from: "programs",  
-        localField: "programs", 
-        foreignField: "programId", 
-        as: "populatedPrograms"    
-      }
-    },
-    {
-      $addFields: {
-        programs: "$populatedPrograms"
-      }
-    },
+    private buildTrainerMatchQuery(filter: ITrainerFilters): FilterQuery<ITrainer> {
+        const query: FilterQuery<ITrainer> = {
+            role: UserRole.TRAINER,
+            verified: filter.status
+        };
 
-    {
-      $project: {
-        populatedPrograms: 0
-      }
+        if (filter.search) {
+            query.name = { $regex: filter.search, $options: "i" };
+        }
+
+        if (filter.gender) {
+            query.gender = filter.gender;
+        }
+
+        if (filter.programId) {
+            query.programs = filter.programId;
+        }
+
+        return query;
     }
-  ];
-  const result = await this.model.aggregate(pipeline);
 
-  if (!result || result.length === 0) {
-    return null;
-  }
-  return this.toEntity(result[0]);
-}
-
- async findTrainerByEmail(email: string): Promise<TrainerEntity | null> {
-  console.log('repoimpl')
-    return this.aggregateOne(
-      {email},
-    {
-      from: "programs",
-      localField: "programs",
-      foreignField: "programId",
-      as: "populatedPrograms"
+    private getSortOrder(sortType?: string): Record<string, 1 | -1> {
+        const sortMap: Record<string, Record<string, 1 | -1>> = {
+            rating: { rating: -1 },
+            exp: { experience: -1 },
+            latest: { createdAt: -1 }
+        };
+        return sortMap[sortType as string] || { createdAt: -1 };
     }
-    ) 
-  }
-  
-async updateTrainer(id: string, payload: TrainerEntity): Promise<void> {
-  const persistenceData = TrainerMapper.toPersistence(payload);
 
-  const result = await this.model.findOneAndUpdate(
-    { trainerId: id },
-    { $set: persistenceData },
-    { new: true }
-  );
-
-  if (!result) {
-    throw new Error("Trainer update failed: Trainer not found");
-  }
-}
-
-
-async updateVerificationStatus(id: string, status: "accepted" | "rejected", reason?: string): Promise<TrainerEntity | null> {
-  await this.model.findOneAndUpdate(
-    { trainerId: id },
-    {
-      verified: status,
-      rejectReason: status === "rejected" ? reason : undefined
+    async RegisterTrainer(payload: TrainerEntity): Promise<void> {
+        await this.model.create({ ...payload });
     }
-  );
-
-  return this.aggregateOne(
-    { trainerId: id },
-    {
-      from: "programs",
-      localField: "programs",
-      foreignField: "programId",
-      as: "populatedPrograms"
+    async updateTrainerStatus(id: string, newStatus: boolean): Promise<void> {
+        await this.model.findOneAndUpdate(
+            { trainerId: id },
+            { $set: { status: newStatus } }
+        );
     }
-  );
-}
 
-  async deleteTrainer(id: string) {
-      return this.delete(id);
-  }
+    async findTrainerById(id: string): Promise<TrainerEntity | null> {
+        const doc = await this.model.findOne({ trainerId: id })
+        return doc ? doc : null
+    }
 
-async findAccepted(
-  page: number, 
-  limit: number, 
-  filter: TrainerFilter
-): Promise<{ data: TrainerEntity[]; totalCount: number }> {
-  
-  const skip = (page - 1) * limit;
-  const matchQuery: any = { role: "trainer", verified: "accepted" };
+    async findTrainerByEmail(email: string): Promise<TrainerEntity | null> {
 
-  if (filter.searchQuery) {
-    matchQuery.name = { $regex: filter.searchQuery, $options: "i" };
-  }
-  
-  if (filter.gender) {
-    matchQuery.gender = filter.gender;
-  }
-  if (filter.programId) {
-    matchQuery.programs = filter.programId; 
-  }
+        const doc = await this.model.findOne({ email })
+        return doc ? doc : null
+    }
 
-  const sortMap = {
-    rating: { rating: -1 },
-    exp: { experience: -1 },
-    latest: { createdAt: -1 }
-  } as const;
+    async updateTrainer(id: string, payload: TrainerEntity): Promise<void> {
 
-  const sortOrder = sortMap[filter.sort ?? "latest"] || { createdAt: -1 };
+        const result = await this.model.findOneAndUpdate(
+            { trainerId: id },
+            { $set: payload },
+            { new: true }
+        );
 
-  const pipeline = [
-    { $match: matchQuery },
-    { $sort: sortOrder },
-    {
-      $facet: {
-        totalCount: [{ $count: "total" }],
-        docs: [
-          { $skip: skip },
-          { $limit: limit },
-          {
-            $lookup: {
-              from: "programs",
-              localField: "programs",
-              foreignField: "programId",
-              as: "populatedPrograms"
+        if (!result) {
+            throw new AppError(ERROR_MESSAGES.TRAINER_NOT_FOUND, HttpStatus.NOT_FOUND);
+        }
+    }
+
+
+    async updateVerificationStatus(id: string, status: TRAINER_STATUS.ACCEPTED | TRAINER_STATUS.REJECTED, reason?: string): Promise<void> {
+        await this.model.findOneAndUpdate(
+            { trainerId: id },
+            {
+                verified: status,
+                rejectReason: status === TRAINER_STATUS.REJECTED ? reason : undefined
             }
-          },
-          {
-            $addFields: {
-              programs: "$populatedPrograms"
-            }
-          },
-          { $project: { populatedPrograms: 0 } }
-        ]
-      }
+        );
+
     }
-  ];
 
-  const result = await this.model.aggregate(pipeline);
-  let totalRowCount=result[0].totalCount[0]?.total || 0
-  return {
-    data: result[0].docs.map((doc: any) => this.toEntity(doc)),
-    totalCount: Math.ceil(totalRowCount/limit)
-  };
-}
-
-
-async updatePassword(id: string, hashedPassword: string): Promise<void> {
-  await this.model.findOneAndUpdate({trainerId:id}, { password: hashedPassword });
-}
-
-
-async findPending(
-  page: number,
-  limit: number,
-  filter: TrainerFilter
-): Promise<{ data: TrainerEntity[]; totalCount: number }> {
-  
-  const skip = (page - 1) * limit;
-  const matchQuery: any = { role: "trainer", verified: "pending" };
-
-  if (filter.searchQuery) {
-    matchQuery.name = { $regex: filter.searchQuery, $options: "i" };
-  }
-
-  const pipeline = [
-    { $match: matchQuery },
-    { $sort: { createdAt: -1 } as const },
-    {
-      $facet: {
-        totalCount: [{ $count: "totalCount" }],
-        docs: [
-          { $skip: skip },
-          { $limit: limit },
-          {
-            $lookup: {
-              from: "programs",        
-              localField: "programs", 
-              foreignField: "programId", 
-              as: "programsData"         
-            }
-          },
-          {
-            $addFields: {
-              programs: "$programsData"
-            }
-          },
-          { $project: { programsData: 0 } }
-        ]
-      }
+    async deleteTrainer(id: string) {
+        return this.delete(id);
     }
-  ];
 
-  const result = await this.model.aggregate(pipeline);
+    async updatePassword(id: string, hashedPassword: string): Promise<void> {
+        await this.model.findOneAndUpdate({ trainerId: id }, { password: hashedPassword });
+    }
 
-  const totalRowCount = result[0].totalCount[0]?.totalCount || 0;
-  
+    async findTrainerDetails(trainerId: string): Promise<TrainerType | null> {
+        const docs = await this.model.aggregate<TrainerType>([
+            { $match: { trainerId } },
+            {
+                $lookup: {
+                    from: "programs",
+                    localField: "programs",
+                    foreignField: "programId",
+                    as: "programsData"
+                }
+            },
+            {
+                $project: {
+                    _id: 0,
+                    trainer: {
+                        $mergeObjects: ["$$ROOT", { programs: "$programsData" }]
+                    }
+                }
+            },
+            {
+                $project: {
+                    "trainer.programsData": 0
+                }
+            }
+        ]);
 
-  return { 
-    data: result[0].docs.map((doc: any) =>this.toEntity(doc)), 
-    totalCount:Math.ceil(totalRowCount/limit)
-  };
-}
+        return docs.length > 0 ? docs[0] : null;
+    }
+
+    async findAllTrainers(
+        page: number,
+        limit: number,
+        filter: ITrainerFilters
+    ): Promise<{ data: TrainerType[]; totalCount: number }> {
+        const skip = (page - 1) * limit;
+        const matchQuery = this.buildTrainerMatchQuery(filter);
+        const sortOrder = this.getSortOrder(filter.sort);
+
+        const pipeline: PipelineStage[] = [
+            { $match: matchQuery },
+            { $sort: sortOrder },
+            {
+                $facet: {
+                    totalCount: [{ $count: "total" }],
+                    docs: [
+                        { $skip: skip },
+                        { $limit: limit },
+                        {
+                            $lookup: {
+                                from: "programs",
+                                localField: "programs",
+                                foreignField: "programId",
+                                as: "programsData"
+                            }
+                        },
+                        {
+                            $project: {
+                                _id: 0,
+                                trainer: {
+                                    $mergeObjects: ["$$ROOT", { programs: "$programsData" }]
+                                }
+                            }
+                        },
+                        {
+                            $project: {
+                                "trainer.programsData": 0
+                            }
+                        }
+                    ]
+                }
+            }
+        ];
+
+        const result = await this.model.aggregate(pipeline);
+        const totalRowCount = result[0]?.totalCount[0]?.total || 0;
+
+        return {
+            data: result[0]?.docs || [],
+            totalCount: totalRowCount
+        };
+    }
 
 
-async countActiveTrainers():Promise<number>{
-  let res=await this.model.find({status:true,verified:STATUS.ACCEPT}).countDocuments()
-  return res
-}
+    async countActiveTrainers(): Promise<number> {
+        const res = await this.model.find({ status: true, verified: TRAINER_STATUS.ACCEPTED }).countDocuments()
+        return res
+    }
 
-async updateTrainerProfilePicture(trainerId: string, profilePic: string): Promise<void> {
-  await this.model.findOneAndUpdate({trainerId},{profilePic})
-}
+    async updateTrainerProfilePicture(trainerId: string, profilePic: string): Promise<void> {
+        await this.model.findOneAndUpdate({ trainerId }, { profilePic })
+    }
 }

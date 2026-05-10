@@ -11,43 +11,54 @@ import { AdminBookingDetailsResponseDTO } from "application/dto/booking/fetch-bo
 import { AppError } from "domain/errors/AppError";
 import { ERROR_MESSAGES } from "utils/ErrorMessage";
 import { BookingParams } from "Presentation/interfaces/request.params";
+
+
 @injectable()
 export class AdminBookingController {
-
     constructor(
-        @inject(I_FETCH_ADMIN_ALL_BOOKINGS_TOKEN) private _fetchAllBookings: IFetchAllBookingsUseCase<FetchAllBookingsListRequestDTO, FetchAllBookingsListResponseDTO>,
-        @inject(I_ADMIN_BOOKING_DASHBOARD_METRICS) private _fetchBookingMetrics: IFetchAdminBookingsMetrics,
-        @inject(I_FETCH_ADMIN_BOOKING_DETAILS_TOKEN) private _fetchBookingDetails: IFetchBookingDetails<AdminBookingDetailsResponseDTO>
+        @inject(I_FETCH_ADMIN_ALL_BOOKINGS_TOKEN)
+        private readonly _fetchAllBookingsUseCase: IFetchAllBookingsUseCase<FetchAllBookingsListRequestDTO, FetchAllBookingsListResponseDTO>,
+
+        @inject(I_ADMIN_BOOKING_DASHBOARD_METRICS)
+        private readonly _fetchBookingMetricsUseCase: IFetchAdminBookingsMetrics,
+
+        @inject(I_FETCH_ADMIN_BOOKING_DETAILS_TOKEN)
+        private readonly _fetchBookingDetailsUseCase: IFetchBookingDetails<AdminBookingDetailsResponseDTO>
     ) { }
+
     getAllBookings = async (req: Request, res: Response, next: NextFunction) => {
         try {
-
-            const payload = {
-                searchQuery: (req.query.search as string) || "",
+            const rawSearch = req.query.search;
+            const search = typeof rawSearch === 'string' ? rawSearch : "";
+            const fetchBookingsPayload: FetchAllBookingsListRequestDTO = {
                 currentPage: Number(req.query.page) || 1,
                 limit: Number(req.query.limit) || PAGINATION.DEFAULT_LIMIT,
-                filter: {}
-            };
+                filter: {
+                    search: search || ""
+                }
+            }
 
-            const result: FetchAllBookingsListResponseDTO = await this._fetchAllBookings.execute(payload);
+            const bookingsResult = await this._fetchAllBookingsUseCase.execute(fetchBookingsPayload);
 
             res.status(HttpStatus.OK).json({
                 success: true,
-                ...result
+                ...bookingsResult
             });
         } catch (error) {
-            next(error)
+            next(error);
         }
     }
 
     getBookingMetrics = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const range = (req.query.range as '7days' | '6months') || '7days';
-            const data:FetchAdminBookingDashboardResponseDTO = await this._fetchBookingMetrics.execute(range);
+            const timeRange = (req.query.range as '7days' | '6months') || '7days';
 
-            res.status(200).json({
+            const metricsData: FetchAdminBookingDashboardResponseDTO =
+                await this._fetchBookingMetricsUseCase.execute(timeRange);
+
+            res.status(HttpStatus.OK).json({
                 success: true,
-                ...data
+                ...metricsData
             });
         } catch (err) {
             next(err);
@@ -56,14 +67,19 @@ export class AdminBookingController {
 
     getBookingDetails = async (req: Request<BookingParams>, res: Response, next: NextFunction) => {
         try {
-            let bookingId=req.params.bookingId
+            const { bookingId } = req.params;
 
-            if(!bookingId) throw new AppError(ERROR_MESSAGES.MISSING_REQUIRED_DATA,HttpStatus.BAD_REQUEST)
-           let result:AdminBookingDetailsResponseDTO=await this._fetchBookingDetails.execute(bookingId)
-           res.status(HttpStatus.OK).json({
-            success:true,
-            data:result
-           })
+            if (!bookingId) {
+                throw new AppError(ERROR_MESSAGES.MISSING_REQUIRED_DATA, HttpStatus.BAD_REQUEST);
+            }
+
+            const bookingDetails: AdminBookingDetailsResponseDTO =
+                await this._fetchBookingDetailsUseCase.execute(bookingId);
+
+            res.status(HttpStatus.OK).json({
+                success: true,
+                data: bookingDetails
+            });
         } catch (err) {
             next(err);
         }

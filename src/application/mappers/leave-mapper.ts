@@ -1,12 +1,12 @@
 import { RequestLeaveDTO } from "application/dto/leave/request.leave.dto";
 import { LeaveEntity } from "domain/entities/LeaveEntity";
 import { randomUUID } from "crypto";
-import { LEAVE_STATUS,LEAVE_TYPES } from "utils/Constants";
-import { TrainerLeaveRequest,AdminLeaveRequest } from "application/dto/leave/leave-requests.dto";
+import { LEAVE_TYPES, LEAVE_STATUS } from "domain/constants/leave-status";
+import { TrainerLeaveRequest, AdminLeaveRequest } from "application/dto/leave/leave-requests.dto";
 import { IAdminLeaveDashboard, TrainerLeaveMetrics } from "application/dto/leave/leave-metrics.dto";
 import { MAX_LEAVE_COUNT } from "utils/Constants";
-import { TrainerEntity } from "domain/entities/TrainerEntity";
-
+import { LeaveRequestsType } from "domain/repositories/types/leave-type";
+import { LeaveExportDataResponseDTO } from "application/dto/leave/leave-export-data.dto";
 export const LeaveMapper = {
     toEntity(input: RequestLeaveDTO): LeaveEntity {
         const start = new Date(input.startDate);
@@ -26,19 +26,6 @@ export const LeaveMapper = {
         );
     },
 
-    toTrainerAllLeaveRequests(entity: LeaveEntity): TrainerLeaveRequest {
-        return {
-            leaveId: entity.leaveId,
-            type: entity.type,
-            startDate: entity.start.toISOString().split('T')[0],
-            endDate: entity.end.toISOString().split('T')[0],
-            days: entity.days,
-            reason: entity.reason,
-            status: entity.status,
-            submittedAt: entity.createdAt || new Date().toISOString(),
-            adminComment: entity.adminComment
-        };
-    },
 
     toTrainerLeaveMetrics(rawData: { label: string, count: number }[]): TrainerLeaveMetrics[] {
         const getCount = (type: string): number => rawData.find(d => d.label === type)?.count || 0;
@@ -61,51 +48,63 @@ export const LeaveMapper = {
             },
         ];
     },
-    toAdminLeaveMetrics(rawData: { 
-    approvalStatus: { label: string, count: number }[], 
-    leaveTypes: { label: string, count: number }[] 
-  }): IAdminLeaveDashboard { 
-    
-    const totalRequestsCount = rawData.approvalStatus.reduce((acc, curr) => acc + curr.count, 0);
+    toAdminLeaveMetrics(rawData: {
+        approvalStatus: { label: string, count: number }[],
+        leaveTypes: { label: string, count: number }[]
+    }): IAdminLeaveDashboard {
 
-    return {
-      approvalStatus: [
-        ...rawData.approvalStatus,
-        { label: 'requested', count: totalRequestsCount } 
-      ],
-      leaveTypes: rawData.leaveTypes
-    };
-  },
-toAdminAllLeaveRequests(entity: LeaveEntity): AdminLeaveRequest {
-    const trainer = entity.trainer as TrainerEntity;
-    const isPopulated = typeof entity.trainer !== 'string';
+        const totalRequestsCount = rawData.approvalStatus.reduce((acc, curr) => acc + curr.count, 0);
 
-    return {
-      leaveId: entity.leaveId,
-      type: entity.type,
-      startDate: entity.start.toISOString(),
-      endDate: entity.end.toISOString(),
-      days: entity.days,
-      reason: entity.reason,
-      status: entity.status,
-      submittedAt: entity.createdAt || new Date().toISOString(),
-      
-      trainerId: isPopulated ? trainer.trainerId : (entity.trainer as string),
-      trainerName: isPopulated ? trainer.name : "Unknown Trainer",
-      trainerProfilePic: isPopulated ? trainer.profilePic || "" : ""
-    };
-  },
+        return {
+            approvalStatus: [
+                ...rawData.approvalStatus,
+                { label: 'requested', count: totalRequestsCount }
+            ],
+            leaveTypes: rawData.leaveTypes
+        };
+    },
 
-toPdfRow(entity: LeaveEntity): string[] {
-    const trainer = entity.trainer as TrainerEntity;
-    const isPopulated = typeof entity.trainer !== 'string';
+    toExportDTO(data: LeaveRequestsType): LeaveExportDataResponseDTO {
+        return {
+            trainerName: data.trainer.name,
+            type: data.leave.type,
+            startDate: new Date(data.leave.start).toLocaleDateString('en-GB'),
+            days: data.leave.days,
+            status: data.leave.status
+        };
+    },
 
-    return [
-        isPopulated ? trainer.name : "Unknown Trainer",
-        entity.type,
-        entity.start.toLocaleDateString(),
-        entity.days.toString(),
-        entity.status
-    ];
-}
+    toExportDTOList(records: LeaveRequestsType[]): LeaveExportDataResponseDTO[] {
+        return records.map(record => this.toExportDTO(record));
+    },
+
+    toAdminLeaveRequestDTO(data: LeaveRequestsType): AdminLeaveRequest {
+        return {
+            leaveId: data.leave.leaveId,
+            type: data.leave.type,
+            startDate: new Date(data.leave.start).toISOString(),
+            endDate: new Date(data.leave.end).toISOString(),
+            days: data.leave.days,
+            reason: data.leave.reason,
+            status: data.leave.status,
+            submittedAt: new Date(data.leave.createdAt ?? Date.now()).toISOString(),
+            trainerId: data.trainer.trainerId,
+            trainerName: data.trainer.name,
+            trainerProfilePic: data.trainer.profilePic || ""
+        };
+    },
+
+    toTrainerLeaveRequestDTO(data: LeaveRequestsType): TrainerLeaveRequest {
+        return {
+            leaveId: data.leave.leaveId,
+            type: data.leave.type,
+            startDate: new Date(data.leave.start).toISOString(),
+            endDate: new Date(data.leave.end).toISOString(),
+            days: data.leave.days,
+            reason: data.leave.reason,
+            status: data.leave.status,
+            submittedAt: new Date(data.leave.createdAt || Date.now()).toISOString(),
+            adminComment: data.leave.adminComment
+        };
+    }
 };

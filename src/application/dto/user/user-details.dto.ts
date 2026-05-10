@@ -1,8 +1,9 @@
+import { GENDER } from "domain/constants/gender";
 import { UserResponseDTO } from "./fetch-all-users.dto";
 export interface AdminUserDetailDTO extends UserResponseDTO {    
   role: string;         
   createdAt: Date;   
-  gender?: string;
+  gender?: GENDER;
   age?: number;
   phone?: string;
   address?: string;
@@ -12,7 +13,7 @@ export interface AdminUserDetailDTO extends UserResponseDTO {
 
 export interface UserProfileDTO extends Omit<UserResponseDTO,'status'> {
   role:string,
-  gender?: string;
+  gender?: GENDER;
   age?: number;
   phone?: string;
   address?: string;

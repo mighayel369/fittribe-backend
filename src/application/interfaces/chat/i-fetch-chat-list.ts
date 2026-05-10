@@ -1,6 +1,6 @@
 export const I_FETCH_NON_ESTABLISHED_TRAINER_CHAT_LIST_TOKEN = Symbol("I_FETCH_NON_ESTABLISHED_TRAINER_CHAT_LIST_TOKEN");
 export const I_FETCH_ESTABLISHED_TRAINER_CHAT_LIST_TOKEN = Symbol("I_FETCH_ESTABLISHED_TRAINER_CHAT_LIST_TOKEN");
 export const I_FETCH_ESTABLISHED_CLIENT_CHAT_LIST_TOKEN = Symbol("I_FETCH_ESTABLISHED_CLIENT_CHAT_LIST_TOKEN");
-export interface IFetchChatList<requestDTO,responseDTO>{
-    execute(input:requestDTO):Promise<responseDTO[]>
+export interface IFetchChatList<requestDTO, responseDTO> {
+    execute(input: requestDTO): Promise<responseDTO>
 }

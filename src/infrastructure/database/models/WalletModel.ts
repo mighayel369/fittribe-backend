@@ -1,27 +1,12 @@
 
 import mongoose, { Schema, Document } from "mongoose";
-
-export interface IWallet extends Document {
-  ownerId: string;
-  balance: number;
-  holds: {
-    bookingId: string;
-    amount: number;
-    status: "active" | "released" | "converted";
-    createdAt: Date;
-  }[];
-  transactions: {
-    type: "credit" | "debit";
-    amount: number;
-    source: "booking" | "refund" | "admin";
-    bookingId: string;
-    createdAt: Date;
-  }[];
-}
+import { WalletEntity } from "domain/entities/WalletEntity";
+import { HOLD_STATUS, TRANSACTION_SOURCE, TRANSACTION_TYPE } from "domain/constants/wallet-constants";
+export interface IWallet extends Document, WalletEntity { }
 
 const WalletSchema = new Schema<IWallet>(
   {
-    ownerId: { type: String, required: true, trim: true,unique: true },
+    ownerId: { type: String, required: true, trim: true, unique: true },
     balance: { type: Number, default: 0 },
     holds: [
       {
@@ -29,29 +14,32 @@ const WalletSchema = new Schema<IWallet>(
         amount: Number,
         status: {
           type: String,
-          enum: ["active", "released", "converted"],
-          default: "active"
+          enum: Object.values(HOLD_STATUS),
+          default: HOLD_STATUS.ACTIVE
         },
         createdAt: { type: Date, default: Date.now }
       }
     ],
     transactions: [
       {
-        type: { type: String, enum: ["credit", "debit"] },
+        type: { type: String, enum: Object.values(TRANSACTION_TYPE) },
         amount: Number,
         source: {
           type: String,
-          enum: ["booking", "refund", "admin"]
+          enum: Object.values(TRANSACTION_SOURCE)
         },
         bookingId: String,
         createdAt: { type: Date, default: Date.now }
       }
     ]
   },
-  { timestamps: true
+  {
+    timestamps: true
   }
 );
 
 WalletSchema.index({ ownerId: 1, ownerType: 1 }, { unique: true });
+
+WalletSchema.loadClass(WalletEntity)
 
 export default mongoose.model<IWallet>("Wallet", WalletSchema);

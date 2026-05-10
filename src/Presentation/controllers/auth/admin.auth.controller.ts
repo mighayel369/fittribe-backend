@@ -1,39 +1,39 @@
 import { Request, Response, NextFunction } from 'express';
 import { inject, injectable } from "tsyringe";
-import { ERROR_MESSAGES } from 'utils/ErrorMessage';
 import { HttpStatus } from 'utils/HttpStatus';
-import { AppError } from 'domain/errors/AppError';
-import config from 'config';
 import { SUCCESS_MESSAGES } from 'utils/SuccessMessages';
 import { I_ADMIN_LOGIN_USECASE_TOKEN, ILoginUseCase } from 'application/interfaces/auth/i-login.usecase';
 import { LoginRequestDTO, LoginResponseDTO } from 'application/dto/auth/login.dto';
+import { COOKIE_CONFIG } from 'utils/authConfig';
+import { AUTH_CONSTANTS } from 'utils/Constants';
 @injectable()
 export class AdminAuthController {
     constructor(
-        @inject(I_ADMIN_LOGIN_USECASE_TOKEN) private _adminLogin: ILoginUseCase
+        @inject(I_ADMIN_LOGIN_USECASE_TOKEN)
+        private readonly _adminLoginUseCase: ILoginUseCase
     ) { }
 
     login = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const input: LoginRequestDTO = req.body
+            const loginCredentials: LoginRequestDTO = req.body;
 
-            const result: LoginResponseDTO = await this._adminLogin.execute(input);
+            const authResult: LoginResponseDTO = await this._adminLoginUseCase.execute(loginCredentials);
 
-            res.cookie("refreshToken", result.refreshToken, {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === "production",
-                sameSite: "strict",
-                maxAge: config.COOKIE_MAX_AGE
-            });
+            res.cookie(
+                AUTH_CONSTANTS.REFRESH_TOKEN_COOKIE,
+                authResult.refreshToken,
+                COOKIE_CONFIG
+            );
 
             res.status(HttpStatus.OK).json({
                 success: true,
-                accessToken: result.accessToken,
-                role: result.role,
-                admin:result.user,
+                accessToken: authResult.accessToken,
+                role: authResult.role,
+                admin: authResult.user,
                 message: SUCCESS_MESSAGES.AUTH.LOGIN_SUCCESSFULL
             });
         } catch (error) {
+
             next(error);
         }
     };

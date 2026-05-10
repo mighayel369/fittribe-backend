@@ -1,21 +1,20 @@
+import { AppError } from "domain/errors/AppError";
 export class ProgramEntity {
   constructor(
     public programId: string,
     public name: string,
     public description: string,
-    public programPic: string,  
-    public status?: boolean,
-    public isArchived?: boolean
-  ) {
-    this.validate();
-  }
+    public programPic: string,
+    public status = true,
+    public isArchived = false
+  ) { }
 
-  public validate(): void {
+  public validateProgram(): void {
     if (!this.name || this.name.trim().length < 3) {
-      throw new Error("Program name must be at least 3 characters long.");
+      throw new AppError("Program name must be at least 3 characters long.");
     }
     if (!this.description || this.description.length < 10) {
-      throw new Error("Description is too short to be helpful for users.");
+      throw new AppError("Description is too short to be helpful for users.");
     }
   }
 
@@ -25,6 +24,6 @@ export class ProgramEntity {
     if (description) this.description = description;
     if (pic) this.programPic = pic;
 
-    this.validate();
+    this.validateProgram();
   }
 }

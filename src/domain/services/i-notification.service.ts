@@ -3,5 +3,5 @@ import { NotificationResponseDTO } from "application/dto/notification/notificati
 export const I_NOTIFICATION_SERVICE_TOKEN = Symbol("I_NOTIFICATION_SERVICE_TOKEN");
 
 export interface INotificationService {
-  notifyUser(recipientId: string,payload:NotificationResponseDTO): Promise<void>;
+  notifyUser(recipientId: string, payload: NotificationResponseDTO): Promise<void>;
 }

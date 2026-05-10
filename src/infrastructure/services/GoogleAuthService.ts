@@ -1,16 +1,22 @@
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import passport from 'passport';
 import config from 'config';
-import { injectable,inject } from 'tsyringe';
+import { injectable, inject } from 'tsyringe';
 import { randomUUID } from "crypto";
-import user from '../database/models/UserModel';
+import { IUserRepo, I_USER_REPO_TOKEN } from 'domain/repositories/IUserRepo';
 import { I_JWT_SERVICE_TOKEN, IJwtService } from 'domain/services/i-jwt.service';
 import { IGoogleAuthService } from 'domain/services/IGoogleAuthService';
-import { UserRole } from 'utils/Constants';
+import { UserRole } from 'domain/constants/user-role';
+import { UserEntity } from 'domain/entities/UserEntity';
+import { ERROR_MESSAGES } from 'utils/ErrorMessage';
 
 @injectable()
 export class GoogleAuthServiceImpl implements IGoogleAuthService {
-  constructor(@inject(I_JWT_SERVICE_TOKEN) private _jwtService:IJwtService){}
+  constructor(
+    @inject(I_JWT_SERVICE_TOKEN) private _jwtService: IJwtService,
+    @inject(I_USER_REPO_TOKEN) private _userRepo: IUserRepo
+  ) { }
+
   initializeStrategy(): void {
     passport.use(
       new GoogleStrategy(
@@ -19,34 +25,49 @@ export class GoogleAuthServiceImpl implements IGoogleAuthService {
           clientSecret: config.GOOGLE_CLIENT_SECRET,
           callbackURL: config.GOOGLE_CALLBACK
         },
-        async (accessToken, refreshToken, profile, done) => {
+        async (_googleAccessToken, _googleRefreshToken, profile, done) => {
           try {
-            let userDoc = await user.findOne({ email: profile.emails?.[0].value });
+            const email = profile.emails?.[0]?.value;
 
-            if (!userDoc) {
-              userDoc = await user.create({
-                userId:randomUUID(),
-                googleId: profile.id,
-                email: profile.emails?.[0].value,
-                name: profile.displayName,
-                verified: true,
-                status: true
-              });
+            if (!email) {
+              return done(new Error(ERROR_MESSAGES.GOOGLE_DATA_FETCHING_ERROR), undefined);
             }
 
-              const accessToken = this._jwtService.generateAccessToken({
-                id: String(userDoc.userId),
-                email: userDoc.email,
-                role: UserRole.USER
-              });
+            let userDoc = await this._userRepo.findUserByEmail(email);
 
-              let AuthUser={
-                id:userDoc.userId,
-                name:userDoc.name,
-                email:userDoc.email
-              }
+            if (!userDoc) {
+              const newUser = new UserEntity(
+                profile.displayName,
+                email,
+                randomUUID(),
+                UserRole.USER,
+                "",
+                true,
+                new Date(),
+                undefined,
+                undefined,
+                profile.id,
+              );
 
-            done(null, { user: AuthUser, accessToken });
+              userDoc = await this._userRepo.registerUser(newUser);
+            }
+            if (!userDoc) {
+              return done(new Error(ERROR_MESSAGES.ACCOUNT_SETUP_FAILED), undefined);
+            }
+            const appAccessToken = this._jwtService.generateAccessToken({
+              id: String(userDoc.userId),
+              email: userDoc.email,
+              role: userDoc.role
+            });
+
+            const authUser = {
+              id: userDoc.userId,
+              name: userDoc.name,
+              email: userDoc.email,
+              role: userDoc.role
+            };
+
+            done(null, { user: authUser, accessToken: appAccessToken });
 
           } catch (error) {
             done(error as Error, undefined);

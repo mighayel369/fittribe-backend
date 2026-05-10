@@ -1,19 +1,21 @@
 
 import { injectable } from "tsyringe";
-import  { Model } from "mongoose";
+import { Model } from "mongoose";
 import WalletModel, { IWallet } from "../models/WalletModel";
 import { BaseRepository } from "./BaseRepository";
 import { WalletEntity } from "domain/entities/WalletEntity";
-import { WalletMapper } from "../mappers/WalletMapper";
 import { IWalletRepo } from "domain/repositories/IWalletRepo";
+import { HOLD_STATUS, TRANSACTION_SOURCE, TRANSACTION_TYPE } from "domain/constants/wallet-constants";
+import { AppError } from "domain/errors/AppError";
+import { ERROR_MESSAGES } from "utils/ErrorMessage";
+import { HttpStatus } from "utils/HttpStatus";
 
 @injectable()
 export class WalletRepoImpl
-  extends BaseRepository<IWallet, WalletEntity>
+  extends BaseRepository<IWallet>
   implements IWalletRepo {
 
   protected model: Model<IWallet> = WalletModel;
-  protected toEntity = WalletMapper.toEntity;
 
   async createWallet(ownerId: string): Promise<WalletEntity> {
     const wallet = await this.model.create({
@@ -22,13 +24,13 @@ export class WalletRepoImpl
       holds: [],
       transactions: []
     });
-    return this.toEntity(wallet);
+    return wallet;
   }
 
   async credit(
     ownerId: string,
     amount: number,
-    source: "booking" | "refund",
+    source: TRANSACTION_SOURCE,
     bookingId?: string
   ): Promise<WalletEntity | null> {
     const doc = await this.model.findOneAndUpdate(
@@ -37,7 +39,7 @@ export class WalletRepoImpl
         $inc: { balance: amount },
         $push: {
           transactions: {
-            type: "credit",
+            type: TRANSACTION_TYPE.CREDIT,
             amount,
             source,
             bookingId,
@@ -47,13 +49,13 @@ export class WalletRepoImpl
       },
       { new: true }
     );
-    return doc ? this.toEntity(doc) : null;
+    return doc ? doc : null;
   }
 
   async holdAmount(ownerId: string, bookingId: string, amount: number): Promise<void> {
     await this.model.findOneAndUpdate(
       { ownerId },
-      { $push: { holds: { bookingId, amount, status: "active" } } }
+      { $push: { holds: { bookingId, amount, status: HOLD_STATUS.ACTIVE } } }
     );
   }
 
@@ -61,8 +63,8 @@ export class WalletRepoImpl
     const walletDoc = await this.model.findOne({ ownerId });
     if (!walletDoc) return null;
 
-    const hold = walletDoc.holds.find(h => h.bookingId.toString() === bookingId && h.status === "active");
-    if (!hold) throw new Error("Active hold not found");
+    const hold = walletDoc.holds.find(h => h.bookingId.toString() === bookingId && h.status === HOLD_STATUS.ACTIVE);
+    if (!hold) throw new AppError(ERROR_MESSAGES.NOT_FOUND, HttpStatus.NOT_FOUND);
 
     const doc = await this.model.findOneAndUpdate(
       { ownerId },
@@ -71,9 +73,9 @@ export class WalletRepoImpl
         $pull: { holds: { bookingId: bookingId } },
         $push: {
           transactions: {
-            type: "credit",
+            type: TRANSACTION_TYPE.CREDIT,
             amount: hold.amount,
-            source: "booking",
+            source: TRANSACTION_SOURCE.BOOKING,
             bookingId,
             createdAt: new Date()
           }
@@ -81,7 +83,7 @@ export class WalletRepoImpl
       },
       { new: true }
     );
-    return doc ? this.toEntity(doc) : null;
+    return doc ? doc : null;
   }
 
   async releaseHoldWithoutBalance(ownerId: string, bookingId: string): Promise<WalletEntity | null> {
@@ -90,7 +92,7 @@ export class WalletRepoImpl
       { $pull: { holds: { bookingId: bookingId } } },
       { new: true }
     );
-    return doc ? this.toEntity(doc) : null;
+    return doc ? doc : null;
   }
 
   async getWalletWithPaginatedTransactions(ownerId: string, page: number, limit: number) {
@@ -111,9 +113,9 @@ export class WalletRepoImpl
     if (!result || result.length === 0) return null;
 
     const data = result[0];
-    console.log(data)
+
     return {
-      wallet: this.toEntity(data),
+      wallet: data,
       totalTransactions: data.totalTransactions
     };
   }

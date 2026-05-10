@@ -1,4 +1,9 @@
 import { ProgramSummaryDTO } from "./program-summary.dto";
 
+export interface ProgramInfoDTO {
+    programId: string;
+    name: string;
+}
 
-export interface ProgramDetailsResponseDTO extends ProgramSummaryDTO {}
+
+export type ProgramDetailsResponseDTO = ProgramSummaryDTO

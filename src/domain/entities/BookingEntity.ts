@@ -1,98 +1,120 @@
-import { BOOKING_STATUS, UserRole } from "utils/Constants";
-import { TrainerEntity } from "./TrainerEntity";
-import { UserEntity } from "./UserEntity";
+import { UserRole } from "domain/constants/user-role";
+import { BOOKING_STATUS } from "domain/constants/booking-status";
+import { PAYMENT_METHOD, PAYMENT_STATUS } from "domain/constants/payment-status";
 import { AppError } from "domain/errors/AppError";
 import { HttpStatus } from "utils/HttpStatus";
-import { ERROR_MESSAGES } from "utils/ErrorMessage";
-import { timeToMin } from "utils/generateTimeSlots";
+
 export class BookingEntity {
-  private MAX_RESCHEDULE_LIMIT=2
   constructor(
-    public  bookingId: string,
-    public  user: (UserEntity|string),
-    public  trainer: (TrainerEntity|string),
-    public  program:string,
-
-    public  date: Date,
-    public  timeSlot: number,
-    public  duration: number,
-
+    public bookingId: string,
+    public userId: string,
+    public trainerId: string,
+    public program: string,
+    public date: Date,
+    public timeSlot: number,
+    public duration: number,
     public totalAmount: number,
     public adminCommission: number,
     public trainerEarning: number,
-
-    public  status: BOOKING_STATUS,
-
+    public status: BOOKING_STATUS,
     public payment: {
-      method: "wallet" | "online";
-      status: "hold" | "paid" | "refunded";
+      method: PAYMENT_METHOD;
+      status: PAYMENT_STATUS;
     },
-    public  rescheduleRequest?: {
+    public rescheduleRequest?: {
       newDate: Date;
       newTimeSlot: number;
-      requestedBy:UserRole,
+      requestedBy: UserRole;
       createdAt: Date;
+      reason: string;
     },
-    public readonly rescheduleCount?:number,
-    public rejectReason?:string,
-    public meetLink?:string,
-    public isReviewed?:boolean
-  ) {}
+    public rescheduleCount = 0,
+    public rejectReason?: string,
+    public meetLink?: string,
+    public isReviewed = false
+  ) { }
 
-  public get trainerId(): string {
-    if (typeof this.trainer === 'string') {
-      return this.trainer;
-    }
-    return this.trainer.trainerId;
+  get MAX_RESCHEDULE_LIMIT(): number {
+    return 2;
   }
 
-  public get userId(): string {
-  if (typeof this.user === 'string') {
-    return this.user;
-  }
-  return this.user.userId;
-}
 
-  public canBeConfirmed(): boolean {
-    return this.status === BOOKING_STATUS.PENDING;
+  private hoursUntilSession(): number {
+    return (this.date.getTime() - Date.now()) / (1000 * 60 * 60);
   }
 
-  public canBeDeclined(): boolean {
-  return this.status === BOOKING_STATUS.PENDING || this.status === BOOKING_STATUS.CONFIRMED || this.status===BOOKING_STATUS.RESCHEDULE_REQUESTED;
-}
-
-  public canCancel(): boolean {
-    const MIN_CANCEL_HOURS = 24;
-    const now = new Date();
-    const sessionTime = new Date(this.date);
-   
-    if (this.status !== BOOKING_STATUS.CONFIRMED && this.status !== BOOKING_STATUS.PENDING) return false;
-    const hoursDifference = (sessionTime.getTime() - now.getTime()) / (1000 * 60 * 60);
-    return hoursDifference >= MIN_CANCEL_HOURS;
-}
-public requestReschedule(newDate: Date, newTimeSlot: string, requestedBy: UserRole): void {
-    const now = new Date();
-    const sessionDate = new Date(this.date);
+  private clearRescheduleRequest(): void {
+    this.rescheduleRequest = undefined;
+    this.rejectReason = undefined;
+  }
 
 
-    if (this.status !== BOOKING_STATUS.PENDING && this.status !== BOOKING_STATUS.CONFIRMED) {
-      throw new AppError(`Cannot reschedule a ${this.status} booking.`, HttpStatus.BAD_REQUEST);
+  public approveReschedule(performedBy: UserRole): void {
+    if (!this.rescheduleRequest) {
+      throw new AppError("No active reschedule request", HttpStatus.BAD_REQUEST);
     }
 
-    if (requestedBy === UserRole.USER && (this.rescheduleCount || 0) >= this.MAX_RESCHEDULE_LIMIT) {
-      throw new AppError("Maximum reschedule limit reached.", HttpStatus.BAD_REQUEST);
+    if (this.rescheduleRequest.requestedBy === performedBy) {
+      throw new AppError("Cannot approve your own request", HttpStatus.FORBIDDEN);
     }
 
-    const hoursUntil = (sessionDate.getTime() - now.getTime()) / (1000 * 60 * 60);
-    if (hoursUntil < 24) {
-      throw new AppError("Must reschedule at least 24 hours in advance.", HttpStatus.BAD_REQUEST);
+    this.date = this.rescheduleRequest.newDate;
+    this.timeSlot = this.rescheduleRequest.newTimeSlot;
+
+    if (this.rescheduleRequest.requestedBy === UserRole.USER) {
+      this.rescheduleCount += 1;
+    }
+
+    this.status = BOOKING_STATUS.CONFIRMED;
+    this.clearRescheduleRequest();
+  }
+
+
+  public rejectReschedule(
+    performedBy: UserRole,
+    reason?: string,
+    wasPendingBefore = false
+  ): void {
+    if (!this.rescheduleRequest) {
+      throw new AppError("No active reschedule request", HttpStatus.BAD_REQUEST);
+    }
+
+    if (this.rescheduleRequest.requestedBy === performedBy) {
+      throw new AppError("Cannot reject your own request", HttpStatus.FORBIDDEN);
+    }
+
+    this.status = wasPendingBefore
+      ? BOOKING_STATUS.PENDING
+      : BOOKING_STATUS.CONFIRMED;
+
+    this.rescheduleRequest = undefined;
+    this.rejectReason = reason || "Rejected without reason";
+  }
+
+  public requestReschedule(
+    newDate: Date,
+    newTimeSlot: number,
+    requestedBy: UserRole,
+    reason: string
+  ): void {
+
+    if (![BOOKING_STATUS.PENDING, BOOKING_STATUS.CONFIRMED].includes(this.status)) {
+      throw new AppError(`Cannot reschedule ${this.status}`, HttpStatus.BAD_REQUEST);
+    }
+    if (requestedBy === UserRole.USER && this.rescheduleCount >= this.MAX_RESCHEDULE_LIMIT) {
+      throw new AppError("Limit reached", HttpStatus.BAD_REQUEST);
+    }
+
+    if (this.hoursUntilSession() < 24) {
+      throw new AppError("Must reschedule 24hrs before", HttpStatus.BAD_REQUEST);
     }
 
     this.rescheduleRequest = {
       newDate,
-      newTimeSlot: timeToMin(newTimeSlot),
+      newTimeSlot,
       requestedBy,
-      createdAt: new Date()
+      createdAt: new Date(),
+      reason
     };
 
     if (this.status === BOOKING_STATUS.CONFIRMED) {
@@ -100,45 +122,64 @@ public requestReschedule(newDate: Date, newTimeSlot: string, requestedBy: UserRo
     }
   }
 
-  public approveReschedule(performedBy: UserRole): void {
-    if (!this.rescheduleRequest) throw new AppError('No active request.', HttpStatus.BAD_REQUEST);
-    if (this.rescheduleRequest.requestedBy === performedBy) {
-      throw new AppError('Cannot approve your own request.', HttpStatus.FORBIDDEN);
+  public isPending(): boolean {
+    return this.status === BOOKING_STATUS.PENDING;
+  }
+
+  public canBeConfirmed(): boolean {
+    return this.status === BOOKING_STATUS.PENDING;
+  }
+
+  public canCancel(): boolean {
+    if (![BOOKING_STATUS.PENDING, BOOKING_STATUS.CONFIRMED].includes(this.status)) {
+      return false;
     }
 
-    this.date = this.rescheduleRequest.newDate;
-    this.timeSlot = this.rescheduleRequest.newTimeSlot;
-    
-    if (this.rescheduleRequest.requestedBy === UserRole.USER) {
-        (this as any).rescheduleCount = (this.rescheduleCount || 0) + 1;
+    const hoursDiff = this.hoursUntilSession();
+    return hoursDiff >= 24;
+  }
+
+  public confirm(): void {
+    if (!this.canBeConfirmed()) {
+      throw new AppError(
+        `Cannot confirm booking with status ${this.status}`,
+        HttpStatus.BAD_REQUEST
+      );
     }
 
     this.status = BOOKING_STATUS.CONFIRMED;
-    this.rescheduleRequest = undefined;
   }
 
-  public rejectReschedule(performedBy: UserRole, reason?: string, wasPendingBefore: boolean = false): void {
-    if (!this.rescheduleRequest) throw new AppError('No active request.', HttpStatus.BAD_REQUEST);
-    
-    
-    this.status = wasPendingBefore ? BOOKING_STATUS.PENDING : BOOKING_STATUS.CONFIRMED;
-    
-    this.rescheduleRequest = undefined; 
-    this.rejectReason = reason || "Declined without a specific reason.";
+  public canBeDeclined(): boolean {
+    return [
+      BOOKING_STATUS.PENDING,
+      BOOKING_STATUS.CONFIRMED,
+      BOOKING_STATUS.RESCHEDULE_REQUESTED
+    ].includes(this.status);
   }
 
   public decline(reason: string): void {
-  if (!this.canBeDeclined()) {
-    throw new AppError(ERROR_MESSAGES.DECLINE_BOOKING_ERROR, HttpStatus.BAD_REQUEST);
+    if (!this.canBeDeclined()) {
+      throw new AppError(
+        `Cannot decline booking with status ${this.status}`,
+        HttpStatus.BAD_REQUEST
+      );
+    }
+
+    if (!reason || reason.trim().length < 3) {
+      throw new AppError("Valid decline reason required", HttpStatus.BAD_REQUEST);
+    }
+
+    this.status = BOOKING_STATUS.REJECTED;
+    this.rejectReason = reason;
+    this.payment.status = PAYMENT_STATUS.REFUNDED;
   }
 
-  (this as any).status = BOOKING_STATUS.REJECTED; 
-  this.rejectReason = reason;
-  this.payment.status = "refunded";
+  public cancel(): void {
+    if (!this.canCancel()) {
+      throw new AppError("Cancellation not allowed", HttpStatus.BAD_REQUEST);
+    }
+
+    this.status = BOOKING_STATUS.CANCELED;
+  }
 }
-}
-
- 
-
-
-

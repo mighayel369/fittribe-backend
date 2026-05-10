@@ -1,114 +1,127 @@
-import { TrainerEntity } from "domain/entities/TrainerEntity";
-import { 
-    TrainersResponseDTO, 
-    ClientTrainersResponseDTO, 
-    PendingTrainerResponseDTO 
-} from "application/dto/trainer/fetch-all-trainers.dto";
-import { 
-    TrainerDetailsResponseDTO, 
-    TrainerPrivateProfileDTO, 
-    UserTrainerViewDTO 
-} from "application/dto/trainer/fetch-trainer-details.dto";
-import { TrainerApprovalResponseDTO } from "application/dto/trainer/trainer-approval.dto";
-import { UpdateStatusResponseDTO } from "application/dto/common/update-status.dto";
-import { APPROVAL_MESSAGES, TRAINER_STATUS_MESSAGES } from "utils/Constants";
+import { ClientTrainersResponseDTO, PendingTrainerResponseDTO, TrainersResponseDTO } from "application/dto/trainer/fetch-all-trainers.dto";
+import { AdminTrainerDetails, TrainerPrivateProfileDTO, UserTrainerViewDTO } from "application/dto/trainer/fetch-trainer-details.dto";
+import { TrainerType } from "domain/repositories/types/trainer-type";
 
-export class TrainerMapper {
 
-    static toTrainerResponseDTO(trainer: TrainerEntity): TrainersResponseDTO {
+export const TrainerMapper = {
+    toTrainerProfile(data: TrainerType): TrainerPrivateProfileDTO {
+        const { trainer } = data
         return {
             trainerId: trainer.trainerId,
-            name: trainer.name || "N/A",
-            email: trainer.email || "",
-            status: !!trainer.status, 
-            pricePerSession: trainer.pricePerSession || 0
+            name: trainer.name,
+            email: trainer.email,
+            phone: trainer.phone || "Not Provided",
+            gender: trainer.gender,
+            address: trainer.address || "",
+            bio: trainer.bio || "",
+            profilePic: trainer.profilePic || "",
+            experience: trainer.experience,
+            languages: trainer.languages || [],
+            pricePerSession: trainer.pricePerSession,
+            status: trainer.status,
+            verified: trainer.verified,
+            rejectReason: trainer.rejectReason || "",
+            certificate: trainer.certificate || "",
+            rating: trainer.rating || 0,
+            joined: trainer.createdAt ? new Date(trainer.createdAt).toLocaleDateString() : "",
+            programs: trainer.programs.map(p => ({
+                programId: p.programId,
+                name: p.name,
+                description: p.description,
+                image: p.programPic
+            }))
         };
-    }
+    },
 
-    static toClientTrainersResponseDTO(trainer: TrainerEntity): ClientTrainersResponseDTO {
+    toClientTrainerDTO(data: TrainerType): ClientTrainersResponseDTO {
+        const { trainer } = data;
+
         return {
             trainerId: trainer.trainerId,
-            name: trainer.name || "N/A",
-            email: trainer.email || "",
-            status: !!trainer.status,
-            pricePerSession: trainer.pricePerSession || 0,
+            name: trainer.name,
+            email: trainer.email,
+            status: trainer.status,
+            pricePerSession: trainer.pricePerSession,
             profilePic: trainer.profilePic || null,
             rating: trainer.rating || 0,
             experience: trainer.experience || 0,
-            address: trainer.address || "NA",
-            programs: (trainer.programs && trainer.programs.length > 0)
-                ? (typeof trainer.programs[0] === 'string' ? trainer.programs[0] : (trainer.programs[0] as any).name)
-                : "General Fitness"
-        };
-    }
+            address: trainer.address || null,
 
-    static toPendingTrainersResponseDTO(trainer: TrainerEntity): PendingTrainerResponseDTO {
+            programs: trainer.programs.map(p => p.name).join(", ") || "General Training"
+        };
+    },
+
+    toUserTrainerView(data: TrainerType, chatId: string | null): UserTrainerViewDTO {
+        const { trainer } = data;
+
         return {
             trainerId: trainer.trainerId,
-            name: trainer.name || "N/A",
-            pricePerSession: trainer.pricePerSession || 0,
-            gender: trainer.gender || "Not Specified",
-            programs: (trainer.programs || []).map(p => typeof p === 'string' ? p : (p as any).name)
-        };
-    }
-
-    static toTrainerDetailsResponseDTO(trainer: TrainerEntity): TrainerDetailsResponseDTO {
-        return {
-            trainerId: trainer.trainerId,
-            name: trainer.name || "N/A",
-            email: trainer.email || "",
-            status: trainer.status !== undefined ? !!trainer.status : true,
+            name: trainer.name,
             profilePic: trainer.profilePic || "",
-            pricePerSession: trainer.pricePerSession || 0,
-            verified: trainer.verified,
-            certificate: trainer.certificate || "",
-            joined: trainer.createdAt ? trainer.createdAt.toISOString() : new Date().toISOString(),
-            gender: trainer.gender || "Not Specified",
-            programs: (trainer.programs || []).map((program: any) => ({
-                programId: program.programId ? program.programId.toString() : "", 
-                name: program.name || "General"
-            })),
-            role: trainer.role,
-            experience: trainer.experience || 0,
+            pricePerSession: trainer.pricePerSession,
+            experience: trainer.experience,
             languages: trainer.languages || [],
-            rejectReason: trainer.rejectReason || undefined,
-            phone: trainer.phone || undefined
-        };
-    }
-
-    static toTrainerPrivateProfileDTO(trainer: TrainerEntity): TrainerPrivateProfileDTO {
-        const base = this.toTrainerDetailsResponseDTO(trainer);
-        return {
-            ...base,
-            address: trainer.address || "NA",
+            address: trainer.address || "",
             bio: trainer.bio || "",
+            rating: trainer.rating || 0,
+            chatId: chatId,
+            programs: trainer.programs.map(p => ({
+                programId: p.programId,
+                name: p.name,
+                description: p.description,
+                image: p.programPic
+            }))
         };
-    }
+    },
 
-    static toUserTrainerViewDTO(trainer: TrainerEntity): UserTrainerViewDTO {
-        const base = this.toTrainerDetailsResponseDTO(trainer);
-        return {
-            ...base,
-            address: trainer.address || "Global/Remote",
-            bio: trainer.bio || "No bio added yet.",
-            rating: trainer.rating || 0
-        };
-    }
+    toTrainersResponseDTO(data: TrainerType): TrainersResponseDTO {
+        const { trainer } = data;
 
-    static toTrainerApprovalResponseDTO(trainer: TrainerEntity): TrainerApprovalResponseDTO {
         return {
-            success: true,
-            message: trainer.verified === "accepted" ? APPROVAL_MESSAGES.LOG_SUCCESS : APPROVAL_MESSAGES.LOG_REJECT,
-            updatedStatus: (trainer.verified as "accepted" | "rejected") || "pending",
-            trainerName: trainer.name || "Trainer"
+            trainerId: trainer.trainerId,
+            name: trainer.name,
+            email: trainer.email,
+            status: trainer.status,
+            pricePerSession: trainer.pricePerSession
         };
-    }
+    },
 
-    static toUpdateStatusResponseDTO(isActive: boolean): UpdateStatusResponseDTO {
+    toPendingTrainerDTO(data: TrainerType): PendingTrainerResponseDTO {
+        const { trainer } = data;
+
         return {
-            success: true,
-            message: isActive ? TRAINER_STATUS_MESSAGES.UNBLOCK_SUCCESS : TRAINER_STATUS_MESSAGES.BLOCK_SUCCESS,
-            newStatus: isActive
+            trainerId: trainer.trainerId,
+            name: trainer.name,
+            pricePerSession: trainer.pricePerSession,
+            gender: trainer.gender,
+            programs: trainer.programs.map(p => p.name)
+        };
+    },
+
+    toAdminTrainerDetails(data: TrainerType): AdminTrainerDetails {
+        const { trainer } = data;
+
+        return {
+            trainerId: trainer.trainerId,
+            name: trainer.name,
+            email: trainer.email,
+            role: trainer.role,
+            profilePic: trainer.profilePic || null,
+            gender: trainer.gender,
+            experience: trainer.experience,
+            languages: trainer.languages || [],
+            pricePerSession: trainer.pricePerSession,
+            certificate: trainer.certificate || "",
+            verified: trainer.verified,
+            status: trainer.status,
+            joined: trainer.createdAt ? new Date(trainer.createdAt).toISOString() : new Date().toISOString(),
+            rejectReason: trainer.rejectReason || "",
+            programs: trainer.programs.map(p => ({
+                programId: p.programId,
+                name: p.name,
+                description: p.description,
+                image: p.programPic
+            }))
         };
     }
-}
+};

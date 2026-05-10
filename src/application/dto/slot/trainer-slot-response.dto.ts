@@ -1,25 +1,6 @@
-export interface TimeRangeDTO {
-  start: string;
-  end: string;
-}
-
-export interface WeeklyAvailabilityDTO {
-  monday: TimeRangeDTO[];
-  tuesday: TimeRangeDTO[];
-  wednesday: TimeRangeDTO[];
-  thursday: TimeRangeDTO[];
-  friday: TimeRangeDTO[];
-  saturday: TimeRangeDTO[];
-  sunday: TimeRangeDTO[];
-}
+import { WeeklyAvailability } from "domain/entities/types/slot.types";
 
 export interface TrainerSlotResponseDTO {
   trainerId: string;
-  weeklyAvailability: WeeklyAvailabilityDTO;
-  blockedSlots: {
-    date: string;
-    start: string;
-    end: string;
-    reason?: string;
-  }[];
+  weeklyAvailability: WeeklyAvailability
 }

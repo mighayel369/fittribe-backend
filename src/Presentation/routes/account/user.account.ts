@@ -14,13 +14,13 @@ router.get('/verify', ctrl.verifySession);
 router.get('/me', ctrl.getProfile);
 
 router.put(
-    '/update', 
-    validateRequest(updateUserProfileSchema), 
-    ctrl.updateProfile
+  '/update',
+  validateRequest(updateUserProfileSchema),
+  ctrl.updateProfile
 );
 
 router.patch('/avatar', upload.single('profilePic'), ctrl.updateAvatar);
 router.post(
-  '/change-password',validateRequest(changePasswordSchema), ctrl.changePassword
+  '/change-password', validateRequest(changePasswordSchema), ctrl.changePassword
 );
 export default router;

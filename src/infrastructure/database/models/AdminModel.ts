@@ -1,13 +1,6 @@
 import mongoose, { Schema, Document } from "mongoose";
-
-export interface IAdminDocument extends Document {
-  adminId: string;
-  name: string;
-  email: string;
-  password: string;
-  createdAt?: Date;
-  updatedAt?: Date;
-}
+import { AdminEntity } from "domain/entities/AdminEntity";
+export interface IAdminDocument extends Document,AdminEntity {}
 
 const AdminSchema = new Schema<IAdminDocument>({
   adminId:{type:String,required:true},
@@ -15,6 +8,8 @@ const AdminSchema = new Schema<IAdminDocument>({
   email: { type: String, required: true },
   password: { type: String, required: true },
 }, { timestamps: true });
+
+AdminSchema.loadClass(AdminEntity)
 
 const Admin = mongoose.models.admin || mongoose.model<IAdminDocument>('admin', AdminSchema);
 export default Admin;

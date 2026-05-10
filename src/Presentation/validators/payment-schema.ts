@@ -4,7 +4,7 @@ export const initiatePaymentSchema = z.object({
   trainerId: z.string("Invalid Trainer ID"),
   programId: z.string("Invalid Program ID"),
   date: z.string().min(1, "Date is required"),
-  time: z.string().min(1, "Time is required"),
+  time: z.number().int().min(0, "Invalid time slot"),
   amount: z.coerce.number()
     .positive("Amount must be greater than zero")
     .min(1, "Minimum payment amount is 1"),

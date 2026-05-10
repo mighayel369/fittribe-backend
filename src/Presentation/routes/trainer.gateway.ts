@@ -1,5 +1,5 @@
 import express from 'express';
-import { UserRole } from 'utils/Constants';
+import { UserRole } from 'domain/constants/user-role';
 import { authorizeRoles } from 'Presentation/middleware/authMiddleware';
 import notification from './notification/notification.route'
 
@@ -8,8 +8,8 @@ import sessionAuth from './auth/session.auth';
 import wallet from './payment/wallet';
 import trainerAccount from './account/trainer.account';
 import trainerSchedule from './account/trainer.schedule';
-import trainerDashboard from './account/trainer.dashboard';
-import trainerLeaves from './account/trainer.leave'
+import trainerDashboard from './dashboard/trainer.dashboard';
+import trainerLeaves from './leave/trainer.leave'
 import trainerBookings from './booking/trainer.bookings';
 import trainerChats from './chat/trainer.chat'
 import sharedChats from './chat/shared.chat'
@@ -31,7 +31,7 @@ trainerRouter.use(authorizeRoles(UserRole.TRAINER));
 trainerRouter.use('/account', trainerAccount);
 trainerRouter.use('/schedule', trainerSchedule);
 trainerRouter.use('/dashboard', trainerDashboard);
-trainerRouter.use('/leaves', trainerLeaves),
+trainerRouter.use('/leaves', trainerLeaves);
 trainerRouter.use('/chats',trainerChats)
 trainerRouter.use('/chats',sharedChats)
 

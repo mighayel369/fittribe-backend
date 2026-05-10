@@ -1,8 +1,8 @@
 import { z } from 'zod';
-import { LEAVE_TYPES } from "utils/Constants";
+import { LEAVE_TYPES } from 'domain/constants/leave-status';
 
 export const applyLeaveSchema = z.object({
-  type: z.nativeEnum(LEAVE_TYPES).refine((val) => !!val, {
+  type: z.enum(LEAVE_TYPES).refine((val) => !!val, {
     message: "Please select a valid leave type",
   }),
 
@@ -26,10 +26,10 @@ export const applyLeaveSchema = z.object({
 });
 
 export const leaveHistorySchema = z.object({
-    pageNo: z.coerce.number().min(1).default(1),
-    limit: z.coerce.number().min(1).max(50).default(5),
-    search: z.string().optional().default(""),
+  pageNo: z.coerce.number().min(1).default(1),
+  limit: z.coerce.number().min(1).max(50).default(5),
+  search: z.string().optional().default(""),
 });
 export const withdrawLeaveSchema = z.object({
-  leaveId: z.string().min(1,"Invalid UUID format"),
+  leaveId: z.string().min(1, "Invalid UUID format"),
 });
