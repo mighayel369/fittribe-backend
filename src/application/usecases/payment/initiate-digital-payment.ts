@@ -23,7 +23,7 @@ export class InitiateOnlinePaymentUseCase implements IInitiateOnlinePayment {
 
     const isAlreadyBooked = await this._bookingRepository.checkAvailability(
       paymentData.trainerId,
-      new Date(paymentData.date),
+      paymentData.date,
       paymentData.time
     );
 

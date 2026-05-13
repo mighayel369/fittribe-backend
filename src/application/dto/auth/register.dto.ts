@@ -1,6 +1,6 @@
 import { UserRole } from "domain/constants/user-role";
 import { GENDER } from "domain/constants/gender";
-import { LANGUAGE } from "utils/Constants";
+import { LANGUAGE } from "domain/constants/language-type";
 import { TRAINER_STATUS } from "domain/constants/trainer-status";
 
 export interface RegisterResponseDTO {
