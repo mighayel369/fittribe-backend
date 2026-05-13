@@ -186,3 +186,155 @@
 2026-05-13 22:30:45 [info]: ::1 - - [13/May/2026:17:00:45 +0000] "GET /user/notification/get HTTP/1.1" 304 - "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36"
 2026-05-13 22:30:45 [info]: ::1 - - [13/May/2026:17:00:45 +0000] "GET /user/discovery/trainers/availability?trainerId=f573c521-2609-4e4f-98f8-d2f97fe9c062&date=2026-05-13T17:00:45.125Z HTTP/1.1" 200 158 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36"
 2026-05-13 22:30:45 [info]: ::1 - - [13/May/2026:17:00:45 +0000] "GET /user/discovery/trainers/availability?trainerId=f573c521-2609-4e4f-98f8-d2f97fe9c062&date=2026-05-13T17:00:45.125Z HTTP/1.1" 304 - "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36"
+2026-05-13 22:36:41 [info]: ✅ Server & Sockets running on port 5000
+2026-05-13 22:36:44 [info]: ✅ Connection established for user: 3cf9652b-30c1-4c10-bfa7-7c6dbeae9c35
+2026-05-13 22:36:44 [info]: ❌ User disconnected: 3cf9652b-30c1-4c10-bfa7-7c6dbeae9c35
+2026-05-13 22:36:44 [info]: ✅ Connection established for user: 3cf9652b-30c1-4c10-bfa7-7c6dbeae9c35
+2026-05-13 22:36:45 [info]: ::1 - - [13/May/2026:17:06:45 +0000] "GET /user/notification/get HTTP/1.1" 304 - "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36"
+2026-05-13 22:36:45 [info]: ::1 - - [13/May/2026:17:06:45 +0000] "GET /user/discovery/trainers/explore/f573c521-2609-4e4f-98f8-d2f97fe9c062 HTTP/1.1" 304 - "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36"
+2026-05-13 22:36:45 [info]: ::1 - - [13/May/2026:17:06:45 +0000] "GET /user/account/verify HTTP/1.1" 304 - "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36"
+2026-05-13 22:36:45 [info]: ::1 - - [13/May/2026:17:06:45 +0000] "GET /user/notification/get HTTP/1.1" 304 - "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36"
+2026-05-13 22:36:45 [info]: ::1 - - [13/May/2026:17:06:45 +0000] "GET /user/discovery/trainers/explore/f573c521-2609-4e4f-98f8-d2f97fe9c062 HTTP/1.1" 304 - "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36"
+2026-05-13 22:36:45 [info]: ::1 - - [13/May/2026:17:06:45 +0000] "GET /user/account/verify HTTP/1.1" 304 - "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36"
+2026-05-13 22:36:45 [info]: ::1 - - [13/May/2026:17:06:45 +0000] "GET /user/notification/get HTTP/1.1" 304 - "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36"
+2026-05-13 22:36:45 [info]: ::1 - - [13/May/2026:17:06:45 +0000] "GET /user/notification/get HTTP/1.1" 304 - "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36"
+2026-05-13 22:36:45 [info]: ::1 - - [13/May/2026:17:06:45 +0000] "GET /user/discovery/trainers/availability?trainerId=f573c521-2609-4e4f-98f8-d2f97fe9c062&date=2026-05-13T17:06:44.938Z HTTP/1.1" 200 158 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36"
+2026-05-13 22:36:45 [info]: ::1 - - [13/May/2026:17:06:45 +0000] "GET /user/discovery/trainers/availability?trainerId=f573c521-2609-4e4f-98f8-d2f97fe9c062&date=2026-05-13T17:06:44.938Z HTTP/1.1" 304 - "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36"
+2026-05-13 22:36:46 [info]: ::1 - - [13/May/2026:17:06:46 +0000] "GET /user/discovery/trainers/availability?trainerId=f573c521-2609-4e4f-98f8-d2f97fe9c062&date=2026-05-13T18:30:00.000Z HTTP/1.1" 304 - "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36"
+2026-05-13 22:37:09 [info]: ::1 - - [13/May/2026:17:07:09 +0000] "GET /user/discovery/trainers/availability?trainerId=f573c521-2609-4e4f-98f8-d2f97fe9c062&date=2026-05-14T18:30:00.000Z HTTP/1.1" 304 - "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36"
+2026-05-13 22:37:39 [info]: ::1 - - [13/May/2026:17:07:39 +0000] "GET /user/notification/get HTTP/1.1" 304 - "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36"
+2026-05-13 22:37:39 [info]: ::1 - - [13/May/2026:17:07:39 +0000] "GET /user/discovery/trainers/explore/f573c521-2609-4e4f-98f8-d2f97fe9c062 HTTP/1.1" 304 - "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36"
+2026-05-13 22:37:39 [info]: ::1 - - [13/May/2026:17:07:39 +0000] "GET /user/account/verify HTTP/1.1" 304 - "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36"
+2026-05-13 22:37:39 [info]: ::1 - - [13/May/2026:17:07:39 +0000] "GET /user/notification/get HTTP/1.1" 304 - "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36"
+2026-05-13 22:37:39 [info]: ::1 - - [13/May/2026:17:07:39 +0000] "GET /user/discovery/trainers/explore/f573c521-2609-4e4f-98f8-d2f97fe9c062 HTTP/1.1" 304 - "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36"
+2026-05-13 22:37:39 [info]: ::1 - - [13/May/2026:17:07:39 +0000] "GET /user/account/verify HTTP/1.1" 304 - "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36"
+2026-05-13 22:37:39 [info]: ::1 - - [13/May/2026:17:07:39 +0000] "GET /user/notification/get HTTP/1.1" 304 - "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36"
+2026-05-13 22:37:39 [info]: ::1 - - [13/May/2026:17:07:39 +0000] "GET /user/notification/get HTTP/1.1" 304 - "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36"
+2026-05-13 22:37:39 [info]: ::1 - - [13/May/2026:17:07:39 +0000] "GET /user/discovery/trainers/availability?trainerId=f573c521-2609-4e4f-98f8-d2f97fe9c062&date=2026-05-13T17:07:39.146Z HTTP/1.1" 200 158 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36"
+2026-05-13 22:37:40 [info]: ::1 - - [13/May/2026:17:07:40 +0000] "GET /user/discovery/trainers/availability?trainerId=f573c521-2609-4e4f-98f8-d2f97fe9c062&date=2026-05-13T17:07:39.146Z HTTP/1.1" 304 - "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36"
+2026-05-13 22:37:43 [info]: ❌ User disconnected: 3cf9652b-30c1-4c10-bfa7-7c6dbeae9c35
+2026-05-13 22:37:43 [info]: ✅ Connection established for user: 3cf9652b-30c1-4c10-bfa7-7c6dbeae9c35
+2026-05-13 22:37:43 [info]: ::1 - - [13/May/2026:17:07:43 +0000] "GET /user/notification/get HTTP/1.1" 304 - "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36"
+2026-05-13 22:37:43 [info]: ::1 - - [13/May/2026:17:07:43 +0000] "GET /user/discovery/trainers/explore/f573c521-2609-4e4f-98f8-d2f97fe9c062 HTTP/1.1" 304 - "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36"
+2026-05-13 22:37:43 [info]: ::1 - - [13/May/2026:17:07:43 +0000] "GET /user/account/verify HTTP/1.1" 304 - "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36"
+2026-05-13 22:37:43 [info]: ::1 - - [13/May/2026:17:07:43 +0000] "GET /user/notification/get HTTP/1.1" 304 - "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36"
+2026-05-13 22:37:43 [info]: ::1 - - [13/May/2026:17:07:43 +0000] "GET /user/discovery/trainers/explore/f573c521-2609-4e4f-98f8-d2f97fe9c062 HTTP/1.1" 304 - "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36"
+2026-05-13 22:37:43 [info]: ::1 - - [13/May/2026:17:07:43 +0000] "GET /user/account/verify HTTP/1.1" 304 - "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36"
+2026-05-13 22:37:44 [info]: ::1 - - [13/May/2026:17:07:44 +0000] "GET /user/notification/get HTTP/1.1" 304 - "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36"
+2026-05-13 22:37:44 [info]: ::1 - - [13/May/2026:17:07:44 +0000] "GET /user/notification/get HTTP/1.1" 304 - "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36"
+2026-05-13 22:37:44 [info]: ::1 - - [13/May/2026:17:07:44 +0000] "GET /user/discovery/trainers/availability?trainerId=f573c521-2609-4e4f-98f8-d2f97fe9c062&date=2026-05-13T17:07:43.837Z HTTP/1.1" 200 158 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36"
+2026-05-13 22:37:44 [info]: ::1 - - [13/May/2026:17:07:44 +0000] "GET /user/discovery/trainers/availability?trainerId=f573c521-2609-4e4f-98f8-d2f97fe9c062&date=2026-05-13T17:07:43.837Z HTTP/1.1" 304 - "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36"
+2026-05-13 22:37:45 [info]: ::1 - - [13/May/2026:17:07:45 +0000] "GET /user/discovery/trainers/availability?trainerId=f573c521-2609-4e4f-98f8-d2f97fe9c062&date=2026-05-13T18:30:00.000Z HTTP/1.1" 304 - "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36"
+2026-05-13 23:38:24 [info]: ❌ User disconnected: 3cf9652b-30c1-4c10-bfa7-7c6dbeae9c35
+2026-05-13 23:49:43 [info]: ✅ Connection established for user: 3cf9652b-30c1-4c10-bfa7-7c6dbeae9c35
+2026-05-13 23:50:22 [info]: ✅ Server & Sockets running on port 5000
+2026-05-13 23:50:22 [info]: ✅ Connection established for user: 3cf9652b-30c1-4c10-bfa7-7c6dbeae9c35
+2026-05-13 23:50:24 [info]: ✅ Server & Sockets running on port 5000
+2026-05-13 23:50:24 [info]: ✅ Connection established for user: 3cf9652b-30c1-4c10-bfa7-7c6dbeae9c35
+2026-05-13 23:51:58 [info]: ✅ Server & Sockets running on port 5000
+2026-05-13 23:51:59 [info]: ✅ Server & Sockets running on port 5000
+2026-05-13 23:51:59 [info]: ✅ Connection established for user: 3cf9652b-30c1-4c10-bfa7-7c6dbeae9c35
+2026-05-13 23:52:17 [info]: ✅ Server & Sockets running on port 5000
+2026-05-13 23:52:17 [info]: ✅ Connection established for user: 3cf9652b-30c1-4c10-bfa7-7c6dbeae9c35
+2026-05-13 23:52:48 [info]: ✅ Server & Sockets running on port 5000
+2026-05-13 23:52:48 [info]: ✅ Connection established for user: 3cf9652b-30c1-4c10-bfa7-7c6dbeae9c35
+2026-05-13 23:52:52 [info]: ✅ Server & Sockets running on port 5000
+2026-05-13 23:52:52 [info]: ✅ Connection established for user: 3cf9652b-30c1-4c10-bfa7-7c6dbeae9c35
+2026-05-14 00:04:10 [info]: ✅ Server & Sockets running on port 5000
+2026-05-14 00:04:10 [info]: ✅ Connection established for user: 3cf9652b-30c1-4c10-bfa7-7c6dbeae9c35
+2026-05-14 00:04:45 [info]: ✅ Server & Sockets running on port 5000
+2026-05-14 00:04:45 [info]: ✅ Connection established for user: 3cf9652b-30c1-4c10-bfa7-7c6dbeae9c35
+2026-05-14 00:05:05 [info]: ✅ Server & Sockets running on port 5000
+2026-05-14 00:05:05 [info]: ✅ Connection established for user: 3cf9652b-30c1-4c10-bfa7-7c6dbeae9c35
+2026-05-14 00:05:43 [info]: ✅ Server & Sockets running on port 5000
+2026-05-14 00:05:43 [info]: ✅ Connection established for user: 3cf9652b-30c1-4c10-bfa7-7c6dbeae9c35
+2026-05-14 00:05:47 [info]: ✅ Server & Sockets running on port 5000
+2026-05-14 00:05:47 [info]: ✅ Connection established for user: 3cf9652b-30c1-4c10-bfa7-7c6dbeae9c35
+2026-05-14 00:05:52 [info]: ✅ Server & Sockets running on port 5000
+2026-05-14 00:05:52 [info]: ✅ Connection established for user: 3cf9652b-30c1-4c10-bfa7-7c6dbeae9c35
+2026-05-14 00:07:44 [info]: ✅ Server & Sockets running on port 5000
+2026-05-14 00:07:44 [info]: ✅ Connection established for user: 3cf9652b-30c1-4c10-bfa7-7c6dbeae9c35
+2026-05-14 00:07:47 [info]: ✅ Server & Sockets running on port 5000
+2026-05-14 00:07:47 [info]: ✅ Connection established for user: 3cf9652b-30c1-4c10-bfa7-7c6dbeae9c35
+2026-05-14 00:07:50 [info]: ✅ Server & Sockets running on port 5000
+2026-05-14 00:07:50 [info]: ✅ Connection established for user: 3cf9652b-30c1-4c10-bfa7-7c6dbeae9c35
+2026-05-14 00:07:55 [info]: ✅ Server & Sockets running on port 5000
+2026-05-14 00:07:55 [info]: ✅ Connection established for user: 3cf9652b-30c1-4c10-bfa7-7c6dbeae9c35
+2026-05-14 00:09:50 [info]: ✅ Server & Sockets running on port 5000
+2026-05-14 00:09:50 [info]: ✅ Connection established for user: 3cf9652b-30c1-4c10-bfa7-7c6dbeae9c35
+2026-05-14 00:09:53 [info]: ✅ Server & Sockets running on port 5000
+2026-05-14 00:09:53 [info]: ✅ Connection established for user: 3cf9652b-30c1-4c10-bfa7-7c6dbeae9c35
+2026-05-14 00:09:55 [info]: ✅ Server & Sockets running on port 5000
+2026-05-14 00:09:56 [info]: ✅ Connection established for user: 3cf9652b-30c1-4c10-bfa7-7c6dbeae9c35
+2026-05-14 00:10:00 [info]: ✅ Server & Sockets running on port 5000
+2026-05-14 00:10:00 [info]: ✅ Connection established for user: 3cf9652b-30c1-4c10-bfa7-7c6dbeae9c35
+2026-05-14 00:10:02 [info]: ✅ Server & Sockets running on port 5000
+2026-05-14 00:10:02 [info]: ✅ Connection established for user: 3cf9652b-30c1-4c10-bfa7-7c6dbeae9c35
+2026-05-14 00:11:03 [info]: ✅ Server & Sockets running on port 5000
+2026-05-14 00:11:03 [info]: ✅ Connection established for user: 3cf9652b-30c1-4c10-bfa7-7c6dbeae9c35
+2026-05-14 00:11:21 [info]: ✅ Server & Sockets running on port 5000
+2026-05-14 00:11:21 [info]: ✅ Connection established for user: 3cf9652b-30c1-4c10-bfa7-7c6dbeae9c35
+2026-05-14 00:11:23 [info]: ✅ Server & Sockets running on port 5000
+2026-05-14 00:11:23 [info]: ✅ Connection established for user: 3cf9652b-30c1-4c10-bfa7-7c6dbeae9c35
+2026-05-14 00:12:03 [info]: ✅ Server & Sockets running on port 5000
+2026-05-14 00:12:03 [info]: ✅ Connection established for user: 3cf9652b-30c1-4c10-bfa7-7c6dbeae9c35
+2026-05-14 00:12:07 [info]: ✅ Server & Sockets running on port 5000
+2026-05-14 00:12:07 [info]: ✅ Connection established for user: 3cf9652b-30c1-4c10-bfa7-7c6dbeae9c35
+2026-05-14 00:12:10 [info]: ✅ Server & Sockets running on port 5000
+2026-05-14 00:12:10 [info]: ✅ Connection established for user: 3cf9652b-30c1-4c10-bfa7-7c6dbeae9c35
+2026-05-14 00:12:12 [info]: ✅ Server & Sockets running on port 5000
+2026-05-14 00:12:12 [info]: ✅ Connection established for user: 3cf9652b-30c1-4c10-bfa7-7c6dbeae9c35
+2026-05-14 00:14:14 [info]: ✅ Server & Sockets running on port 5000
+2026-05-14 00:14:15 [info]: ✅ Connection established for user: 3cf9652b-30c1-4c10-bfa7-7c6dbeae9c35
+2026-05-14 00:14:16 [info]: ✅ Server & Sockets running on port 5000
+2026-05-14 00:14:17 [info]: ✅ Connection established for user: 3cf9652b-30c1-4c10-bfa7-7c6dbeae9c35
+2026-05-14 00:14:37 [info]: ✅ Server & Sockets running on port 5000
+2026-05-14 00:14:37 [info]: ✅ Connection established for user: 3cf9652b-30c1-4c10-bfa7-7c6dbeae9c35
+2026-05-14 00:16:04 [info]: ✅ Server & Sockets running on port 5000
+2026-05-14 00:16:04 [info]: ✅ Connection established for user: 3cf9652b-30c1-4c10-bfa7-7c6dbeae9c35
+2026-05-14 00:16:07 [info]: ✅ Server & Sockets running on port 5000
+2026-05-14 00:16:07 [info]: ✅ Connection established for user: 3cf9652b-30c1-4c10-bfa7-7c6dbeae9c35
+2026-05-14 00:16:16 [info]: ✅ Server & Sockets running on port 5000
+2026-05-14 00:16:16 [info]: ✅ Connection established for user: 3cf9652b-30c1-4c10-bfa7-7c6dbeae9c35
+2026-05-14 00:35:41 [info]: ❌ User disconnected: 3cf9652b-30c1-4c10-bfa7-7c6dbeae9c35
+2026-05-14 00:44:54 [info]: ✅ Connection established for user: 3cf9652b-30c1-4c10-bfa7-7c6dbeae9c35
+2026-05-14 00:46:18 [error]: Error: querySrv ECONNREFUSED _mongodb._tcp.cluster0.hv7hieh.mongodb.net
+    at QueryReqWrap.onresolve [as oncomplete] (node:internal/dns/promises:294:17)
+2026-05-14 00:46:18 [info]: ✅ Server & Sockets running on port 5000
+2026-05-14 00:46:18 [info]: ✅ Connection established for user: 3cf9652b-30c1-4c10-bfa7-7c6dbeae9c35
+2026-05-14 00:46:23 [error]: Error: querySrv ECONNREFUSED _mongodb._tcp.cluster0.hv7hieh.mongodb.net
+    at QueryReqWrap.onresolve [as oncomplete] (node:internal/dns/promises:294:17)
+2026-05-14 00:46:23 [info]: ✅ Server & Sockets running on port 5000
+2026-05-14 00:46:23 [info]: ✅ Connection established for user: 3cf9652b-30c1-4c10-bfa7-7c6dbeae9c35
+2026-05-14 00:46:56 [error]: Error: querySrv ECONNREFUSED _mongodb._tcp.cluster0.hv7hieh.mongodb.net
+    at QueryReqWrap.onresolve [as oncomplete] (node:internal/dns/promises:294:17)
+2026-05-14 00:46:56 [info]: ✅ Server & Sockets running on port 5000
+2026-05-14 00:46:57 [info]: ✅ Connection established for user: 3cf9652b-30c1-4c10-bfa7-7c6dbeae9c35
+2026-05-14 00:47:36 [error]: Error: querySrv ECONNREFUSED _mongodb._tcp.cluster0.hv7hieh.mongodb.net
+    at QueryReqWrap.onresolve [as oncomplete] (node:internal/dns/promises:294:17)
+2026-05-14 00:47:36 [info]: ✅ Server & Sockets running on port 5000
+2026-05-14 00:47:37 [info]: ✅ Connection established for user: 3cf9652b-30c1-4c10-bfa7-7c6dbeae9c35
+2026-05-14 00:47:50 [error]: Error: querySrv ECONNREFUSED _mongodb._tcp.cluster0.hv7hieh.mongodb.net
+    at QueryReqWrap.onresolve [as oncomplete] (node:internal/dns/promises:294:17)
+2026-05-14 00:47:50 [info]: ✅ Server & Sockets running on port 5000
+2026-05-14 00:47:50 [info]: ✅ Connection established for user: 3cf9652b-30c1-4c10-bfa7-7c6dbeae9c35
+2026-05-14 00:47:54 [error]: Error: querySrv ECONNREFUSED _mongodb._tcp.cluster0.hv7hieh.mongodb.net
+    at QueryReqWrap.onresolve [as oncomplete] (node:internal/dns/promises:294:17)
+2026-05-14 00:47:54 [info]: ✅ Server & Sockets running on port 5000
+2026-05-14 00:47:54 [info]: ✅ Connection established for user: 3cf9652b-30c1-4c10-bfa7-7c6dbeae9c35
+2026-05-14 00:48:17 [error]: Error: querySrv ECONNREFUSED _mongodb._tcp.cluster0.hv7hieh.mongodb.net
+    at QueryReqWrap.onresolve [as oncomplete] (node:internal/dns/promises:294:17)
+2026-05-14 00:48:17 [info]: ✅ Server & Sockets running on port 5000
+2026-05-14 00:48:17 [info]: ✅ Connection established for user: 3cf9652b-30c1-4c10-bfa7-7c6dbeae9c35
+2026-05-14 00:48:20 [error]: Error: querySrv ECONNREFUSED _mongodb._tcp.cluster0.hv7hieh.mongodb.net
+    at QueryReqWrap.onresolve [as oncomplete] (node:internal/dns/promises:294:17)
+2026-05-14 00:48:20 [info]: ✅ Server & Sockets running on port 5000
+2026-05-14 00:48:20 [info]: ✅ Connection established for user: 3cf9652b-30c1-4c10-bfa7-7c6dbeae9c35
+2026-05-14 00:51:22 [info]: ✅ Server & Sockets running on port 5000
+2026-05-14 00:51:23 [info]: ✅ Connection established for user: 3cf9652b-30c1-4c10-bfa7-7c6dbeae9c35
+2026-05-14 00:51:28 [info]: ✅ Server & Sockets running on port 5000
+2026-05-14 00:51:28 [info]: ✅ Connection established for user: 3cf9652b-30c1-4c10-bfa7-7c6dbeae9c35
+2026-05-14 00:51:31 [info]: ✅ Server & Sockets running on port 5000
+2026-05-14 00:51:31 [info]: ✅ Connection established for user: 3cf9652b-30c1-4c10-bfa7-7c6dbeae9c35
+2026-05-14 00:51:34 [info]: ✅ Server & Sockets running on port 5000
+2026-05-14 00:51:34 [info]: ✅ Connection established for user: 3cf9652b-30c1-4c10-bfa7-7c6dbeae9c35

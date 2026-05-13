@@ -18,9 +18,12 @@ export class FetchTrainerAvailableSlotsUseCase implements IFetchTrainerAvailable
 
   async execute(queryInput: FetchAvailableSlotsRequestDTO): Promise<FetchAvailableSlotResponseDTO> {
     const { trainerId, date: dateStr } = queryInput;
-    const date = new Date(dateStr);
 
-    const isOnLeave = await this._leaveRepository.isTrainerOnLeave(trainerId, date);
+    const dateObj = new Date(dateStr);
+    
+    const isoDate = dateObj.toISOString();
+
+    const isOnLeave = await this._leaveRepository.isTrainerOnLeave(trainerId, isoDate);
     if (isOnLeave) {
       return {
         status: SCHEDULE_STATUS.ON_LEAVE,
@@ -29,9 +32,12 @@ export class FetchTrainerAvailableSlotsUseCase implements IFetchTrainerAvailable
       };
     }
 
-    const dayName = date.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
-    const slotDoc = await this._slotRepository.getTrainerSlot(trainerId);
+    const dayName = dateObj.toLocaleDateString('en-US', { 
+      weekday: 'long', 
+      timeZone: 'UTC' 
+    }).toLowerCase();
 
+    const slotDoc = await this._slotRepository.getTrainerSlot(trainerId);
     if (!slotDoc) return { status: SCHEDULE_STATUS.NO_SCHEDULE, slots: [], message: SUCCESS_MESSAGES.SLOT.NO_AVAILABILITY_SET };
 
     const dayAvailability = slotDoc.weeklyAvailability[dayName as keyof typeof slotDoc.weeklyAvailability];
@@ -39,14 +45,13 @@ export class FetchTrainerAvailableSlotsUseCase implements IFetchTrainerAvailable
       return { status: SCHEDULE_STATUS.UNAVAILABLE, slots: [], message: ERROR_MESSAGES.TRAINER_ON_LEAVE };
     }
 
-    const allPossibleSlots = generateHourlySlots(dayAvailability, date);
 
-    const bookedSlots = await this._bookingRepository.findBookedSlots(trainerId, date);
+    const allPossibleSlots = generateHourlySlots(dayAvailability, isoDate);
+    const bookedSlots = await this._bookingRepository.findBookedSlots(trainerId, isoDate);
 
     const bookedSet = new Set(bookedSlots);
-
     const availableSlots = allPossibleSlots.filter(slot => !bookedSet.has(slot));
-    console.log(availableSlots)
+
     return {
       status: SCHEDULE_STATUS.AVAILABLE,
       slots: availableSlots,

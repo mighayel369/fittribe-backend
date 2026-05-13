@@ -1,14 +1,18 @@
 export const generateHourlySlots = (
     ranges: { start: string; end: string }[],
-    date: Date,
+    date: Date | string,
     duration = 60
 ) => {
     const slots: number[] = [];
     const now = new Date();
+    const targetDate = new Date(date);
 
-    const isToday = date.toDateString() === now.toDateString();
+    const isToday = 
+        targetDate.getUTCFullYear() === now.getUTCFullYear() &&
+        targetDate.getUTCMonth() === now.getUTCMonth() &&
+        targetDate.getUTCDate() === now.getUTCDate();
 
-    const currentTotalMinutes = now.getHours() * 60 + now.getMinutes();
+    const currentTotalMinutes = now.getUTCHours() * 60 + now.getUTCMinutes();
 
     for (const range of ranges) {
         let startMin = timeToMin(range.start);
@@ -26,7 +30,6 @@ export const generateHourlySlots = (
     }
     return slots;
 };
-
 export const timeToMin = (time: string): number => {
 
     const [t, modifier] = time.split(" ")

@@ -9,8 +9,12 @@ export const checkoutSchema = z.object({
 
     date: z.coerce.date().refine((date) => {
         const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        return date >= today;
+        today.setUTCHours(0, 0, 0, 0);
+
+        const compareDate = new Date(date);
+        compareDate.setUTCHours(0, 0, 0, 0);
+
+        return compareDate >= today;
     }, {
         message: "Booking date cannot be in the past",
     }),
@@ -18,7 +22,6 @@ export const checkoutSchema = z.object({
     time: z.number().int().min(0, "Invalid time slot"),
     price: z.number().positive("Price must be greater than 0"),
 });
-
 
 export const userRescheduleSchema = z.object({
     bookingId: z.string().min(1, "Booking ID is required"),

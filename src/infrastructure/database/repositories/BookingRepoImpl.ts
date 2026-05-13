@@ -129,12 +129,14 @@ export class BookingRepoImpl
     }
 
 
-    async findBookedSlots(trainerId: string, date: Date): Promise<number[]> {
-        const startOfDay = new Date(date);
-        startOfDay.setHours(0, 0, 0, 0);
+    async findBookedSlots(trainerId: string, date: string): Promise<number[]> {
+        const baseDate = new Date(date);
 
-        const endOfDay = new Date(date);
-        endOfDay.setHours(23, 59, 59, 999);
+        const startOfDay = new Date(baseDate);
+        startOfDay.setUTCHours(0, 0, 0, 0);
+
+        const endOfDay = new Date(baseDate);
+        endOfDay.setUTCHours(23, 59, 59, 999);
 
         const bookings = await this.model.find(
             {
@@ -145,10 +147,8 @@ export class BookingRepoImpl
                 },
                 status: { $nin: [BOOKING_STATUS.CANCELED, BOOKING_STATUS.REJECTED] }
             },
-
             { timeSlot: 1, _id: 0 }
         ).lean();
-
 
         return bookings.map((b) => b.timeSlot);
     }
@@ -220,12 +220,12 @@ export class BookingRepoImpl
         return !!booking;
     }
 
-    async checkAvailability(trainerId: string, date: Date, time: number): Promise<boolean> {
+    async checkAvailability(trainerId: string, date: string, time: number): Promise<boolean> {
         const startOfDay = new Date(date);
-        startOfDay.setHours(0, 0, 0, 0);
+        startOfDay.setUTCHours(0, 0, 0, 0);
 
         const endOfDay = new Date(date);
-        endOfDay.setHours(23, 59, 59, 999);
+        endOfDay.setUTCHours(23, 59, 59, 999);
         const existingBooking = await this.model.findOne({
             trainerId,
             date: {

@@ -8,7 +8,7 @@ export interface ILeaveRepo {
     getAllLeaveRequests(filter?: ILeaveFilters, page?: number, limit?: number): Promise<{ data: LeaveRequestsType[]; totalCount: number }>
     requestLeave(data: LeaveEntity): Promise<void>,
     getTrainerLeaveCounts(trainerId: string): Promise<{ label: string, count: number }[]>,
-    isTrainerOnLeave(trainerId: string, date: Date): Promise<boolean>
+    isTrainerOnLeave(trainerId: string, date: string): Promise<boolean>
     getAllLeaveCount(): Promise<{ approvalStatus: { label: string, count: number }[], leaveTypes: { label: string, count: number }[] }>
     updateLeaveData(data: LeaveEntity): Promise<void>
     getLeaveById(leaveId: string): Promise<LeaveEntity | null>

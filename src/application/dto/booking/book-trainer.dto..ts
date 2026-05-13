@@ -3,7 +3,7 @@ export interface BookSessionWithTrainerRequestDTO {
   userId: string;
   trainerId: string;
   program: string;
-  date: Date;
+  date: string;
   time: number;
   price: number;
 }

@@ -149,18 +149,20 @@ export class LeaveRepository extends BaseRepository<ILeave> implements ILeaveRep
         return counts;
     }
 
-    async isTrainerOnLeave(trainerId: string, date: Date): Promise<boolean> {
-        const startOfSelectedDate = new Date(date);
-        startOfSelectedDate.setHours(0, 0, 0, 0);
+    async isTrainerOnLeave(trainerId: string, date: string): Promise<boolean> {
+        const baseDate = new Date(date);
 
-        const endOfSelectedDate = new Date(date);
-        endOfSelectedDate.setHours(23, 59, 59, 999);
+        const startOfSelectedDate = new Date(baseDate);
+        startOfSelectedDate.setUTCHours(0, 0, 0, 0);
+
+        const endOfSelectedDate = new Date(baseDate);
+        endOfSelectedDate.setUTCHours(23, 59, 59, 999);
 
         const activeLeave = await this.model.findOne({
             trainer: trainerId,
             status: { $in: [LEAVE_STATUS.PENDING, LEAVE_STATUS.APPROVED] },
-            start: { $lte: endOfSelectedDate },
-            end: { $gte: startOfSelectedDate }
+            start: { $lte: endOfSelectedDate.toISOString() },
+            end: { $gte: startOfSelectedDate.toISOString() }
         });
 
         return !!activeLeave;

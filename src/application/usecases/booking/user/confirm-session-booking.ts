@@ -47,11 +47,10 @@ export class OnlineBookingUseCase
             razorpay_signature
         });
 
-        const bookingDate = new Date(bookingData.date);
 
         const isAlreadyBooked = await this._bookingRepository.checkAvailability(
             bookingData.trainerId,
-            bookingDate,
+            bookingData.date,
             bookingData.time
         );
 
