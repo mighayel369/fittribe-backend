@@ -46,7 +46,7 @@ export class FetchTrainerAvailableSlotsUseCase implements IFetchTrainerAvailable
     const bookedSet = new Set(bookedSlots);
 
     const availableSlots = allPossibleSlots.filter(slot => !bookedSet.has(slot));
-
+    console.log(availableSlots)
     return {
       status: SCHEDULE_STATUS.AVAILABLE,
       slots: availableSlots,
