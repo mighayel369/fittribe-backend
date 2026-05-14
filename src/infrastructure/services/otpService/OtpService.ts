@@ -4,6 +4,7 @@ import { OtpEntity } from "domain/entities/OtpEntity";
 import { injectable, inject } from "tsyringe";
 import logger from "utils/logger";
 import { IMailService, I_EMAIL_SERVICE_TOKEN } from "domain/services/i-mail-service";
+import { UserRole } from "domain/constants/user-role";
 
 @injectable()
 export class OtpService implements IOtpService {
@@ -16,7 +17,7 @@ export class OtpService implements IOtpService {
     return Math.floor(100000 + Math.random() * 900000).toString();
   }
 
-  async sendOtp(email: string, role: string): Promise<boolean> {
+  async sendOtp(email: string, role: UserRole): Promise<boolean> {
     try {
       const otp = this.generateOtp();
       const subject = "FitTribe OTP Verification";

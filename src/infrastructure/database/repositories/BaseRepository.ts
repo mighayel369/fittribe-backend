@@ -6,6 +6,7 @@ import {
   SortOrder,
 } from "mongoose";
 
+
 export abstract class BaseRepository<TDocument extends Document> {
   protected abstract model: Model<TDocument>;
 
