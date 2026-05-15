@@ -30,11 +30,15 @@ export class AdminBookingController {
         try {
             const rawSearch = req.query.search;
             const search = typeof rawSearch === 'string' ? rawSearch : "";
+            const dateQuery = req.query.date;
+
+            const validatedDate = typeof dateQuery === 'string' ? new Date(dateQuery) : new Date();
             const fetchBookingsPayload: FetchAllBookingsListRequestDTO = {
                 currentPage: Number(req.query.page) || 1,
                 limit: Number(req.query.limit) || PAGINATION.DEFAULT_LIMIT,
                 filter: {
-                    search: search || ""
+                    search: search || "",
+                    date:validatedDate
                 }
             }
 

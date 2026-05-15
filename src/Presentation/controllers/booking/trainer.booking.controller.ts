@@ -173,7 +173,9 @@ export class TrainerBookingController {
             if (!trainerId) {
                 throw new AppError(ERROR_MESSAGES.UNAUTHORIZED, HttpStatus.UNAUTHORIZED);
             }
+            const dateQuery = req.query.date;
 
+            const validatedDate = typeof dateQuery === 'string' ? new Date(dateQuery) : new Date();
 
             const rawSearch = req.query.search;
             const search = typeof rawSearch === 'string' ? rawSearch : "";
@@ -182,7 +184,8 @@ export class TrainerBookingController {
                 currentPage: Math.max(1, Number(req.query.pageNo) || 1),
                 limit: Number(req.query.limit) || PAGINATION.DEFAULT_LIMIT,
                 filter: {
-                    search: search || ""
+                    search: search || "",
+                    date: validatedDate
                 }
             };
 
@@ -209,13 +212,16 @@ export class TrainerBookingController {
 
             const rawSearch = req.query.search;
             const search = typeof rawSearch === 'string' ? rawSearch : "";
+            const dateQuery = req.query.date;
 
+            const validatedDate = typeof dateQuery === 'string' ? new Date(dateQuery) : new Date();
             const fetchPayload: FetchAllTrainerBookingRequestDTO = {
                 trainerId,
                 currentPage: Math.max(1, Number(req.query.pageNo) || 1),
                 limit: Number(req.query.limit) || PAGINATION.DEFAULT_LIMIT,
                 filter: {
-                    search: search || ""
+                    search: search || "",
+                    date: validatedDate
                 }
             };
 
@@ -241,12 +247,16 @@ export class TrainerBookingController {
 
             const rawSearch = req.query.search;
             const search = typeof rawSearch === 'string' ? rawSearch : "";
+            const dateQuery = req.query.date;
+
+            const validatedDate = typeof dateQuery === 'string' ? new Date(dateQuery) : new Date();
             const fetchPayload: FetchAllTrainerBookingRequestDTO = {
                 trainerId,
                 currentPage: Math.max(1, Number(req.query.pageNo) || 1),
                 limit: Number(req.query.limit) || PAGINATION.DEFAULT_LIMIT,
                 filter: {
-                    search: search || ""
+                    search: search || "",
+                    date: validatedDate
                 }
             };
 
