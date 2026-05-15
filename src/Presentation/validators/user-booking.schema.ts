@@ -1,3 +1,4 @@
+import { BOOKING_TYPES } from 'utils/Constants';
 import { z } from 'zod';
 export const checkoutSchema = z.object({
     razorpay_order_id: z.string().min(1, "Order ID is required"),
@@ -45,5 +46,7 @@ export const userRescheduleSchema = z.object({
 export const userBookingQuerySchema = z.object({
     pageNo: z.coerce.number().min(1).default(1),
     search: z.string().optional().default(""),
+    filter:z.enum(BOOKING_TYPES).default(BOOKING_TYPES.ALL),
+    date:z.coerce.date()
 });
 

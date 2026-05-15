@@ -122,13 +122,18 @@ export class UserBookingController {
             const rawFilter = req.query.filter;
             const filterType = this.isValidBookingType(rawFilter) ? rawFilter : BOOKING_TYPES.ALL;
 
+            const dateQuery = req.query.date;
+
+            const validatedDate = typeof dateQuery === 'string' ? new Date(dateQuery) : new Date();
+
             const fetchPayload: FetchAllUserBookingRequestDTO = {
                 userId,
                 limit: 5,
                 currentPage: Number(req.query.pageNo) || 1,
                 filter: {
                     search: search || "",
-                    filterType: filterType
+                    filterType: filterType,
+                    date: validatedDate
                 }
             };
 

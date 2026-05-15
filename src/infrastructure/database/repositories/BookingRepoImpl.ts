@@ -23,11 +23,13 @@ export class BookingRepoImpl
     private buildQuery(filters: IBookingFilters): Record<string, unknown> {
         const query: FilterQuery<IBooking> = {};
 
-        const startOfToday = new Date();
-        startOfToday.setHours(0, 0, 0, 0);
+        const baseDate = filters.date ? new Date(filters.date) : new Date();
+        
+        const startOfToday = new Date(baseDate);
+        startOfToday.setUTCHours(0, 0, 0, 0);
 
-        const endOfToday = new Date();
-        endOfToday.setHours(23, 59, 59, 999);
+        const endOfToday = new Date(baseDate);
+        endOfToday.setUTCHours(23, 59, 59, 999);
         if (filters.status) query.status = filters.status;
         if (filters.trainerId) query.trainerId = filters.trainerId;
         if (filters.clientId) query.userId = filters.clientId;
