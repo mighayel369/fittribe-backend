@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { inject, injectable } from "tsyringe";
 import { I_ADD_REVIEW_TOKEN, IAddReview } from "application/interfaces/review/i-add-review";
-import { AddReviewDTO } from "application/dto/review/add-review.dto";
+import { AddReviewDTO } from "application/dto/review/user/add-review.dto";
 import { HttpStatus } from "utils/HttpStatus";
 import { SUCCESS_MESSAGES } from "utils/SuccessMessages";
 import { AppError } from "domain/errors/AppError";
@@ -26,11 +26,10 @@ export class UserReviewController {
                 rating,
                 comment,
                 trainerId,
-                bookingId,
-                userId: userId
+                bookingId
             };
 
-            await this._addReviewUseCase.execute(reviewSubmissionRequest);
+            await this._addReviewUseCase.execute(reviewSubmissionRequest, userId);
 
             res.status(HttpStatus.CREATED).json({
                 success: true,

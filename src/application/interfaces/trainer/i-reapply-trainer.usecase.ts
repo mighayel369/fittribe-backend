@@ -1,7 +1,9 @@
-import { ReapplyTrainerRequestDTO } from "application/dto/trainer/update-trainer-profile.dto";
+import { CertificatePictureFile } from "application/dto/auth/trainer/certificate-file.schema";
+import { ReapplyTrainerDTO } from "application/dto/auth/trainer/reapply-trainer.dto";
 
 export const I_REAPPLY_TRAINER_TOKEN = Symbol("I_REAPPLY_TRAINER_TOKEN");
 
 export interface IReapplyTrainer {
-    execute(input: ReapplyTrainerRequestDTO): Promise<void>
+
+  execute(trainerId: string,data: ReapplyTrainerDTO,certificate?: CertificatePictureFile): Promise<void>
 }

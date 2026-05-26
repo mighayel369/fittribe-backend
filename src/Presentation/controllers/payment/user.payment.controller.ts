@@ -3,10 +3,9 @@ import { inject, injectable } from "tsyringe";
 import { HttpStatus } from 'utils/HttpStatus';
 import { SUCCESS_MESSAGES } from 'utils/SuccessMessages';
 import { I_INITIATE_ONLINE_PAYMENT_TOKEN, IInitiateOnlinePayment } from 'application/interfaces/payment/i-initiate-online-payment.usecase';
-import { CreateOnlinePaymentRequestDTO, OnlinePaymentOrderResponseDTO } from 'application/dto/payment/online-payment.dto';
 import { I_VERIFY_ONLINE_PAYMENT_TOKEN, IVeirfyOnlinePayment } from 'application/interfaces/payment/i-verify-online-payment.usecase';
-import { VerifyOnlinePaymentRequestDTO } from 'application/dto/payment/verify-online-payment.dto';
-
+import { CreateOnlinePaymentRequestDTO } from 'application/dto/payment/create-online-payment.dto';
+import { VerifyPaymentRequestDTO } from 'application/dto/payment/online-payment.dto';
 @injectable()
 export class UserPaymentController {
     constructor(
@@ -16,9 +15,9 @@ export class UserPaymentController {
 
     initiateOnlinePayment = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const input: CreateOnlinePaymentRequestDTO = { ...req.body };
+            const input = req.body as CreateOnlinePaymentRequestDTO;
 
-            const orderData: OnlinePaymentOrderResponseDTO = await this._initiatePayment.execute(input);
+            const orderData = await this._initiatePayment.execute(input);
 
             res.status(HttpStatus.CREATED).json({
                 success: true,
@@ -32,13 +31,16 @@ export class UserPaymentController {
 
     verifyOnlinePayment = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const input: VerifyOnlinePaymentRequestDTO = { ...req.body };
+            const input =   req.body as VerifyPaymentRequestDTO
 
-            await this._verifyPayment.execute(input);
+            await this._verifyPayment.execute(
+                input
+            );
 
             res.status(HttpStatus.OK).json({
                 success: true,
-                message: SUCCESS_MESSAGES.PAYMENT.PAYMENT_SUCCESS
+                message:
+                    SUCCESS_MESSAGES.PAYMENT.PAYMENT_SUCCESS
             });
         } catch (error) {
             next(error);

@@ -16,6 +16,7 @@ export const NotificationMapper = {
   },
 
   toResponseDTO(entity: NotificationEntity): NotificationResponseDTO {
+
     const date = entity.createdAt || new Date();
 
     return {

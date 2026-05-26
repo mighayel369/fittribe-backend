@@ -5,7 +5,7 @@ import { IReviewRepo } from "domain/repositories/IReviewRepo";
 import { Model } from "mongoose";
 import { injectable } from "tsyringe";
 import { AppError } from "domain/errors/AppError";
-import { ReviewsList } from "domain/repositories/types/review-type";
+import { ReviewListAggregate } from "domain/repositories/types/review-aggregate.type.ts";
 import { ERROR_MESSAGES } from "utils/ErrorMessage";
 import { HttpStatus } from "utils/HttpStatus";
 
@@ -18,128 +18,154 @@ export class ReviewRepoImpl extends BaseRepository<IReview> implements IReviewRe
         await this.model.create(data);
     }
 
-    async getTrainerReviewsList(trainerId: string): Promise<ReviewsList[]> {
-        return await this.model.aggregate<ReviewsList>([
-            { $match: { trainerId, isDeleted: false } },
+
+    async getTrainerReviewsList(trainerId: string): Promise<ReviewListAggregate[]> {
+
+        return await this.model.aggregate<ReviewListAggregate>([
+            {
+                $match: {
+                    trainerId,
+                    isDeleted: false
+                }
+            },
+
             {
                 $lookup: {
                     from: "users",
                     localField: "userId",
                     foreignField: "userId",
-                    as: "userDetails"
+                    as: "user"
                 }
             },
-            { $unwind: { path: "$userDetails", preserveNullAndEmptyArrays: true } },
+
+            {
+                $unwind: {
+                    path: "$user",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+
             {
                 $lookup: {
                     from: "bookings",
                     localField: "bookingId",
                     foreignField: "bookingId",
-                    as: "bookingDetails"
+                    as: "booking"
                 }
             },
-            { $unwind: { path: "$bookingDetails", preserveNullAndEmptyArrays: true } },
+
+            {
+                $unwind: {
+                    path: "$booking",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+
             {
                 $lookup: {
                     from: "trainers",
                     localField: "trainerId",
                     foreignField: "trainerId",
-                    as: "trainerDetails"
+                    as: "trainer"
                 }
             },
-            { $unwind: { path: "$trainerDetails", preserveNullAndEmptyArrays: true } },
+
+            {
+                $unwind: {
+                    path: "$trainer",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+
             {
                 $project: {
                     _id: 0,
-                    reviews: {
-                        $mergeObjects: [
-                            "$$ROOT",
-                            {
-                                user: "$userDetails",
-                                trainer: "$trainerDetails",
-                                booking: "$bookingDetails"
-                            }
-                        ]
-                    }
+                    userId: 0,
+                    trainerId: 0,
+                    bookingId: 0
                 }
             },
+
             {
-                $project: {
-                    "reviews._id": 0,
-                    "reviews.userId": 0,
-                    "reviews.trainerId": 0,
-                    "reviews.bookingId": 0,
-                    "reviews.userDetails": 0,
-                    "reviews.bookingDetails": 0,
-                    "reviews.trainerDetails": 0
+                $sort: {
+                    createdAt: -1
                 }
-            },
-            { $sort: { "reviews.createdAt": -1 } }
+            }
         ]);
     }
 
-    async getAdminReviewsList(): Promise<ReviewsList[]> {
-        return await this.model.aggregate<ReviewsList>([
+    async getAdminReviewsList(): Promise<ReviewListAggregate[]> {
+
+        return await this.model.aggregate<ReviewListAggregate>([
             {
                 $lookup: {
                     from: "users",
                     localField: "userId",
                     foreignField: "userId",
-                    as: "userDetails"
+                    as: "user"
                 }
             },
-            { $unwind: { path: "$userDetails", preserveNullAndEmptyArrays: true } },
+
+            {
+                $unwind: {
+                    path: "$user",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+
             {
                 $lookup: {
                     from: "bookings",
                     localField: "bookingId",
                     foreignField: "bookingId",
-                    as: "bookingDetails"
+                    as: "booking"
                 }
             },
-            { $unwind: { path: "$bookingDetails", preserveNullAndEmptyArrays: true } },
+
+            {
+                $unwind: {
+                    path: "$booking",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+
             {
                 $lookup: {
                     from: "trainers",
                     localField: "trainerId",
                     foreignField: "trainerId",
-                    as: "trainerDetails"
+                    as: "trainer"
                 }
             },
-            { $unwind: { path: "$trainerDetails", preserveNullAndEmptyArrays: true } },
+
+            {
+                $unwind: {
+                    path: "$trainer",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+
             {
                 $project: {
                     _id: 0,
-                    reviews: {
-                        $mergeObjects: [
-                            "$$ROOT",
-                            {
-                                user: "$userDetails",
-                                trainer: "$trainerDetails",
-                                booking: "$bookingDetails"
-                            }
-                        ]
-                    }
+                    userId: 0,
+                    trainerId: 0,
+                    bookingId: 0
                 }
             },
+
             {
-                $project: {
-                    "reviews._id": 0,
-                    "reviews.userId": 0,
-                    "reviews.trainerId": 0,
-                    "reviews.bookingId": 0,
-                    "reviews.userDetails": 0,
-                    "reviews.bookingDetails": 0,
-                    "reviews.trainerDetails": 0
+                $sort: {
+                    createdAt: -1
                 }
-            },
-            { $sort: { "reviews.createdAt": -1 } }
+            }
         ]);
     }
+
     async getReviewById(reviewId: string): Promise<ReviewEntity> {
         const doc = await this.model.findOne({ reviewId });
 
-        if (!doc) throw new AppError(ERROR_MESSAGES.TRAINER_REVIEWS_NOT_FOUND,HttpStatus.NOT_FOUND);
+        if (!doc) throw new AppError(ERROR_MESSAGES.TRAINER_REVIEWS_NOT_FOUND, HttpStatus.NOT_FOUND);
 
         return doc;
     }
@@ -151,6 +177,6 @@ export class ReviewRepoImpl extends BaseRepository<IReview> implements IReviewRe
             { new: true }
         );
 
-        if (!result) throw new AppError(ERROR_MESSAGES.TRAINER_REVIEWS_NOT_FOUND,HttpStatus.NOT_FOUND);
+        if (!result) throw new AppError(ERROR_MESSAGES.TRAINER_REVIEWS_NOT_FOUND, HttpStatus.NOT_FOUND);
     }
 }

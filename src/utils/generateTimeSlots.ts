@@ -1,13 +1,13 @@
+import { TimeRange } from "domain/entities/types/slot.types";
 
 export const generateHourlySlots = (
-    ranges: { start: string; end: string }[],
-    date: Date | string,
+    ranges: TimeRange[],
     duration = 60
 ) => {
     const slots: number[] = [];
     for (const range of ranges) {
-        let startMin = timeToMin(range.start);
-        const endMin = timeToMin(range.end);
+        let startMin = range.start
+        const endMin = range.end
 
         while (startMin + duration <= endMin) {
             slots.push(startMin);

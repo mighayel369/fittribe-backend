@@ -2,27 +2,27 @@ import { BookingEntity } from "domain/entities/BookingEntity";
 import { randomUUID } from "crypto";
 import { BOOKING_STATUS } from "domain/constants/booking-status";
 import config from "config";
-import { BookingSummaryDTO, BookSessionWithTrainerRequestDTO, OnlineBookingRequestDTO } from "application/dto/booking/book-trainer.dto.";
-import { VerifyOnlinePaymentRequestDTO } from "application/dto/payment/verify-online-payment.dto";
-import { BookingResponseType } from "domain/repositories/types/booking-type";
-import { AdminBookingListDTO, BookingResponseDTO, TrainerPendingBookingDTO, TrainerRescheduleRequestDTO, TrainserBookingResponseDTO } from "application/dto/booking/fetch-all-bookings.dto";
-import { AdminDashboardMetrics } from "domain/repositories/types/admin-dashboard-type";
-import { FetchAdminBookingDashboardResponseDTO } from "application/dto/booking/fetch-all-bookings.dto";
-import { AdminBookingDetailsResponseDTO, TrainerBookingDetailsResponseDTO, UserBookingDetailsResponseDTO } from "application/dto/booking/fetch-booking-details.dto";
+import { BookingAggregate } from "domain/repositories/types/booking-aggregate.type";
+import { AdminDashboardMetricsAggregate } from "domain/repositories/types/admin-dashboard-aggregate";
 import { PAYMENT_METHOD, PAYMENT_STATUS } from "domain/constants/payment-status";
+import { AdminBookingListItemDTO, AdminBookingListItemSchema } from "application/dto/booking/admin/admin-booking-list.dto";
+import { FetchAdminBookingDashboardResponseDTO, FetchAdminBookingDashboardResponseSchema } from "application/dto/booking/admin/booking-dashboard.response.dto";
+import { AdminBookingDetailsResponseDTO, AdminBookingDetailsResponseSchema } from "application/dto/booking/admin/booking-details.dto";
+import { TrainerBookingItemDTO } from "application/dto/booking/trainer/fetch-trainer-bookings.dto";
+import { UserBookingDetailsResponseDTO, UserBookingDetailsResponseSchema } from "application/dto/booking/user/booking-details.dto";
+import { CheckoutBookingDTO } from "application/dto/booking/user/checkout-booking.schema";
+import { TrainerPendingBookingDTO } from "application/dto/booking/trainer/fetch-pending-bookings.dto";
+import { TrainerRescheduleResponseDTO } from "application/dto/booking/trainer/fetch-reschedule-booking.dto";
+import { TrainerBookingDetailsResponseDTO } from "application/dto/booking/trainer/trainer-booking-details.response.dto";
+import { BookingSummaryDTO } from "application/dto/booking/shared/booking-summary.response.dto";
+import { BookingResponseDTO } from "application/dto/booking/user/fetch-user-bookings.dto";
+
 
 
 
 export class BookingMapper {
-  static toPaymentVerificationDTO(input: OnlineBookingRequestDTO): VerifyOnlinePaymentRequestDTO {
-    return {
-      razorpay_order_id: input.razorpay_order_id,
-      razorpay_payment_id: input.razorpay_payment_id,
-      razorpay_signature: input.razorpay_signature
-    };
-  }
 
-  static toBookingEntity(data: BookSessionWithTrainerRequestDTO): BookingEntity {
+  static toBookingEntity(data: CheckoutBookingDTO, userId: string): BookingEntity {
     const totalAmount = data.price;
     const adminPercent = config.ADMIN_PERCENT || 0.1;
     const adminCommission = totalAmount * adminPercent;
@@ -30,7 +30,7 @@ export class BookingMapper {
 
     return new BookingEntity(
       randomUUID(),
-      data.userId,
+      userId,
       data.trainerId,
       data.program,
       new Date(data.date),
@@ -46,83 +46,83 @@ export class BookingMapper {
       }
     );
   }
-  static toAdminBookingListResponse(data: BookingResponseType): AdminBookingListDTO {
-    return {
-      id: data.bookingId,
-      client: data.user.name,
-      trainer: data.trainer.name,
-      date: new Date(data.date).toISOString(),
-      total: data.totalAmount,
-      fee: data.adminCommission,
-      status: data.status,
-      payment: data.payment.method
-    };
+
+  static toAdminBookingListItemDTO(booking: BookingAggregate): AdminBookingListItemDTO {
+
+    return AdminBookingListItemSchema.parse({
+      bookingId: booking.bookingId,
+      clientName: booking.user?.name ?? "Unknown User",
+      trainerName: booking.trainer?.name ?? "Unknown Trainer",
+      date: new Date(booking.date).toISOString(),
+      totalAmount: booking.totalAmount,
+      platformFee: booking.adminCommission,
+      paymentMethod: booking.payment.method,
+      status: booking.status
+    });
   }
 
-  static toAdminDashboardDTO(domainMetrics: AdminDashboardMetrics): FetchAdminBookingDashboardResponseDTO {
-    return {
+  static toAdminDashboardDTO(
+    domainMetrics: AdminDashboardMetricsAggregate
+  ): FetchAdminBookingDashboardResponseDTO {
+
+    return FetchAdminBookingDashboardResponseSchema.parse({
       stats: {
         todaySessions: domainMetrics.stats.todaySessions,
         pendingRequests: domainMetrics.stats.pendingRequests,
         totalBookings: domainMetrics.stats.totalBookings,
-        successRate: domainMetrics.stats.successRate,
+        successRate: domainMetrics.stats.successRate
       },
+
       charts: {
         bookingTrend: domainMetrics.trends,
         statusDistribution: domainMetrics.distribution
       }
-    };
+    });
   }
 
-  static toAdminBookingDetailsResponse(data: BookingResponseType): AdminBookingDetailsResponseDTO {
-    return {
+  static toAdminBookingDetailsResponseDTO(
+    data: BookingAggregate
+  ): AdminBookingDetailsResponseDTO {
+
+    return AdminBookingDetailsResponseSchema.parse({
       bookingId: data.bookingId,
-      scheduledDate: data.date ? new Date(data.date).toISOString() : "N/A",
+      scheduledDate: data.date.toISOString(),
       scheduledTime: data.timeSlot,
       duration: data.duration,
       sessionType: "One to one online training",
       bookingStatus: data.status,
+      bookedProgram: data.program,
+
       payment: {
         baseRate: data.totalAmount - data.adminCommission,
         platformFee: data.adminCommission,
         totalAmount: data.totalAmount,
         paymentType: data.payment.method
       },
+
       client: {
         name: data.user.name,
         email: data.user.email,
         clientId: data.user.userId,
         totalSessions: 0,
-        joinedOn: data.user.createdAt ? new Date(data.user.createdAt).toISOString() : "N/A",
-        profilePic: data.user.profilePic || ""
+        joinedOn: data.user.createdAt?.toISOString() ?? "",
+        profilePic: data.user.profilePic ?? ""
       },
+
       trainer: {
         name: data.trainer.name,
         trainerId: data.trainer.trainerId,
-        serviceProvided: "Fitness Instruction",
-        rating: data.trainer.rating || 0,
+        rating: data.trainer.rating,
         experience: `${data.trainer.experience} years`,
-        profilePic: data.trainer.profilePic || ""
+        profilePic: data.trainer.profilePic ?? ""
       }
-    };
+    });
   }
 
-  static toTrainerBookingResponse(data: BookingResponseType): TrainserBookingResponseDTO {
-    return {
-      bookingId: data.bookingId,
-      clientName: data.user.name,
-      clientEmail: data.user.email,
-      bookedProgram: data.program,
-      bookedDate: data.date ? new Date(data.date).toISOString() : "N/A",
-      bookedTime: data.timeSlot,
-      sessionAmount: data.totalAmount,
-      bookingStatus: data.status,
-      meetLink: data.meetLink,
-      isReviewed: data.isReviewed
-    };
-  }
+  static toTrainerBookingResponse(
+    data: BookingAggregate
+  ): TrainerBookingItemDTO {
 
-  static toTrainerPendingBookingResponse(data: BookingResponseType): TrainerPendingBookingDTO {
     return {
       bookingId: data.bookingId,
       clientName: data.user.name,
@@ -132,77 +132,97 @@ export class BookingMapper {
       bookedTime: data.timeSlot,
       sessionAmount: data.totalAmount,
       bookingStatus: data.status,
-      meetLink: data.meetLink,
+      isReviewed: data.isReviewed
+    };
+  }
+
+  static toTrainerPendingBookingResponse(
+    data: BookingAggregate
+  ): TrainerPendingBookingDTO {
+
+    return {
+      bookingId: data.bookingId,
+      clientName: data.user.name,
+      clientEmail: data.user.email,
+      bookedProgram: data.program,
+      bookedDate: new Date(data.date).toISOString(),
+      bookedTime: data.timeSlot,
+      sessionAmount: data.totalAmount,
+      bookingStatus: data.status,
       isReviewed: data.isReviewed,
       paymentMethod: data.payment.method,
       paymentStatus: data.payment.status
     };
   }
 
-  static toTrainerRescheduleBookingResponse(data: BookingResponseType): TrainerRescheduleRequestDTO {
+
+  static toTrainerRescheduleBookingResponse(
+    data: BookingAggregate
+  ): TrainerRescheduleResponseDTO {
+
     return {
       bookingId: data.bookingId,
       clientName: data.user.name,
       clientEmail: data.user.email,
       bookedProgram: data.program,
-      bookedDate: data.date ? new Date(data.date).toISOString() : "N/A",
+      bookedDate: new Date(data.date).toISOString(),
       bookedTime: data.timeSlot,
       sessionAmount: data.totalAmount,
       bookingStatus: data.status,
-      meetLink: data.meetLink || "",
       isReviewed: data.isReviewed,
-
-      requestedNewDate: data.rescheduleRequest?.newDate
-        ? new Date(data.rescheduleRequest.newDate).toISOString()
-        : "N/A",
-
+      requestedNewDate:
+        data.rescheduleRequest?.newDate ? new Date(data.rescheduleRequest.newDate).toISOString() : "",
       requestedNewTime: data.rescheduleRequest?.newTimeSlot ?? 0,
-
-      requestedBy: data.rescheduleRequest?.requestedBy ?? "unknown"
+      requestedBy: data.rescheduleRequest?.requestedBy ?? ""
     };
   }
 
   static toTrainerBookingDetailsResponse(
-    data: BookingResponseType,
+    data: BookingAggregate,
     chatId: string | null
   ): TrainerBookingDetailsResponseDTO {
+
     return {
       bookingId: data.bookingId,
-      chatId: chatId,
+      chatId,
       clientId: data.user.userId,
       clientName: data.user.name,
       clientEmail: data.user.email,
       clientPhone: data.user.phone || "Not provided",
       clientProfilePic: data.user.profilePic || "",
-
       bookedProgram: data.program,
-
       bookedDate: new Date(data.date).toISOString(),
       bookedTime: data.timeSlot,
       sessionDuration: data.duration,
-
       bookingStatus: data.status,
       totalAmount: data.totalAmount,
       trainerEarning: data.trainerEarning,
       paymentStatus: data.payment.status,
       paymentMethod: data.payment.method,
+      rescheduleRequest:
+        data.rescheduleRequest?.newDate &&
+          data.rescheduleRequest?.createdAt
+          ? {
+            newDate: new Date(
+              data.rescheduleRequest.newDate
+            ).toISOString(),
 
+            newTimeSlot:
+              data.rescheduleRequest.newTimeSlot,
 
-      rescheduleRequest: data.rescheduleRequest && data.rescheduleRequest.newDate ? {
-        newDate: new Date(data.rescheduleRequest.newDate).toISOString(),
-        newTimeSlot: data.rescheduleRequest.newTimeSlot,
-        requestedBy: data.rescheduleRequest.requestedBy,
-        requestedAt:new Date(data.rescheduleRequest.createdAt).toISOString()
-          
-      } : undefined,
+            requestedBy:
+              data.rescheduleRequest.requestedBy,
 
+            requestedAt: new Date(
+              data.rescheduleRequest.createdAt
+            ).toISOString()
+          }
+          : undefined,
       rejectReason: data.rejectReason,
-      meetLink: data.meetLink || "",
       isReviewed: data.isReviewed
     };
   }
-
-  static toBookingSummary(data: BookingResponseType): BookingSummaryDTO {
+  static toBookingSummary(data: BookingAggregate): BookingSummaryDTO {
     return {
       bookingId: data.bookingId,
       trainerName: data.trainer.name,
@@ -214,53 +234,67 @@ export class BookingMapper {
     };
   }
 
-  static toUserBookingResponse(data: BookingResponseType): BookingResponseDTO {
+  static toUserBookingResponse(data: BookingAggregate): BookingResponseDTO {
+
     return {
       bookingId: data.bookingId,
       trainerName: data.trainer.name,
       trainerId: data.trainer.trainerId,
-      bookedDate: data.date ? new Date(data.date).toISOString() : "N/A",
+      bookedDate: data.date
+        ? new Date(data.date).toISOString()
+        : "N/A",
       bookedTime: data.timeSlot,
       bookedProgram: data.program,
       sessionAmount: data.totalAmount,
       bookingStatus: data.status,
-      trainerProfilePic: data.trainer.profilePic || "",
-      meetLink: data.meetLink,
+      trainerProfilePic:
+        data.trainer.profilePic || "",
       isReviewed: data.isReviewed
     };
   }
 
-  static toUserBookingDetailsResponse(data: BookingResponseType): UserBookingDetailsResponseDTO {
-    return {
+  static toUserBookingDetailsResponse(
+    data: BookingAggregate
+  ): UserBookingDetailsResponseDTO {
+
+    const mappedData = {
       bookingId: data.bookingId,
       bookedProgram: data.program,
       bookedDate: new Date(data.date).toISOString(),
       bookedTime: data.timeSlot,
       sessionDuration: data.duration,
       bookingStatus: data.status,
-
       trainerId: data.trainer.trainerId,
       trainerName: data.trainer.name,
       trainerProfilePic: data.trainer.profilePic || "",
       trainerExperience: data.trainer.experience,
       trainerGender: data.trainer.gender,
-
       totalAmount: data.totalAmount,
       payment: {
         method: data.payment.method,
-        status: data.payment.status,
+        status: data.payment.status
       },
-
-      rescheduleRequest: data.rescheduleRequest && data.rescheduleRequest.newDate ? {
-        newDate: new Date(data.rescheduleRequest.newDate).toISOString(),
-        newTimeSlot: data.rescheduleRequest.newTimeSlot,
-        requestedBy: data.rescheduleRequest.requestedBy,
-        status: data.status
-      } : undefined,
-
+      rescheduleRequest:
+        data.rescheduleRequest &&
+          data.rescheduleRequest.newDate
+          ? {
+            newDate:
+              new Date(
+                data.rescheduleRequest.newDate
+              ).toISOString(),
+            newTimeSlot:
+              data.rescheduleRequest.newTimeSlot,
+            requestedBy:
+              data.rescheduleRequest.requestedBy,
+            status: data.status
+          }
+          : undefined,
       rejectReason: data.rejectReason,
-      meetLink: data.meetLink,
       isReviewed: data.isReviewed
     };
+
+    return UserBookingDetailsResponseSchema.parse(
+      mappedData
+    );
   }
 }

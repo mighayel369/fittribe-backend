@@ -2,7 +2,7 @@ import { inject, injectable } from "tsyringe";
 import { IExportLeaveReport } from "application/interfaces/leave/i-export-leave-resport";
 import { ILeaveRepo, I_LEAVE_REPO_TOKEN } from "domain/repositories/ILeaveRepo";
 import { ReportGeneratorService } from "infrastructure/services/report-generator.service";
-import { LeaveExportDataResponseDTO } from "application/dto/leave/leave-export-data.dto";
+import { LeaveExportDataResponseDTO } from "application/dto/leave/admin/leave-export-data.dto";
 import { LeaveMapper } from "application/mappers/leave-mapper"
 
 @injectable()

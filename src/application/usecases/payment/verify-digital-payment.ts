@@ -1,10 +1,10 @@
 import { inject, injectable } from "tsyringe";
-import { VerifyOnlinePaymentRequestDTO } from "application/dto/payment/verify-online-payment.dto";
 import { IVeirfyOnlinePayment } from "application/interfaces/payment/i-verify-online-payment.usecase";
 import { I_PAYMENT_SERVICE_TOKEN, IPaymentService } from "domain/services/IPaymentService";
 import { AppError } from "domain/errors/AppError";
 import { ERROR_MESSAGES } from "utils/ErrorMessage";
 import { HttpStatus } from "utils/HttpStatus";
+import { VerifyOnlinePaymentDTO } from "application/dto/payment/verify-online-payment.dto";
 
 @injectable()
 export class VerifyOnlinePaymentUsecase implements IVeirfyOnlinePayment {
@@ -13,7 +13,7 @@ export class VerifyOnlinePaymentUsecase implements IVeirfyOnlinePayment {
     private readonly _paymentService: IPaymentService
   ) { }
 
-  async execute(verificationData: VerifyOnlinePaymentRequestDTO): Promise<boolean> {
+  async execute(verificationData: VerifyOnlinePaymentDTO): Promise<boolean> {
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = verificationData;
 
     if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {

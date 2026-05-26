@@ -1,6 +1,10 @@
-import { USER_STATUS_FILTERS } from "utils/Constants"
+import { USER_STATUS_FILTERS } from "utils/Constants";
+import { z } from "zod";
 
-export interface IUserFilters {
-    search?: string
-    status?: USER_STATUS_FILTERS
-}
+export const UserFiltersSchema =
+    z.object({
+        search: z.string().trim().optional(),
+        status: z.enum(USER_STATUS_FILTERS).optional()
+    });
+
+export type IUserFilters = z.infer<typeof UserFiltersSchema>;

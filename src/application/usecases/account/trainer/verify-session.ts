@@ -1,5 +1,5 @@
 import { inject, injectable } from "tsyringe";
-import { TrainerSessionDTO } from "application/dto/auth/verify-session.dto";
+import { TrainerSessionResponseDTO } from "application/dto/account/trainer/verify-session";
 import { IVerifySession } from "application/interfaces/auth/i-verify-session.usecase";
 import { ITrainerRepo, I_TRAINER_REPO_TOKEN } from "domain/repositories/ITrainerRepo";
 import { AuthMapper } from "application/mappers/auth-mapper";
@@ -8,25 +8,23 @@ import { HttpStatus } from "utils/HttpStatus";
 import { ERROR_MESSAGES } from "utils/ErrorMessage";
 
 @injectable()
-export class VerifyTrainerSession implements IVerifySession<TrainerSessionDTO> {
+export class VerifyTrainerSessionUseCase implements IVerifySession<TrainerSessionResponseDTO> {
   constructor(
-    @inject(I_TRAINER_REPO_TOKEN)
-    private readonly _trainerRepository: ITrainerRepo,
+    @inject(I_TRAINER_REPO_TOKEN) private readonly _trainerRepository: ITrainerRepo
   ) { }
 
+  async execute(trainerId: string): Promise<TrainerSessionResponseDTO> {
 
-  async execute(trainerId: string): Promise<TrainerSessionDTO> {
-    const trainerAccount = await this._trainerRepository.findTrainerById(trainerId);
+    const trainer = await this._trainerRepository.findTrainerById(trainerId);
 
-    if (!trainerAccount) {
+    if (!trainer) {
       throw new AppError(ERROR_MESSAGES.UNAUTHORIZED, HttpStatus.UNAUTHORIZED);
     }
 
-
-    if (trainerAccount.isBlocked()) {
+    if (trainer.isBlocked()) {
       throw new AppError(ERROR_MESSAGES.TRAINER_BLOCKED, HttpStatus.FORBIDDEN);
     }
 
-    return AuthMapper.toVerifyTrainerSessionResponseDTO(trainerAccount);
+    return AuthMapper.toTrainerSessionResponseDTO(trainer);
   }
 }

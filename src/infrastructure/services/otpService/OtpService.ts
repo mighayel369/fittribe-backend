@@ -2,13 +2,13 @@ import { IOtpService } from "domain/services/IOtpService";
 import { OtpModel } from "infrastructure/database/models/OtpModel";
 import { OtpEntity } from "domain/entities/OtpEntity";
 import { injectable, inject } from "tsyringe";
-import logger from "utils/logger";
+import logger from "logger";
 import { IMailService, I_EMAIL_SERVICE_TOKEN } from "domain/services/i-mail-service";
 import { UserRole } from "domain/constants/user-role";
 
 @injectable()
 export class OtpService implements IOtpService {
-
+private logger = logger;
   constructor(
     @inject(I_EMAIL_SERVICE_TOKEN) private _mailService: IMailService
   ) { }
@@ -28,7 +28,7 @@ export class OtpService implements IOtpService {
 
       return true;
     } catch (error) {
-      logger.error("OTP Flow Error:", error);
+      this.logger.error("OTP Flow Error:", error);
       return false;
     }
   }

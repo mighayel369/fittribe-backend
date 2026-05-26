@@ -7,7 +7,7 @@ const MessageSchema = new Schema<MessageDocument>({
     messageId: { type: String, required: true, unique: true },
     chatId: { type: String, required: true, index: true },
     senderId: { type: String, required: true },
-    content: { type: String, required: true },
+    content: { type: String },
     type: {
         type: String,
         enum: Object.values(MessageType),

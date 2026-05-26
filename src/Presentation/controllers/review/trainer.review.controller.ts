@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { inject, injectable } from "tsyringe";
-import { TrainerReviewsListsResponseDTO } from "application/dto/review/review-list.dto";
+import { TrainerReviewsListsResponseDTO } from "application/dto/review/trainer/review-list.dto";
 import { I_GET_TRAINER_REVIEW_LISTS_TOKEN, IGetTrainerReviewLists } from "application/interfaces/review/i-get-trainer-review-lists";
 import { HttpStatus } from "utils/HttpStatus";
 import { SUCCESS_MESSAGES } from "utils/SuccessMessages";
@@ -21,8 +21,7 @@ export class TrainerReviewController {
                 throw new AppError(ERROR_MESSAGES.UNAUTHORIZED, HttpStatus.UNAUTHORIZED);
             }
 
-            const reviewHistory: TrainerReviewsListsResponseDTO =
-                await this._getTrainerReviewListUseCase.execute(trainerId);
+            const reviewHistory: TrainerReviewsListsResponseDTO = await this._getTrainerReviewListUseCase.execute(trainerId);
 
             res.status(HttpStatus.OK).json({
                 success: true,

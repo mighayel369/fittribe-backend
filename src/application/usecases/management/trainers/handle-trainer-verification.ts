@@ -3,7 +3,7 @@ import { ITrainerRepo, I_TRAINER_REPO_TOKEN } from "domain/repositories/ITrainer
 import { IMailService, I_EMAIL_SERVICE_TOKEN } from "domain/services/i-mail-service";
 import { AppError } from "domain/errors/AppError";
 import { HttpStatus } from "utils/HttpStatus";
-import { TrainerApprovalRequestDTO } from "application/dto/trainer/trainer-approval.dto";
+import { TrainerApprovalRequestDTO } from "application/dto/management/trainer-management/trainer-approval.dto";
 import { IHandleTrainerApproval } from "application/interfaces/trainer/i-handle-trainer-approval.usecase";
 import { ACTIONS, APPROVAL_MESSAGES } from "utils/Constants";
 import { ERROR_MESSAGES } from "utils/ErrorMessage";
@@ -31,7 +31,7 @@ export class HandleTrainerApproval implements IHandleTrainerApproval {
 
     const message = isAccepted
       ? APPROVAL_MESSAGES.SUCCESS_BODY(trainer.name)
-      : APPROVAL_MESSAGES.REJECT_BODY(trainer.name, reason||"N/A");
+      : APPROVAL_MESSAGES.REJECT_BODY(trainer.name, reason || "N/A");
 
     const htmlContent = getTrainerStatusTemplate(subject, message);
 

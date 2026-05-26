@@ -1,4 +1,4 @@
-import { TrainerApprovalRequestDTO } from "application/dto/trainer/trainer-approval.dto";
+import { TrainerApprovalRequestDTO } from "application/dto/management/trainer-management/trainer-approval.dto";
 
 export const I_HANDLE_TRAINER_APPROVAL_TOKEN = Symbol("I_HANDLE_TRAINER_APPROVAL_TOKEN");
 

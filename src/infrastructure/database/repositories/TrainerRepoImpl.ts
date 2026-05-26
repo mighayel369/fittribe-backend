@@ -6,45 +6,66 @@ import { TrainerEntity } from "domain/entities/TrainerEntity";
 import { ITrainerRepo } from "domain/repositories/ITrainerRepo";
 import { TRAINER_STATUS } from "domain/constants/trainer-status";
 import { UserRole } from "domain/constants/user-role";
-import { TrainerType } from "domain/repositories/types/trainer-type";
+import { TrainerProfileAggregate } from "domain/repositories/types/trainer-aggregate.type";
 import { FilterQuery, PipelineStage } from "mongoose";
 import { ITrainerFilters } from "domain/filters/ITrainerFilters";
 import { AppError } from "domain/errors/AppError";
 import { ERROR_MESSAGES } from "utils/ErrorMessage";
 import { HttpStatus } from "utils/HttpStatus";
+import { TrainerSortOptions } from "utils/Constants";
 @injectable()
+
+
 export class TrainerRepoImpl extends BaseRepository<ITrainer> implements ITrainerRepo {
     protected model = TrainerModel;
 
 
     private buildTrainerMatchQuery(filter: ITrainerFilters): FilterQuery<ITrainer> {
+
         const query: FilterQuery<ITrainer> = {
             role: UserRole.TRAINER,
             verified: filter.status
         };
 
         if (filter.search) {
-            query.name = { $regex: filter.search, $options: "i" };
+            query.name = {
+                $regex: filter.search,
+                $options: "i"
+            };
         }
 
         if (filter.gender) {
-            query.gender = filter.gender;
+            query.gender =
+                filter.gender;
         }
 
         if (filter.programId) {
-            query.programs = filter.programId;
+            query.programs =
+                filter.programId;
         }
 
         return query;
     }
 
-    private getSortOrder(sortType?: string): Record<string, 1 | -1> {
-        const sortMap: Record<string, Record<string, 1 | -1>> = {
-            rating: { rating: -1 },
-            exp: { experience: -1 },
-            latest: { createdAt: -1 }
+    private getSortOrder(sortType?: TrainerSortOptions): Record<string, 1 | -1> {
+
+        const sortMap:
+            Record<string, Record<string, 1 | -1>> = {
+            rating: {
+                rating: -1
+            },
+            exp: {
+                experience: -1
+            },
+            latest: {
+                createdAt: -1
+            }
         };
-        return sortMap[sortType as string] || { createdAt: -1 };
+        return sortMap[
+            sortType as string
+        ] || {
+            createdAt: -1
+        };
     }
 
     async RegisterTrainer(payload: TrainerEntity): Promise<void> {
@@ -101,81 +122,108 @@ export class TrainerRepoImpl extends BaseRepository<ITrainer> implements ITraine
         await this.model.findOneAndUpdate({ trainerId: id }, { password: hashedPassword });
     }
 
-    async findTrainerDetails(trainerId: string): Promise<TrainerType | null> {
-        const docs = await this.model.aggregate<TrainerType>([
+    async findTrainerDetails(
+        trainerId: string
+    ): Promise<TrainerProfileAggregate | null> {
+
+        const docs = await this.model.aggregate<TrainerProfileAggregate>([
             { $match: { trainerId } },
+
             {
                 $lookup: {
                     from: "programs",
                     localField: "programs",
                     foreignField: "programId",
-                    as: "programsData"
+                    as: "programs"
                 }
             },
+
             {
                 $project: {
-                    _id: 0,
-                    trainer: {
-                        $mergeObjects: ["$$ROOT", { programs: "$programsData" }]
-                    }
-                }
-            },
-            {
-                $project: {
-                    "trainer.programsData": 0
+                    _id: 0
                 }
             }
         ]);
 
-        return docs.length > 0 ? docs[0] : null;
+        if (!docs.length) return null;
+
+        return docs[0]
     }
 
     async findAllTrainers(
         page: number,
         limit: number,
         filter: ITrainerFilters
-    ): Promise<{ data: TrainerType[]; totalCount: number }> {
-        const skip = (page - 1) * limit;
-        const matchQuery = this.buildTrainerMatchQuery(filter);
-        const sortOrder = this.getSortOrder(filter.sort);
-
-        const pipeline: PipelineStage[] = [
-            { $match: matchQuery },
-            { $sort: sortOrder },
-            {
-                $facet: {
-                    totalCount: [{ $count: "total" }],
-                    docs: [
-                        { $skip: skip },
-                        { $limit: limit },
-                        {
-                            $lookup: {
-                                from: "programs",
-                                localField: "programs",
-                                foreignField: "programId",
-                                as: "programsData"
+    ): Promise<{
+        data: TrainerProfileAggregate[];
+        totalCount: number;
+    }> {
+        const skip =
+            (page - 1) * limit;
+        const matchQuery =
+            this.buildTrainerMatchQuery(
+                filter
+            );
+        const sortOrder =
+            this.getSortOrder(
+                filter.sort
+            );
+        const pipeline:
+            PipelineStage[] = [
+                {
+                    $match:
+                        matchQuery
+                },
+                {
+                    $sort:
+                        sortOrder
+                },
+                {
+                    $facet: {
+                        totalCount: [
+                            {
+                                $count: "total"
                             }
-                        },
-                        {
-                            $project: {
-                                _id: 0,
-                                trainer: {
-                                    $mergeObjects: ["$$ROOT", { programs: "$programsData" }]
+                        ],
+                        docs: [
+                            {
+                                $skip: skip
+                            },
+                            {
+                                $limit: limit
+                            },
+                            {
+                                $lookup: {
+                                    from: "programs",
+                                    localField: "programs",
+                                    foreignField: "programId",
+                                    as: "programs"
+                                }
+                            },
+
+                            {
+                                $project: {
+                                    _id: 0,
                                 }
                             }
-                        },
-                        {
-                            $project: {
-                                "trainer.programsData": 0
-                            }
-                        }
-                    ]
+                        ]
+                    }
                 }
-            }
-        ];
+            ];
 
-        const result = await this.model.aggregate(pipeline);
-        const totalRowCount = result[0]?.totalCount[0]?.total || 0;
+        const result = await this.model.aggregate<
+            {
+                totalCount: {
+                    total: number;
+                }[];
+                docs: TrainerProfileAggregate[];
+            }
+        >(pipeline);
+
+        const totalRowCount =
+            result[0]
+                ?.totalCount?.[0]
+                ?.total || 0;
 
         return {
             data: result[0]?.docs || [],

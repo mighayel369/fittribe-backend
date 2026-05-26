@@ -1,25 +1,36 @@
 import { WeeklyAvailability, TimeRange } from "./types/slot.types";
 import { AppError } from "../errors/AppError";
+import { HttpStatus } from "utils/HttpStatus";
 
 export class SlotEntity {
   constructor(
     public readonly trainerId: string,
-    public readonly weeklyAvailability: WeeklyAvailability,
+    public readonly weeklyAvailability: WeeklyAvailability
   ) { }
-
-
-  public isAvailable(day: keyof WeeklyAvailability, time: string): boolean {
-    const daySlots = this.weeklyAvailability[day];
-    return daySlots.some(slot => time >= slot.start && time < slot.end);
-  }
-
   public validateSlots(): void {
-    Object.values(this.weeklyAvailability).forEach((slots: TimeRange[]) => {
-      slots.forEach(slot => {
-        if (slot.start >= slot.end) {
-          throw new AppError(`Invalid slot: ${slot.start} must be before ${slot.end}`, 400);
+    Object.entries(this.weeklyAvailability).forEach(
+      ([day, availability]) => {
+        if (!availability.enabled) {
+          return;
         }
-      });
-    });
+        availability.slots.forEach(
+          (slot: TimeRange) => {
+            if (
+              slot.start >= slot.end
+            ) {
+              throw new AppError(`${day}: slot start time must be before end time`, HttpStatus.BAD_REQUEST);
+            }
+
+            if (
+              slot.start < 0 ||
+              slot.end > 1440
+            ) {
+              throw new AppError(`${day}: invalid time range`, HttpStatus.BAD_REQUEST
+              );
+            }
+          }
+        );
+      }
+    );
   }
 }

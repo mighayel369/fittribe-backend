@@ -1,6 +1,6 @@
 import { container } from "tsyringe";
 import { IGoogleAuthService, I_GOOGLE_AUTH_SERVICE_TOKEN } from "domain/services/IGoogleAuthService";
-import logger from "utils/logger";
+import logger from "../../logger";
 export const passportSet = async (): Promise<boolean> => {
   try {
     const passportSetup = container.resolve<IGoogleAuthService>(I_GOOGLE_AUTH_SERVICE_TOKEN);

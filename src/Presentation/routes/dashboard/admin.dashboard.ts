@@ -7,6 +7,4 @@ const ctrl = container.resolve(AdminDashboardController);
 
 router.get('/overview', ctrl.getPlatformInsights);
 
-router.get('/export-report', ctrl.exportDashboardReport);
-
 export default router;

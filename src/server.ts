@@ -1,6 +1,6 @@
 import "reflect-metadata"
 import 'dotenv/config';
-import logger from 'utils/logger';
+import logger from "logger";
 import 'infrastructure/config/container';
 import { container } from "tsyringe";
 import { I_SOCKET_SERVICE_TOKEN, ISocketService } from 'domain/services/i-socket-service';
@@ -12,7 +12,6 @@ const PORT = process.env.PORT || 5000;
 async function startServer() {
     try {
         await connectDB();
-
         const socketService = container.resolve<ISocketService>(I_SOCKET_SERVICE_TOKEN);
         socketService.init(server);
         container.resolve(SocketChatService);

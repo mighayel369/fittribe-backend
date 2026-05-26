@@ -39,7 +39,6 @@ const BookingSchema = new Schema<IBooking>({
   },
   rescheduleCount: Number,
   rejectReason: String,
-  meetLink: { type: String },
   isReviewed: { type: Boolean, default: false },
 }, { timestamps: true });
 

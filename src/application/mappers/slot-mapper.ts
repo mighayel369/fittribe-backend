@@ -1,18 +1,41 @@
 import { SlotEntity } from "domain/entities/SlotEntity";
-import { TrainerSlotResponseDTO } from "application/dto/slot/trainer-slot-response.dto";
+
+import { TrainerWeeklyAvailabilityResponseDTO, TrainerWeeklyAvailabilityResponseSchema } from "application/dto/schedules/get-trainer-weekly-availability.dto";
+
 export class SlotMapper {
-  static toTrainerSlotResponseDTO(entity: SlotEntity): TrainerSlotResponseDTO {
-    return {
+  static toWeeklyAvailabilityResponseDTO(entity: SlotEntity): TrainerWeeklyAvailabilityResponseDTO {
+    return TrainerWeeklyAvailabilityResponseSchema.parse({
       trainerId: entity.trainerId,
       weeklyAvailability: {
-        monday: entity.weeklyAvailability.monday.map(r => ({ start: r.start, end: r.end })),
-        tuesday: entity.weeklyAvailability.tuesday.map(r => ({ start: r.start, end: r.end })),
-        wednesday: entity.weeklyAvailability.wednesday.map(r => ({ start: r.start, end: r.end })),
-        thursday: entity.weeklyAvailability.thursday.map(r => ({ start: r.start, end: r.end })),
-        friday: entity.weeklyAvailability.friday.map(r => ({ start: r.start, end: r.end })),
-        saturday: entity.weeklyAvailability.saturday.map(r => ({ start: r.start, end: r.end })),
-        sunday: entity.weeklyAvailability.sunday.map(r => ({ start: r.start, end: r.end })),
-      },
-    }
-  };
+        monday: {
+          enabled: entity.weeklyAvailability.monday.enabled,
+          slots: entity.weeklyAvailability.monday.slots
+        },
+        tuesday: {
+          enabled: entity.weeklyAvailability.tuesday.enabled,
+          slots: entity.weeklyAvailability.tuesday.slots
+        },
+        wednesday: {
+          enabled: entity.weeklyAvailability.wednesday.enabled,
+          slots: entity.weeklyAvailability.wednesday.slots
+        },
+        thursday: {
+          enabled: entity.weeklyAvailability.thursday.enabled,
+          slots: entity.weeklyAvailability.thursday.slots
+        },
+        friday: {
+          enabled: entity.weeklyAvailability.friday.enabled,
+          slots: entity.weeklyAvailability.friday.slots
+        },
+        saturday: {
+          enabled: entity.weeklyAvailability.saturday.enabled,
+          slots: entity.weeklyAvailability.saturday.slots
+        },
+        sunday: {
+          enabled: entity.weeklyAvailability.sunday.enabled,
+          slots: entity.weeklyAvailability.sunday.slots
+        }
+      }
+    });
+  }
 }

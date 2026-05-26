@@ -24,6 +24,12 @@ interface Env {
   SESSION_DURATION: number;
   GOOGLE_CALLBACK: string;
   MEETING_URL: string
+
+  LOG_LEVEL: string;
+  LOG_MAX_SIZE: string;
+  LOG_COMBINED_RETENTION: string;
+  LOG_ERROR_RETENTION: string;
+  LOG_DATE_PATTERN: string;
 }
 
 const ensureEnv = (key: string): string => {
@@ -56,7 +62,12 @@ const getConfig = (): Env => {
     ADMIN: ensureEnv("ADMIN"),
     SESSION_DURATION: Number(ensureEnv("SESSION_DURATION")),
     GOOGLE_CALLBACK: ensureEnv("GOOGLE_CALLBACK"),
-    MEETING_URL: ensureEnv("MEETING_URL")
+    MEETING_URL: ensureEnv("MEETING_URL"),
+    LOG_LEVEL: process.env.LOG_LEVEL || 'info',
+    LOG_MAX_SIZE: process.env.LOG_MAX_SIZE || '20m',
+    LOG_COMBINED_RETENTION: process.env.LOG_COMBINED_RETENTION || '14d',
+    LOG_ERROR_RETENTION: process.env.LOG_ERROR_RETENTION || '30d',
+    LOG_DATE_PATTERN: process.env.LOG_DATE_PATTERN || 'YYYY-MM-DD'
   };
 };
 

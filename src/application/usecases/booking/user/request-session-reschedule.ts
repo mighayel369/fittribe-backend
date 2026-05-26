@@ -1,6 +1,6 @@
 import { inject, injectable } from "tsyringe";
 import { IRequestBookingRescheduleUseCase } from "application/interfaces/booking/i-request-booking-reschedule.usecase";
-import { RescheduleRequestDTO } from "application/dto/booking/reschedule-request.dto";
+import { RescheduleRequestDTO } from "application/dto/booking/shared/reschedule-request.dto";
 import { IBookingRepo, I_BOOKING_REPO_TOKEN } from "domain/repositories/IBookingRepo";
 import { AppError } from "domain/errors/AppError";
 import { ERROR_MESSAGES } from "utils/ErrorMessage";
@@ -15,7 +15,7 @@ export class RequestBookingRescheduleUseCase implements IRequestBookingReschedul
   ) { }
 
 
-  async execute(rescheduleRequest: RescheduleRequestDTO): Promise<void> {
+  async execute(rescheduleRequest: RescheduleRequestDTO, _userId: string): Promise<void> {
     const { bookingId, newDate, newTimeSlot, reason } = rescheduleRequest;
 
     const bookingRecord = await this._bookingRepository.findBookingById(bookingId);

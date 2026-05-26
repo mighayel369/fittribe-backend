@@ -1,42 +1,76 @@
-import { ClientTrainersResponseDTO, PendingTrainerResponseDTO, TrainersResponseDTO } from "application/dto/trainer/fetch-all-trainers.dto";
-import { AdminTrainerDetails, TrainerPrivateProfileDTO, UserTrainerViewDTO } from "application/dto/trainer/fetch-trainer-details.dto";
-import { TrainerType } from "domain/repositories/types/trainer-type";
-
-
+import { TrainerProfileDTO } from "application/dto/account/trainer/get-trainer-profile.dto";
+import { TrainerProfileAggregate } from "domain/repositories/types/trainer-aggregate.type";
+import { TrainerProfileSchema } from "application/dto/account/trainer/get-trainer-profile.dto";
+import { ClientTrainerSchema, ClientTrainersResponseDTO } from "application/dto/discovery/public-trainers.dto";
+import { TrainerRegisterRequestDTO } from "application/dto/auth/trainer/trainer.register.dto";
+import { TrainerEntity } from "domain/entities/TrainerEntity";
+import { randomUUID } from "crypto";
+import { UserRole } from "domain/constants/user-role";
+import { TRAINER_STATUS } from "domain/constants/trainer-status";
+import { UserTrainerViewDTO } from "application/dto/discovery/public-trainer-details.dto";
+import { TrainersResponseDTO, TrainersResponseSchema } from "application/dto/management/trainer-management/all-trainers.dto";
+import { PendingTrainerResponseDTO, PendingTrainerResponseSchema } from "application/dto/management/trainer-management/pending-trainers.dto";
+import { AdminTrainerDetailsSchema, AdminTrainerDetailsDTO } from "application/dto/management/trainer-management/trainer-details.dto";
 export const TrainerMapper = {
-    toTrainerProfile(data: TrainerType): TrainerPrivateProfileDTO {
-        const { trainer } = data
-        return {
+    toTrainerProfile(trainer: TrainerProfileAggregate): TrainerProfileDTO {
+
+        return TrainerProfileSchema.parse({
             trainerId: trainer.trainerId,
             name: trainer.name,
             email: trainer.email,
-            phone: trainer.phone || "Not Provided",
+            phone: trainer.phone ?? "Not Provided",
             gender: trainer.gender,
-            address: trainer.address || "",
-            bio: trainer.bio || "",
-            profilePic: trainer.profilePic || "",
+            address: trainer.address ?? "",
+            bio: trainer.bio ?? "",
+            profilePic: trainer.profilePic ?? "",
             experience: trainer.experience,
-            languages: trainer.languages || [],
+            languages: trainer.languages ?? [],
             pricePerSession: trainer.pricePerSession,
             status: trainer.status,
             verified: trainer.verified,
-            rejectReason: trainer.rejectReason || "",
-            certificate: trainer.certificate || "",
-            rating: trainer.rating || 0,
-            joined: trainer.createdAt ? new Date(trainer.createdAt).toLocaleDateString() : "",
-            programs: trainer.programs.map(p => ({
-                programId: p.programId,
-                name: p.name,
-                description: p.description,
-                image: p.programPic
+            rejectReason: trainer.rejectReason ?? "",
+            certificate: trainer.certificate ?? "",
+            rating: trainer.rating ?? 0,
+            joined: trainer.createdAt
+                ? trainer.createdAt.toLocaleDateString()
+                : "",
+            programs: trainer.programs.map(program => ({
+                programId: program.programId,
+                name: program.name,
+                description: program.description,
+                image: program.programPic
             }))
-        };
+        });
     },
 
-    toClientTrainerDTO(data: TrainerType): ClientTrainersResponseDTO {
-        const { trainer } = data;
+    toTrainerEntity(
+        data: TrainerRegisterRequestDTO,
+        hashedPassword: string,
+        certificateUrl?: string
+    ): TrainerEntity {
 
-        return {
+        return new TrainerEntity(
+            randomUUID(),
+            data.name,
+            data.email,
+            UserRole.TRAINER,
+            TRAINER_STATUS.PENDING,
+            data.pricePerSession,
+            hashedPassword,
+            data.languages,
+            data.experience,
+            data.programs,
+            certificateUrl || null,
+            data.gender
+        );
+    },
+
+    toClientTrainerDTO(
+        trainer: TrainerProfileAggregate
+    ): ClientTrainersResponseDTO {
+
+
+        return ClientTrainerSchema.parse({
             trainerId: trainer.trainerId,
             name: trainer.name,
             email: trainer.email,
@@ -46,13 +80,12 @@ export const TrainerMapper = {
             rating: trainer.rating || 0,
             experience: trainer.experience || 0,
             address: trainer.address || null,
-
-            programs: trainer.programs.map(p => p.name).join(", ") || "General Training"
-        };
+            programs: trainer.programs.map(p => p.name)
+        });
     },
 
-    toUserTrainerView(data: TrainerType, chatId: string | null): UserTrainerViewDTO {
-        const { trainer } = data;
+    toUserTrainerView(trainer: TrainerProfileAggregate, chatId: string | null): UserTrainerViewDTO {
+
 
         return {
             trainerId: trainer.trainerId,
@@ -74,34 +107,35 @@ export const TrainerMapper = {
         };
     },
 
-    toTrainersResponseDTO(data: TrainerType): TrainersResponseDTO {
-        const { trainer } = data;
+    toTrainersResponseDTO(trainer: TrainerProfileAggregate): TrainersResponseDTO {
 
-        return {
+        return TrainersResponseSchema.parse({
             trainerId: trainer.trainerId,
             name: trainer.name,
             email: trainer.email,
             status: trainer.status,
             pricePerSession: trainer.pricePerSession
-        };
+        })
     },
 
-    toPendingTrainerDTO(data: TrainerType): PendingTrainerResponseDTO {
-        const { trainer } = data;
+    toPendingTrainerDTO(
+        trainer: TrainerProfileAggregate
+    ): PendingTrainerResponseDTO {
 
-        return {
+        return PendingTrainerResponseSchema.parse({
             trainerId: trainer.trainerId,
             name: trainer.name,
             pricePerSession: trainer.pricePerSession,
             gender: trainer.gender,
             programs: trainer.programs.map(p => p.name)
-        };
+        });
     },
 
-    toAdminTrainerDetails(data: TrainerType): AdminTrainerDetails {
-        const { trainer } = data;
+    toAdminTrainerDetails(
+        trainer: TrainerProfileAggregate
+    ): AdminTrainerDetailsDTO {
 
-        return {
+        return AdminTrainerDetailsSchema.parse({
             trainerId: trainer.trainerId,
             name: trainer.name,
             email: trainer.email,
@@ -114,14 +148,13 @@ export const TrainerMapper = {
             certificate: trainer.certificate || "",
             verified: trainer.verified,
             status: trainer.status,
-            joined: trainer.createdAt ? new Date(trainer.createdAt).toISOString() : new Date().toISOString(),
+            joined: trainer.createdAt
+                ? new Date(trainer.createdAt).toISOString()
+                : new Date().toISOString(),
             rejectReason: trainer.rejectReason || "",
             programs: trainer.programs.map(p => ({
-                programId: p.programId,
-                name: p.name,
-                description: p.description,
-                image: p.programPic
+                programId: p.programId, name: p.name, description: p.description, image: p.programPic
             }))
-        };
+        });
     }
 };

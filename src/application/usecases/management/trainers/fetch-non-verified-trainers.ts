@@ -1,12 +1,11 @@
 import { inject, injectable } from "tsyringe";
 import { ITrainerRepo, I_TRAINER_REPO_TOKEN } from "domain/repositories/ITrainerRepo";
 import { IFetchAllTrainersUseCase } from "application/interfaces/trainer/i-fetch-all-trainers.usecase";
-import { FetchAllPendingTrainersResponseDTO, FetchAllTrainersRequestDTO } from "application/dto/trainer/fetch-all-trainers.dto";
 import { HttpStatus } from "utils/HttpStatus";
 import { AppError } from "domain/errors/AppError";
 import { TrainerMapper } from "application/mappers/trainer-mapper";
-import { ITrainerFilters } from "domain/filters/ITrainerFilters";
-import { TRAINER_STATUS } from "domain/constants/trainer-status";
+import { FetchAllTrainersRequestDTO } from "application/dto/discovery/fetch-all-trainer.request.dto";
+import { FetchAllPendingTrainersResponseDTO, FetchAllPendingTrainersResponseSchema } from "application/dto/management/trainer-management/pending-trainers.dto";
 @injectable()
 export class FetchAllPendingTrainers implements IFetchAllTrainersUseCase<FetchAllPendingTrainersResponseDTO> {
   constructor(
@@ -21,22 +20,18 @@ export class FetchAllPendingTrainers implements IFetchAllTrainersUseCase<FetchAl
       throw new AppError("Invalid pagination parameters", HttpStatus.BAD_REQUEST);
     }
 
+    const result =
+      await this._trainerRepository.findAllTrainers(
+        currentPage,
+        limit,
+        filter || {}
+      );
 
-    const updatedFilter: ITrainerFilters = {
-      ...filter,
-      status: TRAINER_STATUS.PENDING
-    };
-
-    const result = await this._trainerRepository.findAllTrainers(
-      currentPage,
-      limit,
-      updatedFilter
-    );
-
-
-    return {
+    return FetchAllPendingTrainersResponseSchema.parse({
       data: result.data.map(item => TrainerMapper.toPendingTrainerDTO(item)),
-      total: result.totalCount
-    };
+      totalPages: Math.ceil(result.totalCount / limit),
+      currentPage,
+      totalCount: result.totalCount
+    });
   }
 }

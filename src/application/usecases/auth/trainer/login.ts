@@ -3,7 +3,8 @@ import { ITrainerRepo, I_TRAINER_REPO_TOKEN } from "domain/repositories/ITrainer
 import { ISecurityService, I_SECURITY_SERVICE_TOKEN } from "domain/services/i-security-service";
 import { I_JWT_SERVICE_TOKEN, IJwtService } from "domain/services/i-jwt.service";
 import { ILoginUseCase } from "application/interfaces/auth/i-login.usecase";
-import { LoginResponseDTO, LoginRequestDTO, AuthUser } from "application/dto/auth/login.dto";
+import { LoginRequestDTO } from "application/dto/auth/shared/login.request.dto";
+import { LoginResponseDTO, AuthUserPayloadDTO } from "application/dto/auth/shared/login.response.dto";
 import { AppError } from "domain/errors/AppError";
 import { HttpStatus } from "utils/HttpStatus";
 import { ERROR_MESSAGES } from "utils/ErrorMessage";
@@ -59,7 +60,7 @@ export class TrainerLoginUseCase implements ILoginUseCase {
       role: UserRole.TRAINER
     };
 
-    const authenticatedTrainer: AuthUser = {
+    const authenticatedTrainer: AuthUserPayloadDTO = {
       id: trainerAccount.trainerId,
       name: trainerAccount.name,
       email: trainerAccount.email
@@ -68,7 +69,7 @@ export class TrainerLoginUseCase implements ILoginUseCase {
     const accessToken = this._jwtService.generateAccessToken(tokenPayload);
     const refreshToken = this._jwtService.generateRefreshToken(tokenPayload);
 
-    return AuthMapper.toLoginResponse(
+    return AuthMapper.toLoginResponseDTO(
       accessToken,
       refreshToken,
       UserRole.TRAINER,

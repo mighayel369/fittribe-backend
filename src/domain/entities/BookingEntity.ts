@@ -30,7 +30,6 @@ export class BookingEntity {
     },
     public rescheduleCount = 0,
     public rejectReason?: string,
-    public meetLink?: string,
     public isReviewed = false
   ) { }
 

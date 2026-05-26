@@ -2,14 +2,14 @@ import express from "express";
 import { container } from "tsyringe";
 import { NotificationController } from "Presentation/controllers/notification/notification-controller";
 import { validateRequest } from "Presentation/middleware/validate.middleware";
-import { notificationIdParamSchema } from "Presentation/validators/notification-schema";
+import { NotificationIdParamSchema } from "application/dto/notification/notification.param.schema";
 const router = express.Router();
 const ctrl = container.resolve(NotificationController);
-router.get('/get',ctrl.getNotifications)
+router.get('/get', ctrl.getNotifications)
 router.patch(
-  '/mark-as-read/:notificationId', 
-  validateRequest(notificationIdParamSchema, "params"), 
+  '/mark-as-read/:notificationId',
+  validateRequest(NotificationIdParamSchema, "params"),
   ctrl.markAsRead
 );
-router.patch('/mark-all-as-read',ctrl.markAllAsRead)
+router.patch('/mark-all-as-read', ctrl.markAllAsRead)
 export default router;

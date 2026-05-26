@@ -6,14 +6,12 @@ import { AppError } from 'domain/errors/AppError';
 import { SUCCESS_MESSAGES } from 'utils/SuccessMessages';
 
 import { IApplyLeaveRequest, I_APPLY_LEAVE_REQUEST_TOKEN } from 'application/interfaces/leave/i-apply-leave-requests.usecase';
-import { RequestLeaveDTO } from 'application/dto/leave/request.leave.dto';
-import { FetchLeaveRequestsInputDTO, FetchTrainerLeaveResponseDTO } from 'application/dto/leave/leave-requests.dto';
+import { RequestLeaveDTO } from 'application/dto/leave/trainer/request.leave.dto';
 import { IFetchAllLeaveRequests, I_FETCH_ALL_TRAINER_LEAVE_REQUESTS_TOKEN } from 'application/interfaces/leave/i-fetch-all-leave-requests';
 import { IWithdrawLeaveRequest, I_WITHDRAW_LEAVE_REQUEST_TOKEN } from 'application/interfaces/leave/i-withdraw-leave-request';
 import { ITrainerLeaveMetrics, I_GET_TRAINER_LEAVE_METRICS_TOKEN } from 'application/interfaces/leave/i-trainer-leave-metrics';
-import { PAGINATION } from 'utils/Constants';
-import { LeaveParams } from 'Presentation/interfaces/request.params';
-import { TrainerLeaveMetrics } from 'application/dto/leave/leave-metrics.dto';
+import { FetchTrainerLeaveResponseDTO } from 'application/dto/leave/trainer/leave-lists.dto';
+import { fetchAllLeaveQueryDTO } from 'application/dto/leave/shared/leave-requests.dto';
 @injectable()
 export class LeaveController {
     constructor(
@@ -40,7 +38,6 @@ export class LeaveController {
             const { type, startDate, endDate, reason } = req.body;
 
             const leaveRequestPayload: RequestLeaveDTO = {
-                trainerId: trainerId,
                 type,
                 startDate,
                 endDate,
@@ -48,7 +45,7 @@ export class LeaveController {
                 documents: req.file
             };
 
-            await this._applyLeaveUseCase.execute(leaveRequestPayload);
+            await this._applyLeaveUseCase.execute(leaveRequestPayload, trainerId);
 
             res.status(HttpStatus.OK).json({
                 success: true,
@@ -65,22 +62,14 @@ export class LeaveController {
                 throw new AppError(ERROR_MESSAGES.UNAUTHORIZED, HttpStatus.UNAUTHORIZED);
             }
 
-            const fetchHistoryPayload: FetchLeaveRequestsInputDTO = {
-                currentPage: Number(req.query.pageNo) || 1,
-                limit: Number(req.query.limit) || PAGINATION.DEFAULT_LIMIT,
-                trainerId,
-                filter: {
-                    search: (req.query.search as string) || ""
-                }
-            };
+            const query = req.query as unknown as fetchAllLeaveQueryDTO
 
-            const historyResult: FetchTrainerLeaveResponseDTO =
-                await this._getLeaveHistoryUseCase.execute(fetchHistoryPayload);
+            const historyResult: FetchTrainerLeaveResponseDTO = await this._getLeaveHistoryUseCase.execute(query);
 
             res.status(HttpStatus.OK).json({
                 success: true,
                 data: historyResult.data,
-                total: historyResult.total
+                total: historyResult.totalCount
             });
 
         } catch (err) {
@@ -96,7 +85,7 @@ export class LeaveController {
                 throw new AppError(ERROR_MESSAGES.UNAUTHORIZED, HttpStatus.UNAUTHORIZED);
             }
 
-            const leaveMetrics: TrainerLeaveMetrics[] = await this._getLeaveMetricsUseCase.execute(trainerId);
+            const leaveMetrics = await this._getLeaveMetricsUseCase.execute(trainerId);
 
             res.status(HttpStatus.OK).json({
                 success: true,
@@ -105,7 +94,7 @@ export class LeaveController {
         } catch (err) { next(err); }
     };
 
-    withdrawLeaveRequest = async (req: Request<LeaveParams>, res: Response, next: NextFunction) => {
+    withdrawLeaveRequest = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { leaveId } = req.params;
 

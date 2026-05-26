@@ -1,7 +1,7 @@
 import nodemailer from "nodemailer";
 import { injectable } from "tsyringe";
 import config from "config";
-import logger from "utils/logger";
+import logger from "logger";
 import { IMailService } from "domain/services/i-mail-service";
 import { AppError } from "domain/errors/AppError";
 import { ERROR_MESSAGES } from "utils/ErrorMessage";
@@ -9,6 +9,7 @@ import { HttpStatus } from "utils/HttpStatus";
 
 @injectable()
 export class MailService implements IMailService {
+  private logger = logger;
   private createTransporter() {
     return nodemailer.createTransport({
       service: 'gmail',
@@ -29,7 +30,7 @@ export class MailService implements IMailService {
         html,
       });
     } catch (error) {
-      logger.error(`MailService Error sending to ${to}:`, error);
+      this.logger.error(`MailService Error sending to ${to}:`, error);
       throw new AppError(ERROR_MESSAGES.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }

@@ -1,37 +1,51 @@
 import { inject, injectable } from "tsyringe";
 import { IChatRepo, I_CHAT_REPO_TOKEN } from "domain/repositories/IChatRepo";
 import { I_USER_REPO_TOKEN, IUserRepo } from "domain/repositories/IUserRepo";
-
 import { IFetchChatList } from "application/interfaces/chat/i-fetch-chat-list";
-
-import { NonEstablishedChatListResponseDTO, TrainerChatListRequestDTO } from "application/dto/chat/chat-list.dto";
+import { NonEstablishedChatListArraySchema, NonEstablishedChatListResponseDTO } from "application/dto/chat/trainer/client-list.dto";
+import { ChatQueryDTO } from "application/dto/chat/shared/chat-query.schema";
 import { ChatMapper } from "application/mappers/chat-mapper";
 
 @injectable()
-export class FetchNonEstablishedTrainerChatList
-  implements IFetchChatList<TrainerChatListRequestDTO, NonEstablishedChatListResponseDTO[]> {
-
+export class FetchNonEstablishedTrainerChatList implements IFetchChatList<NonEstablishedChatListResponseDTO[]> {
   constructor(
-    @inject(I_CHAT_REPO_TOKEN) private readonly _chatRepository: IChatRepo,
-    @inject(I_USER_REPO_TOKEN) private readonly _userRepository: IUserRepo
+    @inject(I_CHAT_REPO_TOKEN)
+    private readonly _chatRepository: IChatRepo,
+
+    @inject(I_USER_REPO_TOKEN)
+    private readonly _userRepository: IUserRepo
   ) { }
 
-  async execute(trainerQuery: TrainerChatListRequestDTO): Promise<NonEstablishedChatListResponseDTO[]> {
-    const { trainerId, searchQuery } = trainerQuery;
+  async execute(
+    query: ChatQueryDTO,
+    trainerId: string
+  ): Promise<NonEstablishedChatListResponseDTO[]> {
 
+    const { search } = query;
     const establishedChats = await this._chatRepository.getChatListForTrainer(trainerId);
 
-    const establishedClientIds = establishedChats.map(item => item.user.userId);
+    const establishedClientIds = establishedChats.map(
+      item => item.user.userId
+    );
 
-
-    const excludeIds = [...establishedClientIds, trainerId];
-
+    const excludeIds = [
+      ...establishedClientIds,
+      trainerId
+    ];
 
     const potentialClients = await this._userRepository.findPotentialClients(
       excludeIds,
-      searchQuery
+      search
     );
 
-    return potentialClients.map(client => ChatMapper.toNonEstablishedChatDTO(client));
+    const mappedClients = potentialClients.map(client =>
+      ChatMapper.toNonEstablishedChatDTO(
+        client
+      )
+    );
+
+    return NonEstablishedChatListArraySchema.parse(
+      mappedClients
+    );
   }
 }

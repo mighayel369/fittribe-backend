@@ -1,18 +1,18 @@
 
-
-import { AddReviewDTO } from "application/dto/review/add-review.dto";
+import { AddReviewDTO } from "application/dto/review/user/add-review.dto";
 import { ReviewEntity } from "domain/entities/ReviewEntity";
 import { randomUUID } from "crypto";
-import { ReviewsList } from "domain/repositories/types/review-type";
-import { AdminReviewListDTO, ReviewListDTO } from "application/dto/review/review-list.dto";
-
+import { ReviewListAggregate } from "domain/repositories/types/review-aggregate.type.ts";
+import { TrainerReviewsListsResponseDTO, TrainerReviewsListsResponseSchema } from "application/dto/review/trainer/review-list.dto";
+import { ReviewListDTO, ReviewListSchema } from "application/dto/review/trainer/review-list.dto";
+import { AdminReviewListDTO } from "application/dto/review/admin/review-list.dto";
 export const ReviewMapper = {
 
-  toEntity(data: AddReviewDTO): ReviewEntity {
+  toEntity(data: AddReviewDTO,userId:string): ReviewEntity {
     return new ReviewEntity(
       randomUUID(),
       data.trainerId,
-      data.userId,
+      userId,
       data.bookingId,
       data.rating,
       data.comment,
@@ -20,40 +20,41 @@ export const ReviewMapper = {
     );
   },
 
-  toAdminReviewDTO(data: ReviewsList): AdminReviewListDTO {
-    const reviewData = data.reviews;
-    const userData = data.reviews.user;
-    const trainerData = data.reviews.trainer;
-    const bookingData = data.reviews.booking
+  toAdminReviewDTO(data: ReviewListAggregate): AdminReviewListDTO {
+
     return {
-      reviewId: reviewData.reviewId,
-      clientName: userData.name,
-      clientProfilePic: userData.profilePic || "",
-      time: reviewData.createdAt ? new Date(reviewData.createdAt).toISOString() : "N/A",
-      trainerName: trainerData.name,
-      program: bookingData.program,
-      comment: reviewData.comment,
-      rating: reviewData.rating,
-      reviewStatus: reviewData.isDeleted
+      reviewId: data.reviewId,
+      clientName: data.user?.name || "Unknown",
+      clientProfilePic: data.user?.profilePic || "",
+      time: data.createdAt ? new Date(data.createdAt).toISOString() : "N/A",
+      trainerName: data.trainer?.name || "Unknown",
+      program: data.booking?.program || "General",
+      comment: data.comment,
+      rating: data.rating,
+      reviewStatus: data.isDeleted
     };
   },
 
+  toTrainerReviewDTO(data: ReviewListAggregate): ReviewListDTO {
 
+    return ReviewListSchema.parse({
+      profilePic: data.user?.profilePic || "",
+      name: data.user?.name || "Anonymous",
+      time: data.createdAt ? new Date(data.createdAt).toLocaleDateString() : "N/A",
+      program: data.booking?.program || "General Training",
+      comment: data.comment,
+      rating: data.rating
+    });
+  },
 
-  toTrainerReviewDTO(data: ReviewsList): ReviewListDTO {
-    const reviewData = data.reviews;
-    const userData = data.reviews.user;
+  toTrainerReviewListResponse(reviews: ReviewListAggregate[], totalReviewCount: number, rating: number): TrainerReviewsListsResponseDTO {
 
-    return {
-      profilePic: userData?.profilePic || "",
-      name: userData?.name || "Anonymous",
-      time: reviewData.createdAt
-        ? new Date(reviewData.createdAt).toLocaleDateString()
-        : "N/A",
-      program: "General Training",
-      comment: reviewData.comment,
-      rating: reviewData.rating
-    };
+    return TrainerReviewsListsResponseSchema.parse({
+      reviews: reviews.map(review =>
+        this.toTrainerReviewDTO(review)
+      ),
+      totalReviewCount,
+      rating
+    });
   }
-
 };

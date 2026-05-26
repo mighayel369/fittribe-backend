@@ -1,5 +1,5 @@
 import { inject, injectable } from "tsyringe";
-import { AddReviewDTO } from "application/dto/review/add-review.dto";
+import { AddReviewDTO } from "application/dto/review/user/add-review.dto";
 import { IAddReview } from "application/interfaces/review/i-add-review";
 import { I_REVIEW_REPO_TOKEN, IReviewRepo } from "domain/repositories/IReviewRepo";
 import { IBookingRepo, I_BOOKING_REPO_TOKEN } from "domain/repositories/IBookingRepo";
@@ -18,13 +18,13 @@ export class AddReviewUseCase implements IAddReview {
     @inject(I_TRAINER_REPO_TOKEN) private readonly _trainerRepository: ITrainerRepo
   ) { }
 
-  async execute(reviewPayload: AddReviewDTO): Promise<void> {
+  async execute(reviewPayload: AddReviewDTO, userId: string): Promise<void> {
     const booking = await this._bookingRepository.findBookingById(reviewPayload.bookingId);
     if (!booking) {
       throw new AppError(ERROR_MESSAGES.BOOKING_NOT_FOUND, HttpStatus.NOT_FOUND);
     }
 
-    const reviewEntity = ReviewMapper.toEntity(reviewPayload);
+    const reviewEntity = ReviewMapper.toEntity(reviewPayload, userId);
     await this._reviewRepository.addReview(reviewEntity);
 
 

@@ -13,13 +13,51 @@ export class SlotRepoImpl extends BaseRepository<ISlot> implements ISlotRepo {
   async getTrainerSlot(trainerId: string): Promise<SlotEntity | null> {
     return this.findOne({ trainerId });
   }
-  async createTrainerSlot(trainerId: string): Promise<SlotEntity | null> {
-    return this.create({
-      trainerId: trainerId,
-      weeklyAvailability: {
-        monday: [], tuesday: [], wednesday: [], thursday: [],
-        friday: [], saturday: [], sunday: []
+
+  async createTrainerSlot(
+    trainerId: string
+  ): Promise<SlotEntity | null> {
+
+    const defaultAvailability: SlotEntity['weeklyAvailability'] = {
+      monday: {
+        enabled: false,
+        slots: []
+      },
+
+      tuesday: {
+        enabled: false,
+        slots: []
+      },
+
+      wednesday: {
+        enabled: false,
+        slots: []
+      },
+
+      thursday: {
+        enabled: false,
+        slots: []
+      },
+
+      friday: {
+        enabled: false,
+        slots: []
+      },
+
+      saturday: {
+        enabled: false,
+        slots: []
+      },
+
+      sunday: {
+        enabled: false,
+        slots: []
       }
+    };
+
+    return this.create({
+      trainerId,
+      weeklyAvailability: defaultAvailability
     });
   }
 

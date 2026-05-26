@@ -3,7 +3,9 @@ import { I_USER_REPO_TOKEN, IUserRepo } from "domain/repositories/IUserRepo";
 import { ISecurityService, I_SECURITY_SERVICE_TOKEN } from "domain/services/i-security-service";
 import { I_JWT_SERVICE_TOKEN, IJwtService } from "domain/services/i-jwt.service";
 import { ILoginUseCase } from "application/interfaces/auth/i-login.usecase";
-import { LoginResponseDTO, LoginRequestDTO, AuthUser } from "application/dto/auth/login.dto";
+import { LoginRequestDTO } from "application/dto/auth/shared/login.request.dto";
+import { LoginResponseDTO } from "application/dto/auth/shared/login.response.dto";
+import { AuthUserPayloadDTO } from "application/dto/auth/shared/login.response.dto";
 import { ERROR_MESSAGES } from "utils/ErrorMessage";
 import { AppError } from "domain/errors/AppError";
 import { HttpStatus } from "utils/HttpStatus";
@@ -54,7 +56,7 @@ export class UserLoginUseCase implements ILoginUseCase {
       role: UserRole.USER
     };
 
-    const authenticatedUser: AuthUser = {
+    const authenticatedUser: AuthUserPayloadDTO = {
       id: userAccount.userId,
       name: userAccount.name,
       email: userAccount.email
@@ -63,7 +65,7 @@ export class UserLoginUseCase implements ILoginUseCase {
     const accessToken = this._jwtService.generateAccessToken(tokenPayload);
     const refreshToken = this._jwtService.generateRefreshToken(tokenPayload);
 
-    return AuthMapper.toLoginResponse(
+    return AuthMapper.toLoginResponseDTO(
       accessToken,
       refreshToken,
       UserRole.USER,

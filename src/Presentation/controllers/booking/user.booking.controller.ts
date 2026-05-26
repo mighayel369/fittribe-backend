@@ -5,18 +5,19 @@ import { HttpStatus } from 'utils/HttpStatus';
 import { AppError } from 'domain/errors/AppError';
 import { SUCCESS_MESSAGES } from 'utils/SuccessMessages';
 import { I_FETCH_USER_ALL_BOOKINGS_TOKEN, IFetchAllBookingsUseCase } from 'application/interfaces/booking/i-fetch-all-bookings.usecase';
-import { FetchAllUserBookingRequestDTO, FetchAllUserBookingsResponseDTO } from 'application/dto/booking/fetch-all-bookings.dto';
+import { FetchAllUserBookingsResponseDTO } from 'application/dto/booking/user/fetch-user-bookings.dto';
 import { I_FETCH_CLIENT_BOOKING_DETAILS_TOKEN, IFetchBookingDetails } from 'application/interfaces/booking/i-fetch-booking-details.usecase';
-import { UserBookingDetailsResponseDTO } from 'application/dto/booking/fetch-booking-details.dto';
 import { I_BOOK_SESSION_WITH_TRAINER_TOKEN, IBookSessionWithTrainer } from 'application/interfaces/booking/i-book-session-with-trainer.usecase';
-import { RescheduleRequestDTO } from 'application/dto/booking/reschedule-request.dto';
+import { RescheduleRequestDTO } from 'application/dto/booking/shared/reschedule-request.dto';
 import { I_REQUEST_BOOKING_RESCHEDULE_TOKEN, IRequestBookingRescheduleUseCase } from 'application/interfaces/booking/i-request-booking-reschedule.usecase';
 import { I_CANCEL_BOOKING_TOKEN, ICancelBooking } from 'application/interfaces/booking/i-cancel-booking.usecase';
-import { BookingSummaryDTO, OnlineBookingRequestDTO } from 'application/dto/booking/book-trainer.dto.';
 import { I_ACCEPT_RESCHEDULE_REQUEST_TOKEN, I_DECLINE_RESCHEDULE_REQUEST_TOKEN, IProcessTrainerRescheduleUseCase } from 'application/interfaces/booking/i-process-trainer-reschedule.usecase';
-import { BOOKING_TYPES } from 'utils/Constants';
-import { ProcessRescheduleRequestDTO } from 'application/dto/booking/process-reschedule.dto';
-import { BookingParams } from 'Presentation/interfaces/request.params';
+
+import { ProcessRescheduleRequestDTO } from 'application/dto/booking/shared/process-reschedule.dto';
+import { UserBookingDetailsResponseDTO } from 'application/dto/booking/user/booking-details.dto';
+import { fetchAllBookingQueryDTO } from 'application/dto/booking/shared/fetch-all-bookings.request.dto';
+
+
 
 @injectable()
 export class UserBookingController {
@@ -25,7 +26,7 @@ export class UserBookingController {
         private readonly _finalizeBookingUseCase: IBookSessionWithTrainer,
 
         @inject(I_FETCH_USER_ALL_BOOKINGS_TOKEN)
-        private readonly _fetchBookingsUseCase: IFetchAllBookingsUseCase<FetchAllUserBookingRequestDTO, FetchAllUserBookingsResponseDTO>,
+        private readonly _fetchBookingsUseCase: IFetchAllBookingsUseCase<FetchAllUserBookingsResponseDTO>,
 
         @inject(I_FETCH_CLIENT_BOOKING_DETAILS_TOKEN)
         private readonly _getBookingDetailsUseCase: IFetchBookingDetails<UserBookingDetailsResponseDTO>,
@@ -43,25 +44,17 @@ export class UserBookingController {
         private readonly _declineRescheduleUseCase: IProcessTrainerRescheduleUseCase,
     ) { }
 
-    private isValidBookingType = (value: unknown): value is BOOKING_TYPES => {
-        return Object.values(BOOKING_TYPES).includes(value as BOOKING_TYPES);
-    };
-
-
 
     checkoutAndBook = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const userId = req.user?.user.id;
-            if (!userId) {
-                throw new AppError(ERROR_MESSAGES.UNAUTHORIZED, HttpStatus.UNAUTHORIZED)
-            }
-            const bookingPayload: OnlineBookingRequestDTO = {
-                ...req.body,
-                userId
-            };
 
-            const bookingSummary: BookingSummaryDTO =
-                await this._finalizeBookingUseCase.bookSessionWithTrainer(bookingPayload);
+            if (!userId) {
+                throw new AppError(ERROR_MESSAGES.UNAUTHORIZED, HttpStatus.UNAUTHORIZED);
+            }
+
+
+            const bookingSummary = await this._finalizeBookingUseCase.bookSessionWithTrainer(req.body, userId);
 
             res.status(HttpStatus.CREATED).json({
                 success: true,
@@ -75,9 +68,14 @@ export class UserBookingController {
 
     requestReschedule = async (req: Request, res: Response, next: NextFunction) => {
         try {
+            const userId = req.user?.user.id;
+
+            if (!userId) {
+                throw new AppError(ERROR_MESSAGES.UNAUTHORIZED, HttpStatus.UNAUTHORIZED);
+            }
             const reschedulePayload: RescheduleRequestDTO = req.body;
 
-            await this._requestRescheduleUseCase.execute(reschedulePayload);
+            await this._requestRescheduleUseCase.execute(reschedulePayload, userId);
 
             res.status(HttpStatus.OK).json({
                 success: true,
@@ -89,7 +87,7 @@ export class UserBookingController {
         }
     }
 
-    cancelSession = async (req: Request<BookingParams>, res: Response, next: NextFunction) => {
+    cancelSession = async (req: Request, res: Response, next: NextFunction) => {
         try {
 
             const { bookingId } = req.params;
@@ -113,61 +111,36 @@ export class UserBookingController {
         try {
             const userId = req.user?.user.id;
             if (!userId) {
-                throw new AppError(ERROR_MESSAGES.UNAUTHORIZED, HttpStatus.UNAUTHORIZED)
+                throw new AppError(ERROR_MESSAGES.UNAUTHORIZED, HttpStatus.UNAUTHORIZED);
             }
 
-            const rawSearch = req.query.search;
-            const search = typeof rawSearch === 'string' ? rawSearch : "";
+            const query = req.query as unknown as fetchAllBookingQueryDTO
 
-            const rawFilter = req.query.filter;
-            const filterType = this.isValidBookingType(rawFilter) ? rawFilter : BOOKING_TYPES.ALL;
-
-            const dateQuery = req.query.date;
-
-            const validatedDate = typeof dateQuery === 'string' ? new Date(dateQuery) : new Date();
-
-            const fetchPayload: FetchAllUserBookingRequestDTO = {
-                userId,
-                limit: 5,
-                currentPage: Number(req.query.pageNo) || 1,
-                filter: {
-                    search: search || "",
-                    filterType: filterType,
-                    date: validatedDate
-                }
+            query.filter = {
+                ...query.filter,
+                clientId: userId
             };
-
-            const bookingsResult = await this._fetchBookingsUseCase.execute(fetchPayload);
+            const bookingsResult = await this._fetchBookingsUseCase.execute(
+                query
+            );
 
             res.status(HttpStatus.OK).json({
                 success: true,
-                message: SUCCESS_MESSAGES.BOOKING.USER_BOOKINGS,
-                bookingData: bookingsResult.data,
-                totalPages: bookingsResult.total
+                message:
+                    SUCCESS_MESSAGES.BOOKING.USER_BOOKINGS,
+                ...bookingsResult
             });
         } catch (err) {
             next(err);
         }
     };
 
-    getBookingDetails = async (req: Request<BookingParams>, res: Response, next: NextFunction) => {
+    getBookingDetails = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { bookingId } = req.params;
-
-            if (!bookingId) {
-                throw new AppError(ERROR_MESSAGES.BOOKING_NOT_FOUND, HttpStatus.NOT_FOUND);
-            }
-
-            const bookingDetails: UserBookingDetailsResponseDTO =
-                await this._getBookingDetailsUseCase.execute(bookingId);
-
-            if (!bookingDetails) {
-                res.status(HttpStatus.NOT_FOUND).json({
-                    success: false,
-                    message: ERROR_MESSAGES.BOOKING_NOT_FOUND
-                });
-                return;
-            }
+            const bookingDetails = await this._getBookingDetailsUseCase.execute(
+                bookingId
+            );
 
             res.status(HttpStatus.OK).json({
                 success: true,
@@ -175,12 +148,11 @@ export class UserBookingController {
                 data: bookingDetails
             });
         } catch (err) {
-
             next(err);
         }
     }
 
-    acceptReschedule = async (req: Request<BookingParams>, res: Response, next: NextFunction) => {
+    acceptReschedule = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const performedBy = req.user?.user.role;
 
@@ -209,7 +181,7 @@ export class UserBookingController {
         }
     }
 
-    declineReschedule = async (req: Request<BookingParams>, res: Response, next: NextFunction) => {
+    declineReschedule = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const performedBy = req.user?.user.role;
 

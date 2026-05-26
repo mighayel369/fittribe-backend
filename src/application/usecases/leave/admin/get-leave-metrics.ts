@@ -1,6 +1,6 @@
 import { inject, injectable } from "tsyringe";
 import { ILeaveRepo, I_LEAVE_REPO_TOKEN } from "domain/repositories/ILeaveRepo";
-import { IAdminLeaveDashboard } from "application/dto/leave/leave-metrics.dto";
+import { AdminLeaveDashboardDto } from "application/dto/leave/admin/leave-metrics.dto";
 import { IGetAdminLeaveMetrics } from "application/interfaces/leave/i-admin-leave-metrics";
 import { LeaveMapper } from "application/mappers/leave-mapper";
 
@@ -10,7 +10,7 @@ export class GetAdminLeaveMetrics implements IGetAdminLeaveMetrics {
     @inject(I_LEAVE_REPO_TOKEN)
     private readonly _leaveRepository: ILeaveRepo
   ) { }
-  async execute(): Promise<IAdminLeaveDashboard> {
+  async execute(): Promise<AdminLeaveDashboardDto> {
 
     const rawCountData = await this._leaveRepository.getAllLeaveCount();
 

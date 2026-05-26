@@ -1,4 +1,4 @@
-import { UpdateLeaveStatusRequestDTO } from "application/dto/leave/update-status.dto";
+import { UpdateLeaveStatusRequestDTO } from "application/dto/leave/admin/update-status.dto";
 
 export const I_UPDATE_LEAVE_STATUS_TOKEN = Symbol("I_UPDATE_LEAVE_STATUS_TOKEN");
 

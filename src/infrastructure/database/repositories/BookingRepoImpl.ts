@@ -5,12 +5,13 @@ import { IBookingRepo } from "domain/repositories/IBookingRepo";
 import Booking, { IBooking } from "../models/BookingModel";
 import { BookingEntity } from "domain/entities/BookingEntity";
 import { BOOKING_STATUS } from "domain/constants/booking-status";
-import { BookingResponseType } from "domain/repositories/types/booking-type";
-import { AdminDashboardMetrics, AdminDashboardStats, TrainerPerformanceAnalytics } from "domain/repositories/types/admin-dashboard-type";
+import { BookingAggregate } from "domain/repositories/types/booking-aggregate.type";
+import { AdminDashboardMetricsAggregate, AdminDashboardStats, TrainerPerformanceAnalytics } from "domain/repositories/types/admin-dashboard-aggregate";
 import { IBookingFilters } from "domain/filters/IBookingFilters";
 import { AppError } from "domain/errors/AppError";
 import { ERROR_MESSAGES } from "utils/ErrorMessage";
 import { HttpStatus } from "utils/HttpStatus";
+
 
 
 @injectable()
@@ -22,14 +23,17 @@ export class BookingRepoImpl
 
     private buildQuery(filters: IBookingFilters): Record<string, unknown> {
         const query: FilterQuery<IBooking> = {};
+        const baseDate = filters.date
+            ? new Date(filters.date)
+            : new Date();
 
-        const baseDate = filters.date ? new Date(filters.date) : new Date();
-        
+
         const startOfToday = new Date(baseDate);
-        startOfToday.setUTCHours(0, 0, 0, 0);
+        startOfToday.setHours(0, 0, 0, 0);
 
         const endOfToday = new Date(baseDate);
-        endOfToday.setUTCHours(23, 59, 59, 999);
+        endOfToday.setHours(23, 59, 59, 999);
+
         if (filters.status) query.status = filters.status;
         if (filters.trainerId) query.trainerId = filters.trainerId;
         if (filters.clientId) query.userId = filters.clientId;
@@ -78,58 +82,83 @@ export class BookingRepoImpl
         return booking ? booking : null
     }
 
+
+
     async findAllBookings(
         filters: IBookingFilters,
         page = 1,
-        limit = 5
-    ): Promise<{ data: BookingResponseType[]; totalCount: number }> {
+        limit = 10
+    ): Promise<{
+        data: BookingAggregate[];
+        totalCount: number;
+    }> {
+
         const skip = (page - 1) * limit;
 
-        const matchObj = this.buildQuery(filters);
+        const matchQuery = this.buildQuery(filters);
 
-        const results = await this.model.aggregate([
-            { $match: matchObj },
+        const aggregationResult = await this.model.aggregate([
+            {
+                $match: matchQuery
+            },
             {
                 $lookup: {
                     from: "trainers",
                     localField: "trainerId",
                     foreignField: "trainerId",
-                    as: "trainerInfo"
+                    as: "trainer"
                 }
             },
-            { $unwind: { path: "$trainerInfo", preserveNullAndEmptyArrays: true } },
-
-
+            {
+                $unwind: {
+                    path: "$trainer",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
             {
                 $lookup: {
                     from: "users",
                     localField: "userId",
                     foreignField: "userId",
-                    as: "userInfo"
+                    as: "user"
                 }
             },
-            { $unwind: { path: "$userInfo", preserveNullAndEmptyArrays: true } },
-
+            {
+                $unwind: {
+                    path: "$user",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
             {
                 $facet: {
-                    metadata: [{ $count: "total" }],
+                    metadata: [
+                        {
+                            $count: "total"
+                        }
+                    ],
                     data: [
-                        { $sort: { date: 1, timeSlot: 1 } },
-                        { $skip: skip },
-                        { $limit: limit },
-                        { $addFields: { user: "$userInfo", trainer: "$trainerInfo" } },
-                        { $project: { userInfo: 0, trainerInfo: 0 } }
+                        {
+                            $sort: {
+                                date: 1,
+                                timeSlot: 1
+                            }
+                        },
+                        {
+                            $skip: skip
+                        },
+                        {
+                            $limit: limit
+                        }
                     ]
                 }
             }
         ]);
 
         return {
-            data: results[0].data || [],
-            totalCount: results[0].metadata[0]?.total || 0
+            data: aggregationResult[0]?.data ?? [],
+            totalCount: aggregationResult[0]?.metadata?.[0]?.total ?? 0
         };
     }
-
 
     async findBookedSlots(trainerId: string, date: string): Promise<number[]> {
         const baseDate = new Date(date);
@@ -155,47 +184,59 @@ export class BookingRepoImpl
         return bookings.map((b) => b.timeSlot);
     }
 
-    async findBookingDetails(id: string): Promise<BookingResponseType | null> {
-        const result = await this.model.aggregate([
-            { $match: { bookingId: id } },
+    async findBookingDetails(
+        bookingId: string
+    ): Promise<BookingAggregate | null> {
+
+        const aggregationResult = await this.model.aggregate([
+
+            {
+                $match: {
+                    bookingId
+                }
+            },
 
             {
                 $lookup: {
                     from: "users",
                     localField: "userId",
                     foreignField: "userId",
-                    as: "userDetails"
+                    as: "user"
                 }
             },
+
+            {
+                $unwind: {
+                    path: "$user",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+
             {
                 $lookup: {
                     from: "trainers",
                     localField: "trainerId",
                     foreignField: "trainerId",
-                    as: "trainerDetails"
+                    as: "trainer"
                 }
             },
 
-            { $unwind: { path: "$userDetails", preserveNullAndEmptyArrays: true } },
-            { $unwind: { path: "$trainerDetails", preserveNullAndEmptyArrays: true } },
-
             {
-                $addFields: {
-                    user: "$userDetails",
-                    trainer: "$trainerDetails"
+                $unwind: {
+                    path: "$trainer",
+                    preserveNullAndEmptyArrays: true
                 }
             },
 
             {
                 $project: {
-                    userDetails: 0,
-                    trainerDetails: 0,
                     userId: 0,
                     trainerId: 0
                 }
             }
         ]);
-        return result.length > 0 ? result[0] : null;
+
+        return aggregationResult[0] ?? null;
     }
 
     async updateBooking(id: string, booking: BookingEntity): Promise<void> {
@@ -329,12 +370,34 @@ export class BookingRepoImpl
         return result.length > 0 ? result[0].totalEarnings : 0;
     }
 
-    async getPendingActions(trainerId: string): Promise<BookingResponseType[]> {
-        const docs = await this.model.aggregate([
+    async getPendingActions(
+        trainerId: string
+    ): Promise<BookingAggregate[]> {
+
+        const aggregationResult = await this.model.aggregate([
             {
                 $match: {
-                    trainerId: trainerId,
-                    status: { $in: [BOOKING_STATUS.PENDING, BOOKING_STATUS.RESCHEDULE_REQUESTED] }
+                    trainerId,
+                    status: {
+                        $in: [
+                            BOOKING_STATUS.PENDING,
+                            BOOKING_STATUS.RESCHEDULE_REQUESTED
+                        ]
+                    }
+                }
+            },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "userId",
+                    foreignField: "userId",
+                    as: "user"
+                }
+            },
+            {
+                $unwind: {
+                    path: "$user",
+                    preserveNullAndEmptyArrays: true
                 }
             },
             {
@@ -342,53 +405,69 @@ export class BookingRepoImpl
                     from: "trainers",
                     localField: "trainerId",
                     foreignField: "trainerId",
-                    as: "trainerInfo"
-                }
-            },
-            { $unwind: { path: "$trainerInfo", preserveNullAndEmptyArrays: true } },
-            {
-                $lookup: {
-                    from: "users",
-                    localField: "userId",
-                    foreignField: "userId",
-                    as: "userInfo"
-                }
-            },
-            { $unwind: { path: "$userInfo", preserveNullAndEmptyArrays: true } },
-
-            {
-                $addFields: {
-                    user: "$userInfo",
-                    trainer: "$trainerInfo"
+                    as: "trainer"
                 }
             },
             {
-                $sort: { updatedAt: -1 }
+                $unwind: {
+                    path: "$trainer",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $sort: {
+                    updatedAt: -1
+                }
             },
             {
                 $project: {
-                    userInfo: 0,
-                    trainerInfo: 0
+                    userId: 0,
+                    trainerId: 0
                 }
             }
         ]);
-
-        return docs;
+        return aggregationResult;
     }
 
-    async getUpcomingAppointmentsByDate(trainerId: string, date: Date): Promise<BookingResponseType[]> {
+    async getUpcomingAppointmentsByDate(
+        trainerId: string,
+        date: Date
+    ): Promise<BookingAggregate[]> {
+
         const startOfDay = new Date(date);
         startOfDay.setHours(0, 0, 0, 0);
 
         const endOfDay = new Date(date);
         endOfDay.setHours(23, 59, 59, 999);
 
-        const docs = await this.model.aggregate([
+        const aggregationResult = await this.model.aggregate([
             {
                 $match: {
-                    trainerId: trainerId,
-                    date: { $gte: startOfDay, $lte: endOfDay },
-                    status: { $in: [BOOKING_STATUS.COMPLETED, BOOKING_STATUS.CONFIRMED] }
+                    trainerId,
+                    date: {
+                        $gte: startOfDay,
+                        $lte: endOfDay
+                    },
+                    status: {
+                        $in: [
+                            BOOKING_STATUS.CONFIRMED,
+                            BOOKING_STATUS.COMPLETED
+                        ]
+                    }
+                }
+            },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "userId",
+                    foreignField: "userId",
+                    as: "user"
+                }
+            },
+            {
+                $unwind: {
+                    path: "$user",
+                    preserveNullAndEmptyArrays: true
                 }
             },
             {
@@ -396,37 +475,28 @@ export class BookingRepoImpl
                     from: "trainers",
                     localField: "trainerId",
                     foreignField: "trainerId",
-                    as: "trainerInfo"
-                }
-            },
-            { $unwind: "$trainerInfo" },
-            {
-                $lookup: {
-                    from: "users",
-                    localField: "userId",
-                    foreignField: "userId",
-                    as: "userInfo"
-                }
-            },
-            { $unwind: "$userInfo" },
-
-            {
-                $addFields: {
-                    user: "$userInfo",
-                    trainer: "$trainerInfo"
+                    as: "trainer"
                 }
             },
             {
-                $sort: { timeSlot: 1 }
+                $unwind: {
+                    path: "$trainer",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $sort: {
+                    timeSlot: 1
+                }
             },
             {
                 $project: {
-                    userInfo: 0,
-                    trainerInfo: 0
+                    userId: 0,
+                    trainerId: 0
                 }
             }
         ]);
-        return docs;
+        return aggregationResult;
     }
 
     async findUpcomingBookingCount(trainerId: string): Promise<number> {
@@ -580,7 +650,7 @@ export class BookingRepoImpl
         ]);
     }
 
-    async getAdminDashboardMetrics(range: '7days' | '6months' = '7days'): Promise<AdminDashboardMetrics> {
+    async getAdminDashboardMetrics(range: '7days' | '6months' = '7days'): Promise<AdminDashboardMetricsAggregate> {
         const now = new Date();
 
         const todayStart = new Date(now);

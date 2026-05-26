@@ -1,38 +1,57 @@
-import { LoginResponseDTO } from "application/dto/auth/login.dto";
+import { LoginResponseDTO, LoginResponseSchema } from "application/dto/auth/shared/login.response.dto";
 import { UserEntity } from "domain/entities/UserEntity";
 import { TrainerEntity } from "domain/entities/TrainerEntity";
-import { ClientSessionDTO, TrainerSessionDTO } from "application/dto/auth/verify-session.dto";
+import { ClientSessionResponseDTO, ClientSessionResponseSchema } from "application/dto/account/user/verify-session.dto";
+import { TrainerSessionResponseDTO, TrainerSessionResponseSchema } from "application/dto/account/trainer/verify-session";
 import { UserRole } from "domain/constants/user-role";
-import { AuthUser } from "application/dto/auth/login.dto";
+import { AuthUserPayloadDTO } from "application/dto/auth/shared/login.response.dto";
+import { RefreshAccessTokenResponseDTO, RefreshAccessTokenResponseSchema } from "application/dto/auth/shared/refresh-token.dto";
+import { RegisterResponseDTO, RegisterResponseSchema } from "application/dto/auth/shared/register.response.dto";
+
 export class AuthMapper {
-  static toLoginResponse(
-    accessToken: string,
-    refreshToken: string,
-    role: UserRole,
-    user: AuthUser
-  ): LoginResponseDTO {
-    return {
+  static toLoginResponseDTO(accessToken: string, refreshToken: string, role: UserRole, user: AuthUserPayloadDTO): LoginResponseDTO {
+
+    return LoginResponseSchema.parse({
       accessToken,
       refreshToken,
       role,
       user
-    };
+    });
   }
-  static toVerifySessionResponseDTO(entity: UserEntity): ClientSessionDTO {
-    return {
-      name: entity.name,
-      profilePic: entity.profilePic || '',
-      status: entity.status!,
-      role: UserRole.USER
-    }
+
+  static toRegisterResponseDTO(email: string): RegisterResponseDTO {
+
+    return RegisterResponseSchema.parse({
+      email
+    });
   }
-  static toVerifyTrainerSessionResponseDTO(entity: TrainerEntity): TrainerSessionDTO {
-    return {
+
+  static toClientSessionResponseDTO(entity: UserEntity): ClientSessionResponseDTO {
+
+    return ClientSessionResponseSchema.parse({
       name: entity.name,
-      profilePic: entity.profilePic || '',
-      status: entity.status!,
+      role: entity.role,
+      profilePic: entity.profilePic ?? "",
+      status: entity.status
+    });
+  }
+
+  static toTrainerSessionResponseDTO(trainer: TrainerEntity): TrainerSessionResponseDTO {
+
+    return TrainerSessionResponseSchema.parse({
+      name: trainer.name,
+      profilePic: trainer.profilePic ?? "",
+      status: trainer.status,
       role: UserRole.TRAINER,
-      verified: entity.verified
-    }
+      verified: trainer.verified
+    });
+  }
+
+  static toRefreshAccessTokenResponseDTO(accessToken: string, role: UserRole): RefreshAccessTokenResponseDTO {
+
+    return RefreshAccessTokenResponseSchema.parse({
+      accessToken,
+      role
+    });
   }
 }

@@ -3,13 +3,13 @@ import { inject, injectable } from "tsyringe";
 import { HttpStatus } from 'utils/HttpStatus';
 import { SUCCESS_MESSAGES } from 'utils/SuccessMessages';
 import { I_GET_ADMIN_LEAVE_METRICS_TOKEN, IGetAdminLeaveMetrics } from 'application/interfaces/leave/i-admin-leave-metrics';
-import { FetchAdminLeaveResponseDTO, FetchLeaveRequestsInputDTO } from 'application/dto/leave/leave-requests.dto';
 import { I_FETCH_ALL_ADMIN_LEAVE_REQUESTS_TOKEN, IFetchAllLeaveRequests } from 'application/interfaces/leave/i-fetch-all-leave-requests';
 import { I_UPDATE_LEAVE_STATUS_TOKEN, IUpdateLeaveStatus } from 'application/interfaces/leave/i-update-leave-status';
-import { UpdateLeaveStatusRequestDTO } from 'application/dto/leave/update-status.dto';
 import { IExportLeaveReport, I_EXPORT_LEAVE_REPORT_TOKEN } from 'application/interfaces/leave/i-export-leave-resport';
-import { PAGINATION, FILE_CONSTANTS } from 'utils/Constants';
+import { FILE_CONSTANTS } from 'utils/Constants';
 import { FileResponseHelper } from 'utils/file.constants';
+import { FetchAdminLeaveResponseDTO } from 'application/dto/leave/admin/leave-list.dto';
+import { fetchAllLeaveQueryDTO } from 'application/dto/leave/shared/leave-requests.dto';
 
 @injectable()
 export class AdminLeaveManagementController {
@@ -41,23 +41,15 @@ export class AdminLeaveManagementController {
 
     getLeaveRequestsHistory = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const rawSearch = req.query.search;
-            const search = typeof rawSearch === 'string' ? rawSearch : "";
-            const fetchPayload: FetchLeaveRequestsInputDTO = {
-                currentPage: Number(req.query.pageNo) || 1,
-                limit: Number(req.query.limit) || PAGINATION.DEFAULT_LIMIT,
-                filter: {
-                    search: search || ""
-                }
-            };
 
-            const historyResult =
-                await this._getLeaveHistoryUseCase.execute(fetchPayload);
+            const query = req.query as unknown as fetchAllLeaveQueryDTO
+
+            const historyResult = await this._getLeaveHistoryUseCase.execute(query);
 
             res.status(HttpStatus.OK).json({
                 success: true,
                 data: historyResult.data,
-                total: historyResult.total
+                total: historyResult.totalCount
             });
 
         } catch (err) {
@@ -67,11 +59,7 @@ export class AdminLeaveManagementController {
 
     updateLeaveStatus = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const statusPayload: UpdateLeaveStatusRequestDTO = {
-                leaveId: req.body.leaveId,
-                status: req.body.status,
-                adminComment: req.body.adminComment
-            };
+            const statusPayload = req.body
 
             await this._updateLeaveStatusUseCase.execute(statusPayload);
 

@@ -3,13 +3,13 @@ import { IAdminRepo, I_ADMIN_REPO_TOKEN } from "domain/repositories/IAdminRepo";
 import { ISecurityService, I_SECURITY_SERVICE_TOKEN } from "domain/services/i-security-service";
 import { I_JWT_SERVICE_TOKEN, IJwtService } from "domain/services/i-jwt.service";
 import { ILoginUseCase } from "application/interfaces/auth/i-login.usecase";
-import { LoginResponseDTO, LoginRequestDTO, AuthUser } from "application/dto/auth/login.dto";
 import { AppError } from "domain/errors/AppError";
 import { HttpStatus } from "utils/HttpStatus";
 import { AuthMapper } from "application/mappers/auth-mapper";
 import { UserRole } from "domain/constants/user-role";
 import { ERROR_MESSAGES } from "utils/ErrorMessage";
-
+import { LoginRequestDTO } from "application/dto/auth/shared/login.request.dto";
+import { AuthUserPayloadDTO, LoginResponseDTO } from "application/dto/auth/shared/login.response.dto";
 @injectable()
 export class AdminLoginUsecase implements ILoginUseCase {
   constructor(
@@ -49,13 +49,13 @@ export class AdminLoginUsecase implements ILoginUseCase {
     const accessToken = this._jwtService.generateAccessToken(tokenPayload);
     const refreshToken = this._jwtService.generateRefreshToken(tokenPayload);
 
-    const authenticatedAdmin: AuthUser = {
+    const authenticatedAdmin: AuthUserPayloadDTO = {
       id: adminAccount.adminId,
       name: adminAccount.name,
       email: adminAccount.email
     };
 
-    return AuthMapper.toLoginResponse(
+    return AuthMapper.toLoginResponseDTO(
       accessToken,
       refreshToken,
       UserRole.ADMIN,

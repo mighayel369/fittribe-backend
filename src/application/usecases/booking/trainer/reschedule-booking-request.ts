@@ -1,6 +1,6 @@
 import { inject, injectable } from "tsyringe";
 import { IRequestBookingRescheduleUseCase } from "application/interfaces/booking/i-request-booking-reschedule.usecase";
-import { RescheduleRequestDTO } from "application/dto/booking/reschedule-request.dto";
+import { RescheduleRequestDTO } from "application/dto/booking/shared/reschedule-request.dto";
 import { IBookingRepo, I_BOOKING_REPO_TOKEN } from "domain/repositories/IBookingRepo";
 import { AppError } from "domain/errors/AppError";
 import { ERROR_MESSAGES } from "utils/ErrorMessage";
@@ -14,8 +14,8 @@ export class RescheduleBookingByTrainer implements IRequestBookingRescheduleUseC
     private readonly _bookingRepository: IBookingRepo
   ) { }
 
-  async execute(rescheduleRequest: RescheduleRequestDTO): Promise<void> {
-    const { bookingId, newDate, newTimeSlot, reason, trainerId } = rescheduleRequest;
+  async execute(rescheduleRequest: RescheduleRequestDTO, trainerId: string): Promise<void> {
+    const { bookingId, newDate, newTimeSlot, reason } = rescheduleRequest;
 
     if (!reason || reason.trim().length < 3) {
       throw new AppError(ERROR_MESSAGES.REASON_NOT_PROVIDED, HttpStatus.BAD_REQUEST);

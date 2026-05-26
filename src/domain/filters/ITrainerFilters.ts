@@ -1,10 +1,21 @@
-import {  TrainerSortOptions } from "utils/Constants";
+
+import { TrainerSortOptions } from "utils/Constants";
 import { TRAINER_STATUS } from "domain/constants/trainer-status";
 import { GENDER } from "domain/constants/gender";
-export interface ITrainerFilters {
-    status?: TRAINER_STATUS
-    search?: string;
-    gender?: GENDER
-    programId?: string;
-    sort?: TrainerSortOptions;
-}
+import { z } from "zod";
+import { LANGUAGE } from "domain/constants/language-type";
+
+
+
+export const TrainerFiltersSchema =
+    z.object({
+        status: z.enum(TRAINER_STATUS).optional(),
+        search: z.string().trim().optional(),
+        gender: z.enum(GENDER).optional(),
+        programId: z.string().trim().optional(),
+        availability: z.string().optional(),
+        language: z.enum(LANGUAGE).optional(),
+        sort: z.enum(TrainerSortOptions).optional()
+    });
+
+export type ITrainerFilters = z.infer<typeof TrainerFiltersSchema>;

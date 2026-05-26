@@ -3,7 +3,7 @@ import { AppError } from 'domain/errors/AppError';
 import PDFDocument from 'pdfkit';
 import { ERROR_MESSAGES } from 'utils/ErrorMessage';
 import { HttpStatus } from 'utils/HttpStatus';
-import logger from 'utils/logger';
+import logger from 'logger';
 export interface PdfTableConfig<T> {
   title: string;
   subtitle?: string;
@@ -83,7 +83,7 @@ export class ReportGeneratorService {
 
         doc.end();
       } catch (error) {
-        logger.error("Failed to generate PDF report:", error);
+       logger.error("Failed to generate PDF report:", error);
         reject(new AppError(ERROR_MESSAGES.PDF_GENERATION_FAILED, HttpStatus.INTERNAL_SERVER_ERROR));
       }
     });

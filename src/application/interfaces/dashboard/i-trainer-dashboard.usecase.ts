@@ -1,4 +1,4 @@
-import { TrainerDashboardResponseDTO } from "application/dto/dashboard/trainer-dashboard.dto";
+import { TrainerDashboardResponseDTO } from "application/dto/dashboard/trainer/trainer-dashboard.dto";
 
 export const I_TRAINER_DASHBOARD_TOKEN = Symbol("I_TRAINER_DASHBOARD_TOKEN");
 

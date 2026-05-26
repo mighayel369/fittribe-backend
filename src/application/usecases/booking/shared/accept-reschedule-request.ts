@@ -2,7 +2,7 @@ import { inject, injectable } from "tsyringe";
 import { IBookingRepo, I_BOOKING_REPO_TOKEN } from "domain/repositories/IBookingRepo";
 import { I_WALLET_REPO_TOKEN, IWalletRepo } from "domain/repositories/IWalletRepo";
 import { IProcessTrainerRescheduleUseCase } from "application/interfaces/booking/i-process-trainer-reschedule.usecase";
-import { ProcessRescheduleRequestDTO } from "application/dto/booking/process-reschedule.dto";
+import { ProcessRescheduleRequestDTO } from "application/dto/booking/shared/process-reschedule.dto";
 import { AppError } from "domain/errors/AppError";
 import { HttpStatus } from "utils/HttpStatus";
 import { ERROR_MESSAGES } from "utils/ErrorMessage";

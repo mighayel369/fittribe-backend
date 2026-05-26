@@ -2,5 +2,5 @@ import { NotificationResponseDTO } from "application/dto/notification/notificati
 
 export const I_GET_ALL_NOTIFICATIONS_TOKEN = Symbol("I_GET_ALL_NOTIFICATIONS_TOKEN");
 export interface IGetNotification {
-    execute(id: string): Promise<NotificationResponseDTO[]>
+    execute(ownerId: string): Promise<NotificationResponseDTO[]>
 }

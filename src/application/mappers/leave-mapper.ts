@@ -1,14 +1,17 @@
-import { RequestLeaveDTO } from "application/dto/leave/request.leave.dto";
+import { RequestLeaveDTO } from "application/dto/leave/trainer/request.leave.dto";
 import { LeaveEntity } from "domain/entities/LeaveEntity";
 import { randomUUID } from "crypto";
 import { LEAVE_TYPES, LEAVE_STATUS } from "domain/constants/leave-status";
-import { TrainerLeaveRequest, AdminLeaveRequest } from "application/dto/leave/leave-requests.dto";
-import { IAdminLeaveDashboard, TrainerLeaveMetrics } from "application/dto/leave/leave-metrics.dto";
+import { AdminLeaveDashboardDto } from "application/dto/leave/admin/leave-metrics.dto";
 import { MAX_LEAVE_COUNT } from "utils/Constants";
-import { LeaveRequestsType } from "domain/repositories/types/leave-type";
-import { LeaveExportDataResponseDTO } from "application/dto/leave/leave-export-data.dto";
+import { LeaveAggregate } from "domain/repositories/types/leave-aggregate";
+import { LeaveExportDataResponseDTO } from "application/dto/leave/admin/leave-export-data.dto";
+import { AdminLeaveResponseDTO, AdminLeaveResponseSchema, FetchAdminLeaveResponseDTO, FetchAdminLeaveResponseSchema } from "application/dto/leave/admin/leave-list.dto";
+import { TrainerLeaveResponse } from "application/dto/leave/trainer/leave-lists.dto";
+import { TrainerLeaveMetricsListSchema } from "application/dto/leave/trainer/trainer-leave-metrics.dto";
+import { TrainerLeaveMetrics } from "application/dto/leave/trainer/trainer-leave-metrics.dto";
 export const LeaveMapper = {
-    toEntity(input: RequestLeaveDTO): LeaveEntity {
+    toEntity(input: RequestLeaveDTO, trainerId: string): LeaveEntity {
         const start = new Date(input.startDate);
         const end = new Date(input.endDate);
         const diffTime = Math.abs(end.getTime() - start.getTime());
@@ -16,7 +19,7 @@ export const LeaveMapper = {
 
         return new LeaveEntity(
             randomUUID(),
-            input.trainerId,
+            trainerId,
             input.type,
             start,
             end,
@@ -27,31 +30,46 @@ export const LeaveMapper = {
     },
 
 
-    toTrainerLeaveMetrics(rawData: { label: string, count: number }[]): TrainerLeaveMetrics[] {
-        const getCount = (type: string): number => rawData.find(d => d.label === type)?.count || 0;
 
-        return [
-            {
-                label: "Sick",
-                usedCount: getCount(LEAVE_TYPES.SICK_LEAVE),
-                totalCount: MAX_LEAVE_COUNT.SICK
-            },
-            {
-                label: "Casual",
-                usedCount: getCount(LEAVE_TYPES.CASUAL_LEAVE),
-                totalCount: MAX_LEAVE_COUNT.CASUAL
-            },
-            {
-                label: "Medical",
-                usedCount: getCount(LEAVE_TYPES.MEDICAL_LEAVE),
-                totalCount: MAX_LEAVE_COUNT.MEDICAL
-            },
-        ];
+    toTrainerLeaveMetrics(
+        rawData: {
+            label: string;
+            count: number;
+        }[]
+    ): TrainerLeaveMetrics[] {
+
+        const getCount = (
+            type: string
+        ): number => {
+
+            return rawData.find(
+                d => d.label === type
+            )?.count || 0;
+        };
+
+        return TrainerLeaveMetricsListSchema
+            .parse([
+                {
+                    label: "Sick",
+                    usedCount: getCount(LEAVE_TYPES.SICK_LEAVE),
+                    totalCount: MAX_LEAVE_COUNT.SICK
+                },
+                {
+                    label: "Casual",
+                    usedCount: getCount(LEAVE_TYPES.CASUAL_LEAVE),
+                    totalCount: MAX_LEAVE_COUNT.CASUAL
+                },
+                {
+                    label: "Medical",
+                    usedCount: getCount(LEAVE_TYPES.MEDICAL_LEAVE),
+                    totalCount: MAX_LEAVE_COUNT.MEDICAL
+                }
+            ]);
     },
     toAdminLeaveMetrics(rawData: {
         approvalStatus: { label: string, count: number }[],
         leaveTypes: { label: string, count: number }[]
-    }): IAdminLeaveDashboard {
+    }): AdminLeaveDashboardDto {
 
         const totalRequestsCount = rawData.approvalStatus.reduce((acc, curr) => acc + curr.count, 0);
 
@@ -64,7 +82,7 @@ export const LeaveMapper = {
         };
     },
 
-    toExportDTO(data: LeaveRequestsType): LeaveExportDataResponseDTO {
+    toExportDTO(data: LeaveAggregate): LeaveExportDataResponseDTO {
         return {
             trainerName: data.trainer.name,
             type: data.leave.type,
@@ -74,27 +92,77 @@ export const LeaveMapper = {
         };
     },
 
-    toExportDTOList(records: LeaveRequestsType[]): LeaveExportDataResponseDTO[] {
+    toExportDTOList(records: LeaveAggregate[]): LeaveExportDataResponseDTO[] {
         return records.map(record => this.toExportDTO(record));
     },
 
-    toAdminLeaveRequestDTO(data: LeaveRequestsType): AdminLeaveRequest {
-        return {
-            leaveId: data.leave.leaveId,
-            type: data.leave.type,
-            startDate: new Date(data.leave.start).toISOString(),
-            endDate: new Date(data.leave.end).toISOString(),
-            days: data.leave.days,
-            reason: data.leave.reason,
-            status: data.leave.status,
-            submittedAt: new Date(data.leave.createdAt ?? Date.now()).toISOString(),
-            trainerId: data.trainer.trainerId,
-            trainerName: data.trainer.name,
-            trainerProfilePic: data.trainer.profilePic || ""
-        };
+
+    toAdminLeaveResponseDTO(
+        data: LeaveAggregate
+    ): AdminLeaveResponseDTO {
+
+        return AdminLeaveResponseSchema.parse({
+            leaveId:
+                data.leave.leaveId,
+
+            type:
+                data.leave.type,
+
+            startDate:
+                new Date(data.leave.start)
+                    .toISOString(),
+
+            endDate:
+                new Date(data.leave.end)
+                    .toISOString(),
+
+            days:
+                data.leave.days,
+
+            reason:
+                data.leave.reason,
+
+            status:
+                data.leave.status,
+
+            submittedAt:
+                new Date(
+                    data.leave.createdAt ?? Date.now()
+                ).toISOString(),
+
+            adminComment:
+                data.leave.adminComment,
+
+            trainerId:
+                data.trainer.trainerId,
+
+            trainerName:
+                data.trainer.name,
+
+            trainerProfilePic:
+                data.trainer.profilePic || ""
+        });
     },
 
-    toTrainerLeaveRequestDTO(data: LeaveRequestsType): TrainerLeaveRequest {
+    toFetchAdminLeaveResponseDTO(
+        data: AdminLeaveResponseDTO[],
+        totalCount: number,
+        currentPage: number,
+        limit: number
+    ): FetchAdminLeaveResponseDTO {
+
+        return FetchAdminLeaveResponseSchema.parse({
+            data,
+
+            totalCount,
+
+            currentPage,
+
+            totalPages:
+                Math.ceil(totalCount / limit)
+        });
+    },
+    toTrainerLeaveRequestDTO(data: LeaveAggregate): TrainerLeaveResponse {
         return {
             leaveId: data.leave.leaveId,
             type: data.leave.type,

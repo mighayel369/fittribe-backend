@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import config from "config";
-import logger from "utils/logger";
+import logger from "../../logger"
 import { AppError } from "domain/errors/AppError";
 import { ERROR_MESSAGES } from "utils/ErrorMessage";
 import { HttpStatus } from "utils/HttpStatus";

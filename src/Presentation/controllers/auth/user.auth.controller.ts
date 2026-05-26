@@ -3,18 +3,22 @@ import { inject, injectable } from "tsyringe";
 import { HttpStatus } from 'utils/HttpStatus';
 import { SUCCESS_MESSAGES } from 'utils/SuccessMessages';
 import { I_CLIENT_LOGIN_USECASE_TOKEN, ILoginUseCase } from 'application/interfaces/auth/i-login.usecase';
-import { LoginRequestDTO, LoginResponseDTO } from 'application/dto/auth/login.dto';
 import { I_CLIENT_REGISTER_USECASE_TOKEN, IRegisterUseCase } from 'application/interfaces/auth/i-register.usecase';
-import { RegisterResponseDTO, UserRegisterRequestDTO } from 'application/dto/auth/register.dto';
-import { ISendPasswordResetLinkUseCase } from 'application/interfaces/auth/i-send-password-reset-link.usecase';
-import { ResetPasswordTokenBasedDTO } from 'application/dto/auth/change-password.dto';
-import { I_RESET_PASSWORD_TOKEN, IChangePasswordUseCase } from 'application/interfaces/auth/i-change-password.usecase';
-import { I_VERIFY_USER_ACCOUNT_TOKEN, IVerifyAccountUseCase } from 'application/interfaces/public/i-verify-otp.usecase';
-import { VerifyAccountRequestDTO } from 'application/dto/public/verify-account.dto';
+import { ISendPasswordResetLinkUseCase, I_CLIENT_PASSWORD_RESET_USECASE_TOKEN } from 'application/interfaces/auth/i-send-password-reset-link.usecase';
+import { I_VERIFY_USER_ACCOUNT_TOKEN, IVerifyAccountUseCase } from 'application/interfaces/auth/i-verify-otp.usecase';
+import { VerifyAccountRequestDTO } from 'application/dto/auth/shared/verify-account.dto';
 import { AUTH_CONSTANTS } from 'utils/Constants';
 import { COOKIE_CONFIG } from 'utils/authConfig';
 import { ERROR_MESSAGES } from 'utils/ErrorMessage';
 import { getOAuthErrorUrl, getOAuthSuccessUrl } from 'utils/UrlHelper';
+import { UserRegisterRequestDTO } from 'application/dto/auth/user/user.register.dto';
+import { LoginRequestDTO } from 'application/dto/auth/shared/login.request.dto';
+import { ResetPasswordRequestDTO } from 'application/dto/auth/shared/reset-password.dto';
+import { ForgotPasswordRequestDTO } from 'application/dto/auth/shared/forgot-password.dto';
+import { RegisterResponseDTO } from 'application/dto/auth/shared/register.response.dto';
+import { I_RESET_PASSWORD_USECASE_TOKEN, IResetPasswordUseCase } from 'application/interfaces/auth/i-reset-password.usecase';
+
+
 @injectable()
 export class UserAuthController {
     constructor(
@@ -24,20 +28,23 @@ export class UserAuthController {
         @inject(I_CLIENT_LOGIN_USECASE_TOKEN)
         private readonly _loginUserUseCase: ILoginUseCase,
 
-        @inject(I_RESET_PASSWORD_TOKEN)
+        @inject(I_CLIENT_PASSWORD_RESET_USECASE_TOKEN)
         private readonly _sendResetMailUseCase: ISendPasswordResetLinkUseCase,
 
-        @inject(I_RESET_PASSWORD_TOKEN)
-        private readonly _resetPasswordUseCase: IChangePasswordUseCase<ResetPasswordTokenBasedDTO>,
+        @inject(I_RESET_PASSWORD_USECASE_TOKEN)
+        private readonly _resetPasswordUseCase: IResetPasswordUseCase,
 
         @inject(I_VERIFY_USER_ACCOUNT_TOKEN)
         private readonly _verifyAccountUseCase: IVerifyAccountUseCase,
     ) { }
 
+
     login = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const loginCredentials: LoginRequestDTO = req.body;
-            const authResult: LoginResponseDTO = await this._loginUserUseCase.execute(loginCredentials);
+
+            const loginCredentials: LoginRequestDTO = req.body
+            const authResult = await this._loginUserUseCase.execute(loginCredentials);
+
             res.cookie(
                 AUTH_CONSTANTS.REFRESH_TOKEN_COOKIE,
                 authResult.refreshToken,
@@ -46,6 +53,7 @@ export class UserAuthController {
 
             res.status(HttpStatus.OK).json({
                 success: true,
+                message: SUCCESS_MESSAGES.AUTH.LOGIN_SUCCESSFULL,
                 accessToken: authResult.accessToken,
                 role: authResult.role,
                 user: authResult.user
@@ -57,10 +65,9 @@ export class UserAuthController {
 
     register = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const registrationDetails: UserRegisterRequestDTO = req.body;
 
-            const registrationResult: RegisterResponseDTO =
-                await this._registerUserUseCase.execute(registrationDetails);
+            const registrationDetails: UserRegisterRequestDTO = req.body
+            const registrationResult: RegisterResponseDTO = await this._registerUserUseCase.execute(registrationDetails);
 
             res.status(HttpStatus.CREATED).json({
                 success: true,
@@ -70,16 +77,19 @@ export class UserAuthController {
         } catch (error) {
             next(error);
         }
-    };
+    }
 
     forgotPassword = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const { email } = req.body;
+
+            const { email }: ForgotPasswordRequestDTO = req.body;
+
             await this._sendResetMailUseCase.execute(email);
 
             res.status(HttpStatus.OK).json({
                 success: true,
-                message: SUCCESS_MESSAGES.USER.RESET_LINK_SENTED
+                message:
+                    SUCCESS_MESSAGES.USER.RESET_LINK_SENTED
             });
         } catch (error) {
             next(error);
@@ -88,19 +98,16 @@ export class UserAuthController {
 
     resetPassword = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const { password, token } = req.body;
 
-            const resetPasswordPayload: ResetPasswordTokenBasedDTO = {
-                token: token,
-                newPassword: password
-            };
+            const resetPasswordPayload: ResetPasswordRequestDTO = req.body;
 
             await this._resetPasswordUseCase.execute(resetPasswordPayload);
 
             res.status(HttpStatus.OK).json({
                 success: true,
-                message: SUCCESS_MESSAGES.USER.PASSWORD_UPDATED,
+                message: SUCCESS_MESSAGES.USER.PASSWORD_UPDATED
             });
+
         } catch (error) {
             next(error);
         }
@@ -108,14 +115,18 @@ export class UserAuthController {
 
     verifyOtp = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const verificationPayload: VerifyAccountRequestDTO = req.body;
 
-            await this._verifyAccountUseCase.execute(verificationPayload);
+            const verificationRequest: VerifyAccountRequestDTO = req.body;
+
+            await this._verifyAccountUseCase.execute(
+                verificationRequest
+            );
 
             res.status(HttpStatus.OK).json({
                 success: true,
                 message: SUCCESS_MESSAGES.AUTH.AUTHORIZED_SUCCESSFULLY
             });
+
         } catch (error) {
             next(error);
         }
@@ -123,15 +134,13 @@ export class UserAuthController {
 
     googleCallback = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const authData = req.user as { accessToken: string; user: unknown } | undefined;
-
-            if (!authData) {
+            const oauthSession = req.user
+            if (!oauthSession) {
                 return res.redirect(getOAuthErrorUrl(ERROR_MESSAGES.UNAUTHORIZED));
             }
 
-            const { accessToken, user } = authData;
-
-            res.redirect(getOAuthSuccessUrl(accessToken, user));
+            const { accessToken, user } = oauthSession;
+            res.redirect(getOAuthSuccessUrl(accessToken, user))
 
         } catch (error) {
             next(error);

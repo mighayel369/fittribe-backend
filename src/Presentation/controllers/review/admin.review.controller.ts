@@ -1,12 +1,11 @@
 import { NextFunction, Request, Response } from "express";
 import { inject, injectable } from "tsyringe";
-import { AdminReviewListResponseDTO } from "application/dto/review/review-list.dto";
+import { AdminReviewListResponseDTO } from "application/dto/review/admin/review-list.dto";
 import { I_GET_ADMIN_REVIEW_LISTS_TOKEN, IGetAdminReviewLists } from "application/interfaces/review/i-get-admin-review-list";
 import { I_FLAG_REVIEW_TOKEN, IFlagReview } from "application/interfaces/review/i-flag-review";
 import { HttpStatus } from "utils/HttpStatus";
 import { AppError } from "domain/errors/AppError";
 import { ERROR_MESSAGES } from "utils/ErrorMessage";
-import { ReviewParams } from "Presentation/interfaces/request.params";
 import { SUCCESS_MESSAGES } from "utils/SuccessMessages";
 
 @injectable()
@@ -21,8 +20,7 @@ export class AdminReviewController {
 
     getReviewList = async (_req: Request, res: Response, next: NextFunction) => {
         try {
-            const reviewModerationList: AdminReviewListResponseDTO =
-                await this._getAdminReviewListUseCase.execute();
+            const reviewModerationList: AdminReviewListResponseDTO = await this._getAdminReviewListUseCase.execute();
 
             res.status(HttpStatus.OK).json({
                 success: true,
@@ -35,7 +33,7 @@ export class AdminReviewController {
     }
 
 
-    flagReview = async (req: Request<ReviewParams>, res: Response, next: NextFunction) => {
+    flagReview = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { reviewId } = req.params;
 

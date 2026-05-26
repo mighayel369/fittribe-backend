@@ -2,20 +2,21 @@ import express from "express";
 import { UserPaymentController } from "Presentation/controllers/payment/user.payment.controller";
 import { container } from "tsyringe";
 import { validateRequest } from "Presentation/middleware/validate.middleware";
-import { initiatePaymentSchema,verifyPaymentSchema } from "Presentation/validators/payment-schema";
+import { CreateOnlinePaymentSchema } from "application/dto/payment/create-online-payment.dto";
+import { VerifyPaymentRequestSchema } from "application/dto/payment/online-payment.dto";
 const router = express.Router();
 const ctrl = container.resolve(UserPaymentController);
 
 
 router.post(
-  '/initiate', 
-  validateRequest(initiatePaymentSchema), 
+  '/initiate',
+  validateRequest(CreateOnlinePaymentSchema),
   ctrl.initiateOnlinePayment
 );
 
 router.post(
-  '/verify', 
-  validateRequest(verifyPaymentSchema), 
+  '/verify',
+  validateRequest(VerifyPaymentRequestSchema),
   ctrl.verifyOnlinePayment
 );
 

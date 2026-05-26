@@ -2,20 +2,38 @@ import { Request, Response, NextFunction } from "express";
 import { ZodType } from "zod";
 import { HttpStatus } from "utils/HttpStatus";
 
-type Location = "body" | "query" | "params" | "user";
+type Location = "body" | "query" | "params" | "user" | "file";
 
-export const validateRequest = (schema: ZodType<unknown>, location: Location = "body") =>
-    (req: Request, res: Response, next: NextFunction) => {
-        const target = req[location];
+export const validateRequest = <T>(schema: ZodType<T>, location: Location = "body") => {
+    return (req: Request, res: Response, next: NextFunction): void => {
+        try {
+            const target = req[location];
 
-        const result = schema.safeParse(target);
-        if (!result.success) {
-            const errorMessages = result.error.issues.map((err) => err.message);
+            if (location === "file" && !target) {
+                return next();
+            }
 
-            res.status(HttpStatus.BAD_REQUEST).json({ success: false, message: errorMessages[0].split(":")[0] || errorMessages[0] || errorMessages });
-            return;
-        };
+            const result = schema.safeParse(target);
 
-        Object.assign(req[location], result.data);
-        next();
+            if (!result.success) {
+                const errorMessages = result.error.issues.map((err) => err.message);
+                res.status(HttpStatus.BAD_REQUEST).json({
+                    success: false,
+                    message: errorMessages[0]
+                });
+                return;
+            }
+
+            Object.defineProperty(req, location, {
+                value: result.data,
+                writable: true,
+                configurable: true,
+                enumerable: true
+            });
+
+            next();
+        } catch (err) {
+            next(err);
+        }
     };
+};

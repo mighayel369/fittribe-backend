@@ -5,7 +5,6 @@ import { HttpStatus } from "../../../utils/HttpStatus";
 import { AppError } from "domain/errors/AppError";
 import { ERROR_MESSAGES } from "utils/ErrorMessage";
 import { IMarkAsRead, I_MARK_ALL_NOTIFICATIONS_AS_READ_TOKEN, I_MARK_NOTIFICATION_AS_READ_TOKEN } from "application/interfaces/notification/i-mark-as-read";
-import { NotificationParams } from "Presentation/interfaces/request.params";
 import { SUCCESS_MESSAGES } from "utils/SuccessMessages";
 
 @injectable()
@@ -30,6 +29,7 @@ export class NotificationController {
             }
 
             const userNotifications = await this._getNotificationsUseCase.execute(userId);
+
             res.status(HttpStatus.OK).json({
                 success: true,
                 message: SUCCESS_MESSAGES.NOTIFICATION.NOTIFICATION_FETCHED_SUCCESSFULLY,
@@ -40,7 +40,7 @@ export class NotificationController {
         }
     }
 
-    markAsRead = async (req: Request<NotificationParams>, res: Response, next: NextFunction) => {
+    markAsRead = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { notificationId } = req.params;
 

@@ -2,16 +2,18 @@ import express from "express";
 import { container } from "tsyringe";
 import { AdminBookingController } from "Presentation/controllers/booking/admin.booking.controller";
 import { validateRequest } from "Presentation/middleware/validate.middleware";
-import { bookingIdSchema,bookingMetricsSchema } from "Presentation/validators/booking.mngmnt.schema";
+import { BookingMetricsQuerySchema } from "application/dto/booking/admin/booking-dashboard.request.dto";
+import { BookingParamsSchema } from "application/dto/booking/shared/fetch-booking-detaiils.request.dto";
+import { FetchAllBookingQuerySchema } from "application/dto/booking/shared/fetch-all-bookings.request.dto";
 const router = express.Router();
 const ctrl = container.resolve(AdminBookingController);
 
 
-router.get('/all',ctrl.getAllBookings)
+router.get('/all', validateRequest(FetchAllBookingQuerySchema, 'query'), ctrl.getAllBookings)
 router.get(
   '/booking-metrics',
-  validateRequest(bookingMetricsSchema, 'query'), 
+  validateRequest(BookingMetricsQuerySchema, 'query'),
   ctrl.getBookingMetrics
 );
-router.get('/details/:bookingId',validateRequest(bookingIdSchema,'params'),ctrl.getBookingDetails)
+router.get('/details/:bookingId', validateRequest(BookingParamsSchema, 'params'), ctrl.getBookingDetails)
 export default router;

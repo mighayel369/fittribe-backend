@@ -1,5 +1,5 @@
 import { inject, injectable } from "tsyringe";
-import { RequestLeaveDTO } from "application/dto/leave/request.leave.dto";
+import { RequestLeaveDTO } from "application/dto/leave/trainer/request.leave.dto";
 import { IApplyLeaveRequest } from "application/interfaces/leave/i-apply-leave-requests.usecase";
 import { ILeaveRepo, I_LEAVE_REPO_TOKEN } from "domain/repositories/ILeaveRepo";
 import { I_CLOUDINARY_SERVICE_TOKEN, ICloudinaryService } from "domain/services/ICloudinaryService";
@@ -19,8 +19,8 @@ export class ApplyLeaveRequests implements IApplyLeaveRequest {
     private readonly _cloudinaryService: ICloudinaryService
   ) { }
 
-  async execute(requestPayload: RequestLeaveDTO): Promise<void> {
-    const { startDate, trainerId, endDate, type } = requestPayload;
+  async execute(requestPayload: RequestLeaveDTO, trainerId: string): Promise<void> {
+    const { startDate, endDate, type } = requestPayload;
 
     const start = new Date(startDate);
     start.setHours(0, 0, 0, 0);
@@ -30,12 +30,12 @@ export class ApplyLeaveRequests implements IApplyLeaveRequest {
     const isOverlapping = await this._leaveRepository.checkOverlap(trainerId, start, end);
     if (isOverlapping) {
       throw new AppError(
-      ERROR_MESSAGES.LEAVE_ALREADY_EXISTED,
+        ERROR_MESSAGES.LEAVE_ALREADY_EXISTED,
         HttpStatus.BAD_REQUEST
       );
     }
 
-    const leaveEntity = LeaveMapper.toEntity(requestPayload);
+    const leaveEntity = LeaveMapper.toEntity(requestPayload,trainerId);
     const leaveCounts = await this._leaveRepository.getTrainerLeaveCounts(trainerId);
 
     const currentUsage = leaveCounts.find(c => c.label === type)?.count || 0;

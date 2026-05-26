@@ -6,20 +6,18 @@ import { AppError } from 'domain/errors/AppError';
 import { SUCCESS_MESSAGES } from 'utils/SuccessMessages';
 import { I_FETCH_TRAINER_ALL_BOOKINGS_TOKEN, I_FETCH_TRAINER_PENDING_BOOKINGS_TOKEN, I_FETCH_TRAINER_RESCHEDULE_REQUESTS_TOKEN, IFetchAllBookingsUseCase } from 'application/interfaces/booking/i-fetch-all-bookings.usecase';
 import { IFetchBookingDetails, I_FETCH_TRAINER_BOOKING_DETAILS_TOKEN } from 'application/interfaces/booking/i-fetch-booking-details.usecase';
-import { FetchAllTrainerBookingRequestDTO, FetchAllTrainerBookingsResponseDTO, FetchAllTrainerPendingBookingsResponseDTO, FetchAllTrainerRescheduleBookingsResponseDTO } from "application/dto/booking/fetch-all-bookings.dto";
-import { TrainerBookingDetailsResponseDTO } from "application/dto/booking/fetch-booking-details.dto";
+import { TrainerBookingDetailsResponseDTO } from 'application/dto/booking/trainer/trainer-booking-details.response.dto';
 import { IConfirmBookingUseCase, I_CONFIRM_BOOKING_USE_CASE_TOKEN } from "application/interfaces/booking/i-confirm-booking.usecase";
 import { IDeclineBookingUseCase, I_DECLINE_BOOKING_USE_CASE_TOKEN } from "application/interfaces/booking/i-decline-booking-request.usecase";
-import { ProcessRescheduleRequestDTO } from "application/dto/booking/process-reschedule.dto";
+import { ProcessRescheduleRequestDTO } from "application/dto/booking/shared/process-reschedule.dto";
 import { I_ACCEPT_RESCHEDULE_REQUEST_TOKEN, I_DECLINE_RESCHEDULE_REQUEST_TOKEN, IProcessTrainerRescheduleUseCase } from "application/interfaces/booking/i-process-trainer-reschedule.usecase";
-import { RescheduleRequestDTO } from 'application/dto/booking/reschedule-request.dto';
 import { I_TRAINER_RESCHEDULE_BOOKING_TOKEN, IRequestBookingRescheduleUseCase } from 'application/interfaces/booking/i-request-booking-reschedule.usecase';
-import { PAGINATION } from 'utils/Constants';
-import { UserRole } from 'domain/constants/user-role';
-import { I_GET_MEET_LINK_TOKEN, IGetMeetLink } from 'application/interfaces/booking/i-get-meetlink.usecase';
 import { I_MARK_AS_COMPLETE_TOKEN, IMarkAsComplete } from 'application/interfaces/booking/i-mark-as-complete';
-import { BookingParams } from 'Presentation/interfaces/request.params';
-
+import { FetchAllTrainerPendingBookingsResponseDTO } from 'application/dto/booking/trainer/fetch-pending-bookings.dto';
+import { FetchAllTrainerRescheduleBookingsResponseDTO } from 'application/dto/booking/trainer/fetch-reschedule-booking.dto';
+import { FetchAllTrainerBookingsResponseDTO } from 'application/dto/booking/trainer/fetch-trainer-bookings.dto';
+import { fetchAllBookingQueryDTO } from 'application/dto/booking/shared/fetch-all-bookings.request.dto';
+import { BOOKING_STATUS } from 'domain/constants/booking-status';
 @injectable()
 export class TrainerBookingController {
     constructor(
@@ -36,22 +34,19 @@ export class TrainerBookingController {
         private readonly _declineRescheduleUseCase: IProcessTrainerRescheduleUseCase,
 
         @inject(I_FETCH_TRAINER_ALL_BOOKINGS_TOKEN)
-        private readonly _fetchAllBookingsUseCase: IFetchAllBookingsUseCase<FetchAllTrainerBookingRequestDTO, FetchAllTrainerBookingsResponseDTO>,
+        private readonly _fetchAllBookingsUseCase: IFetchAllBookingsUseCase<FetchAllTrainerBookingsResponseDTO>,
 
         @inject(I_FETCH_TRAINER_PENDING_BOOKINGS_TOKEN)
-        private readonly _fetchPendingBookingsUseCase: IFetchAllBookingsUseCase<FetchAllTrainerBookingRequestDTO, FetchAllTrainerPendingBookingsResponseDTO>,
+        private readonly _fetchPendingBookingsUseCase: IFetchAllBookingsUseCase<FetchAllTrainerPendingBookingsResponseDTO>,
 
         @inject(I_FETCH_TRAINER_BOOKING_DETAILS_TOKEN)
         private readonly _fetchBookingDetailsUseCase: IFetchBookingDetails<TrainerBookingDetailsResponseDTO>,
 
         @inject(I_FETCH_TRAINER_RESCHEDULE_REQUESTS_TOKEN)
-        private readonly _fetchRescheduleRequestsUseCase: IFetchAllBookingsUseCase<FetchAllTrainerBookingRequestDTO, FetchAllTrainerRescheduleBookingsResponseDTO>,
+        private readonly _fetchRescheduleRequestsUseCase: IFetchAllBookingsUseCase<FetchAllTrainerRescheduleBookingsResponseDTO>,
 
         @inject(I_TRAINER_RESCHEDULE_BOOKING_TOKEN)
         private readonly _requestRescheduleUseCase: IRequestBookingRescheduleUseCase,
-
-        @inject(I_GET_MEET_LINK_TOKEN)
-        private readonly _getMeetLinkUseCase: IGetMeetLink,
 
         @inject(I_MARK_AS_COMPLETE_TOKEN)
         private readonly _markAsCompleteUseCase: IMarkAsComplete
@@ -60,13 +55,14 @@ export class TrainerBookingController {
 
     acceptBooking = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const { bookingId } = req.body;
+            const { bookingId } = req.params
             await this._confirmBookingUseCase.execute(bookingId);
 
             res.status(HttpStatus.OK).json({
                 success: true,
                 message: SUCCESS_MESSAGES.BOOKING.TRAINER_BOOKING_SUCCESSFULL,
             });
+
         } catch (error) {
             next(error);
         }
@@ -74,9 +70,13 @@ export class TrainerBookingController {
 
     rejectBooking = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const { bookingId, reason } = req.body;
-            await this._declineBookingUseCase.execute(bookingId, reason);
+            const { bookingId } = req.params
+            const { reason } = req.body;
 
+            await this._declineBookingUseCase.execute(
+                bookingId,
+                reason
+            );
             res.status(HttpStatus.OK).json({
                 success: true,
                 message: SUCCESS_MESSAGES.BOOKING.TRAINER_DECLINED_BOOKING
@@ -88,27 +88,26 @@ export class TrainerBookingController {
 
     approveReschedule = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const { bookingId } = req.body;
+            const { bookingId } = req.params
             const performedBy = req.user?.user.role;
 
             if (!performedBy) {
-                throw new AppError(ERROR_MESSAGES.UNAUTHORIZED, HttpStatus.UNAUTHORIZED);
-            }
-
-
-            if (typeof bookingId !== 'string' || !bookingId) {
-                throw new AppError(ERROR_MESSAGES.MISSING_REQUIRED_DATA, HttpStatus.BAD_REQUEST);
+                throw new AppError(
+                    ERROR_MESSAGES.UNAUTHORIZED,
+                    HttpStatus.UNAUTHORIZED
+                );
             }
 
             await this._acceptRescheduleUseCase.execute({
                 bookingId,
-                performedBy: performedBy as UserRole
+                performedBy
             });
 
             res.status(HttpStatus.OK).json({
                 success: true,
                 message: "Reschedule request accepted successfully",
             });
+
         } catch (error) {
             next(error);
         }
@@ -144,18 +143,21 @@ export class TrainerBookingController {
 
     rescheduleByTrainer = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const trainer = req.user;
+            const trainerId = req.user?.user.id;
 
-            if (!trainer || typeof trainer !== 'object' || !('id' in trainer) || typeof trainer.id !== 'string') {
-                throw new AppError(ERROR_MESSAGES.UNAUTHORIZED, HttpStatus.UNAUTHORIZED);
+            if (!trainerId) {
+                throw new AppError(
+                    ERROR_MESSAGES.UNAUTHORIZED,
+                    HttpStatus.UNAUTHORIZED
+                );
             }
 
-            const trainerId = trainer.id;
-            const reschedulePayload: RescheduleRequestDTO = {
-                ...req.body,
+            const payload = req.body
+
+            await this._requestRescheduleUseCase.execute(
+                payload,
                 trainerId
-            }
-            await this._requestRescheduleUseCase.execute(reschedulePayload);
+            );
 
             res.status(HttpStatus.OK).json({
                 success: true,
@@ -169,33 +171,25 @@ export class TrainerBookingController {
     getHistory = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const trainerId = req.user?.user.id;
-
             if (!trainerId) {
                 throw new AppError(ERROR_MESSAGES.UNAUTHORIZED, HttpStatus.UNAUTHORIZED);
             }
-            const dateQuery = req.query.date;
 
-            const validatedDate = typeof dateQuery === 'string' ? new Date(dateQuery) : new Date();
+            const query = req.query as unknown as fetchAllBookingQueryDTO
 
-            const rawSearch = req.query.search;
-            const search = typeof rawSearch === 'string' ? rawSearch : "";
-            const fetchPayload: FetchAllTrainerBookingRequestDTO = {
-                trainerId,
-                currentPage: Math.max(1, Number(req.query.pageNo) || 1),
-                limit: Number(req.query.limit) || PAGINATION.DEFAULT_LIMIT,
-                filter: {
-                    search: search || "",
-                    date: validatedDate
-                }
-            };
+            query.filter = {
+                ...query.filter,
+                trainerId
+            }
 
-            const bookingsHistory = await this._fetchAllBookingsUseCase.execute(fetchPayload);
+            const bookingsHistory = await this._fetchAllBookingsUseCase.execute(query);
 
             res.status(HttpStatus.OK).json({
                 success: true,
                 message: SUCCESS_MESSAGES.BOOKING.BOOKINGS_FETCHED,
                 ...bookingsHistory
             });
+
         } catch (err) {
             next(err);
         }
@@ -204,34 +198,30 @@ export class TrainerBookingController {
     getPendingRequests = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const trainerId = req.user?.user.id;
-
             if (!trainerId) {
                 throw new AppError(ERROR_MESSAGES.UNAUTHORIZED, HttpStatus.UNAUTHORIZED);
             }
 
+            const query = req.query as unknown as fetchAllBookingQueryDTO
 
-            const rawSearch = req.query.search;
-            const search = typeof rawSearch === 'string' ? rawSearch : "";
-            const dateQuery = req.query.date;
-
-            const validatedDate = typeof dateQuery === 'string' ? new Date(dateQuery) : new Date();
-            const fetchPayload: FetchAllTrainerBookingRequestDTO = {
+            query.filter = {
+                ...query.filter,
                 trainerId,
-                currentPage: Math.max(1, Number(req.query.pageNo) || 1),
-                limit: Number(req.query.limit) || PAGINATION.DEFAULT_LIMIT,
-                filter: {
-                    search: search || "",
-                    date: validatedDate
-                }
+                status: BOOKING_STATUS.PENDING
             };
 
-            const pendingBookings = await this._fetchPendingBookingsUseCase.execute(fetchPayload);
+
+            const pendingBookings = await this._fetchPendingBookingsUseCase.execute(
+                query
+            );
 
             res.status(HttpStatus.OK).json({
                 success: true,
-                message: SUCCESS_MESSAGES.BOOKING.BOOKING_PENDING_FETCHED,
+                message:
+                    SUCCESS_MESSAGES.BOOKING.BOOKING_PENDING_FETCHED,
                 ...pendingBookings
             });
+
         } catch (err) {
             next(err);
         }
@@ -245,22 +235,18 @@ export class TrainerBookingController {
                 throw new AppError(ERROR_MESSAGES.UNAUTHORIZED, HttpStatus.UNAUTHORIZED);
             }
 
-            const rawSearch = req.query.search;
-            const search = typeof rawSearch === 'string' ? rawSearch : "";
-            const dateQuery = req.query.date;
-
-            const validatedDate = typeof dateQuery === 'string' ? new Date(dateQuery) : new Date();
-            const fetchPayload: FetchAllTrainerBookingRequestDTO = {
+            const query = req.query as unknown as fetchAllBookingQueryDTO
+            query.filter = {
+                ...query.filter,
                 trainerId,
-                currentPage: Math.max(1, Number(req.query.pageNo) || 1),
-                limit: Number(req.query.limit) || PAGINATION.DEFAULT_LIMIT,
-                filter: {
-                    search: search || "",
-                    date: validatedDate
-                }
+                status: BOOKING_STATUS.RESCHEDULE_REQUESTED
             };
 
-            const rescheduleRequests = await this._fetchRescheduleRequestsUseCase.execute(fetchPayload);
+
+            const rescheduleRequests =
+                await this._fetchRescheduleRequestsUseCase.execute(
+                    query
+                );
 
             res.status(HttpStatus.OK).json({
                 success: true,
@@ -271,13 +257,9 @@ export class TrainerBookingController {
         }
     };
 
-    getBookingDetails = async (req: Request<BookingParams>, res: Response, next: NextFunction) => {
+    getBookingDetails = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const { bookingId } = req.params;
-
-            if (!bookingId) {
-                throw new AppError(ERROR_MESSAGES.MISSING_REQUIRED_DATA, HttpStatus.BAD_REQUEST);
-            }
+            const { bookingId } = req.params
 
             const bookingDetails = await this._fetchBookingDetailsUseCase.execute(bookingId);
 
@@ -286,32 +268,15 @@ export class TrainerBookingController {
                 message: SUCCESS_MESSAGES.BOOKING.BOOKING_DETAILS_FETCHED,
                 data: bookingDetails
             });
+
         } catch (error) {
+
             next(error);
         }
     };
 
-    getMeetLink = async (req: Request<BookingParams>, res: Response, next: NextFunction) => {
-        try {
-            const { bookingId } = req.params;
 
-            if (!bookingId) {
-                throw new AppError(ERROR_MESSAGES.BOOKING_NOT_FOUND, HttpStatus.BAD_REQUEST);
-            }
-
-            const meetLink = await this._getMeetLinkUseCase.execute(bookingId);
-
-            res.status(HttpStatus.OK).json({
-                success: true,
-                message: SUCCESS_MESSAGES.BOOKING.BOOKING_DETAILS_FETCHED,
-                data: meetLink
-            });
-        } catch (err) {
-            next(err);
-        }
-    }
-
-    markAsComplete = async (req: Request<BookingParams>, res: Response, next: NextFunction) => {
+    markAsComplete = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { bookingId } = req.params;
 

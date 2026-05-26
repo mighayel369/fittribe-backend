@@ -23,4 +23,24 @@ export class UserEntity {
   isBlocked(): boolean {
     return this.status === false;
   }
+
+  update(fields: Partial<UserEntity>): UserEntity {
+    return new UserEntity(
+      fields.name ?? this.name,
+      this.email,
+      this.userId,
+      this.role,
+      this.password,
+      this.status,
+      this.createdAt,
+      fields.gender ?? this.gender,
+      fields.age ?? this.age,
+      this.googleId,
+      fields.phone ?? this.phone,
+      fields.address ?? this.address,
+      fields.profilePic ?? this.profilePic,
+      this.passwordResetToken,
+      this.passwordResetExpires
+    );
+  }
 }

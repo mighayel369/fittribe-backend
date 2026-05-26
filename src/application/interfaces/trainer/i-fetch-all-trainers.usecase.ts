@@ -1,4 +1,4 @@
-import { FetchAllTrainersRequestDTO } from "application/dto/trainer/fetch-all-trainers.dto";
+import { FetchAllTrainersRequestDTO } from "application/dto/discovery/fetch-all-trainer.request.dto";
 
 
 export const I_FETCH_ALL_TRAINERS_TOKEN = Symbol("I_FETCH_ALL_TRAINERS_TOKEN");

@@ -5,10 +5,10 @@ export class MessageEntity {
     public readonly messageId: string,
     public readonly chatId: string,
     public readonly senderId: string,
-    public readonly content: string,
     public readonly type: MessageType,
     public readonly isRead = false,
     public readonly isActive = true,
+    public readonly content?: string,
     public readonly file?: {
       url: string;
       mimeType: MessageType;

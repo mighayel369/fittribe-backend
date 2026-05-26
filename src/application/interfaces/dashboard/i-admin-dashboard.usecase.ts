@@ -1,4 +1,4 @@
-import { AdminDashbardResponseDTO } from "application/dto/dashboard/admin-dashboard.dto";
+import { AdminDashbardResponseDTO } from "application/dto/dashboard/admin/admin-dashboard.response.dto";
 
 export const I_ADMIN_DASHBOARD_TOKEN = Symbol("I_ADMIN_DASHBOARD_TOKEN");
 

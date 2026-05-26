@@ -5,10 +5,12 @@ import { ICloudinaryService } from "domain/services/ICloudinaryService";
 import { ERROR_MESSAGES } from "utils/ErrorMessage";
 import { AppError } from "domain/errors/AppError";
 import { HttpStatus } from "utils/HttpStatus";
-import logger from "utils/logger";
+import logger from "logger";
+import { IMemoryUploadedFile } from "domain/services/types/upload-picture";
 
 @injectable()
 export class CloudinaryService implements ICloudinaryService {
+    private logger = logger;
     constructor() {
         cloudinary.config({
             cloud_name: config.CLOUDINARY_CLOUD_NAME,
@@ -17,53 +19,59 @@ export class CloudinaryService implements ICloudinaryService {
         });
     }
 
-    private formatFile(file: Express.Multer.File): string {
+    private formatFile(file: IMemoryUploadedFile): string {
         return `data:${file.mimetype};base64,${file.buffer.toString("base64")}`;
     }
 
-    async getTrainerCertificateUrl(file: Express.Multer.File, email: string): Promise<string> {
+    async getTrainerCertificateUrl(file: IMemoryUploadedFile, email: string): Promise<string> {
         try {
-            const result = await cloudinary.uploader.upload(this.formatFile(file), {
+            const fileDataUri = this.formatFile(file);
+
+            const result = await cloudinary.uploader.upload(fileDataUri, {
                 folder: "trainer-certificates",
                 public_id: `trainer-${email}`,
                 overwrite: true
             });
             return result.secure_url;
         } catch (error) {
-            logger.error("Cloudinary upload failed:", error);
+            this.logger.error("Cloudinary upload failed:", error);
             throw new AppError(ERROR_MESSAGES.UPLOAD_CERTIFICATE_FAILED, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    async getProfilePictureUrl(file: Express.Multer.File, id: string): Promise<string> {
+    async getProfilePictureUrl(file: IMemoryUploadedFile, id: string): Promise<string> {
         try {
-            const result = await cloudinary.uploader.upload(this.formatFile(file), {
+            const fileDataUri = this.formatFile(file);
+
+            const result = await cloudinary.uploader.upload(fileDataUri, {
                 folder: "profile-pictures",
                 public_id: `profile-${id}`,
                 overwrite: true
             });
+
             return result.secure_url;
         } catch (error) {
-            logger.error("Cloudinary profile upload failed:", error);
+            this.logger.error("Cloudinary profile upload failed:", error);
             throw new AppError(ERROR_MESSAGES.UPLOAD_PROFILE_PICTURE_FAILED, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    async getProgramImageUrl(file: Express.Multer.File, program: string): Promise<string> {
+    async getProgramImageUrl(file: IMemoryUploadedFile, program: string): Promise<string> {
         try {
-            const result = await cloudinary.uploader.upload(this.formatFile(file), {
+            const fileDataUri = this.formatFile(file);
+            const result = await cloudinary.uploader.upload(fileDataUri, {
                 folder: "program-images",
                 public_id: `program-${program}-${Date.now()}`,
                 overwrite: true
             });
             return result.secure_url;
         } catch (error) {
-            logger.error("Cloudinary program image upload failed:", error);
+            this.logger.error("Cloudinary program image upload failed:", error);
             throw new AppError(ERROR_MESSAGES.UPLOAD_PROGRAM_IMAGE_FAILED, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    async getLeaveRequestDocumentsUrl(file: Express.Multer.File, trainer: string): Promise<string> {
+    async getLeaveRequestDocumentsUrl(file: IMemoryUploadedFile, trainer: string): Promise<string> {
         try {
             const result = await cloudinary.uploader.upload(this.formatFile(file), {
                 folder: "leave-request-documents",
@@ -72,12 +80,12 @@ export class CloudinaryService implements ICloudinaryService {
             });
             return result.secure_url;
         } catch (error) {
-            logger.error("Cloudinary leave doc upload failed:", error);
+            this.logger.error("Cloudinary leave doc upload failed:", error);
             throw new AppError(ERROR_MESSAGES.UPLOAD_LEAVE_DOCUMENT_FAILED, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    async uploadChatFile(file: Express.Multer.File): Promise<{ url: string; resource_type: string }> {
+    async uploadChatFile(file: IMemoryUploadedFile): Promise<{ url: string; resource_type: string }> {
         return new Promise((resolve, reject) => {
             let rType: "image" | "video" | "raw" = "raw";
 

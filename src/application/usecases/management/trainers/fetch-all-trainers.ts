@@ -2,13 +2,11 @@ import { IFetchAllTrainersUseCase } from "application/interfaces/trainer/i-fetch
 import { inject, injectable } from "tsyringe";
 
 import { ITrainerRepo, I_TRAINER_REPO_TOKEN } from "domain/repositories/ITrainerRepo";
-import { FetchAllTrainersRequestDTO, FetchAllTrainersResponseDTO } from "application/dto/trainer/fetch-all-trainers.dto";
-
+import { FetchAllTrainersRequestDTO } from "application/dto/discovery/fetch-all-trainer.request.dto";
+import { FetchAllTrainersResponseDTO, FetchAllTrainersResponseSchema } from "application/dto/management/trainer-management/all-trainers.dto";
 import { HttpStatus } from "utils/HttpStatus";
 import { AppError } from "domain/errors/AppError";
 import { TrainerMapper } from "application/mappers/trainer-mapper";
-import { ITrainerFilters } from "domain/filters/ITrainerFilters";
-import { TRAINER_STATUS } from "domain/constants/trainer-status";
 
 @injectable()
 export class FetchAllTrainersUseCase
@@ -26,21 +24,14 @@ export class FetchAllTrainersUseCase
     }
 
 
-    const updatedFilter: ITrainerFilters = {
-      ...filter,
-      status: TRAINER_STATUS.ACCEPTED
-    };
 
-    const result = await this._trainerRepository.findAllTrainers(
-      currentPage,
-      limit,
-      updatedFilter
-    );
+    const result = await this._trainerRepository.findAllTrainers(currentPage, limit, filter || {});
 
-
-    return {
+    return FetchAllTrainersResponseSchema.parse({
       data: result.data.map(item => TrainerMapper.toTrainersResponseDTO(item)),
-      total: result.totalCount
-    };
+      totalPages: Math.ceil(result.totalCount / limit),
+      currentPage,
+      totalCount: result.totalCount
+    });
   }
 }

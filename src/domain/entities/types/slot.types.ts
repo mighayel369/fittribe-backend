@@ -1,16 +1,19 @@
-
-
 export interface TimeRange {
-  start: string; 
-  end: string;  
+  start: number;
+  end: number;
+}
+
+export interface DayAvailability {
+  enabled: boolean;
+  slots: TimeRange[];
 }
 
 export interface WeeklyAvailability {
-  monday: TimeRange[];
-  tuesday: TimeRange[];
-  wednesday: TimeRange[];
-  thursday: TimeRange[];
-  friday: TimeRange[];
-  saturday: TimeRange[];
-  sunday: TimeRange[];
+  monday: DayAvailability;
+  tuesday: DayAvailability;
+  wednesday: DayAvailability;
+  thursday: DayAvailability;
+  friday: DayAvailability;
+  saturday: DayAvailability;
+  sunday: DayAvailability;
 }

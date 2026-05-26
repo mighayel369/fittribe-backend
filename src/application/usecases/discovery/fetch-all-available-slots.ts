@@ -1,0 +1,61 @@
+import { inject, injectable } from "tsyringe";
+import { I_SLOT_REPO_TOKEN, ISlotRepo } from "domain/repositories/ISlotRepo";
+import { IBookingRepo, I_BOOKING_REPO_TOKEN } from "domain/repositories/IBookingRepo";
+import { IFetchTrainerAvailableSlotsUseCase } from "application/interfaces/slot/i-fetch-trainer-available-slots.usecase";
+import { generateHourlySlots } from "utils/generateTimeSlots";
+import { I_LEAVE_REPO_TOKEN, ILeaveRepo } from "domain/repositories/ILeaveRepo";
+import { ERROR_MESSAGES } from "utils/ErrorMessage";
+import { SUCCESS_MESSAGES } from "utils/SuccessMessages";
+import { SCHEDULE_STATUS } from "utils/Constants";
+import { FetchAvailableSlotResponseDTO } from "application/dto/discovery/trainer-slots.dto";
+@injectable()
+export class FetchTrainerAvailableSlotsUseCase implements IFetchTrainerAvailableSlotsUseCase {
+  constructor(
+    @inject(I_SLOT_REPO_TOKEN) private readonly _slotRepository: ISlotRepo,
+    @inject(I_BOOKING_REPO_TOKEN) private readonly _bookingRepository: IBookingRepo,
+    @inject(I_LEAVE_REPO_TOKEN) private readonly _leaveRepository: ILeaveRepo,
+  ) { }
+
+  async execute(trainerId: string, date: string): Promise<FetchAvailableSlotResponseDTO> {
+
+    const dateObj = new Date(date);
+
+    const isoDate = dateObj.toISOString();
+
+    const isOnLeave = await this._leaveRepository.isTrainerOnLeave(trainerId, isoDate);
+    if (isOnLeave) {
+      return {
+        status: SCHEDULE_STATUS.ON_LEAVE,
+        message: SUCCESS_MESSAGES.SLOT.TRAINER_ON_LEAVE,
+        slots: []
+      };
+    }
+
+    const dayName = dateObj.toLocaleDateString('en-US', {
+      weekday: 'long',
+      timeZone: 'UTC'
+    }).toLowerCase();
+
+    const slotDoc = await this._slotRepository.getTrainerSlot(trainerId);
+    if (!slotDoc) return { status: SCHEDULE_STATUS.NO_SCHEDULE, slots: [], message: SUCCESS_MESSAGES.SLOT.NO_AVAILABILITY_SET };
+    const dayAvailability = slotDoc.weeklyAvailability[dayName as keyof typeof slotDoc.weeklyAvailability]
+    if (!dayAvailability || dayAvailability.slots.length === 0 || dayAvailability.enabled !== true) {
+      return { status: SCHEDULE_STATUS.UNAVAILABLE, slots: [], message: ERROR_MESSAGES.TRAINER_ON_LEAVE };
+    }
+
+
+    const allPossibleSlots = generateHourlySlots(dayAvailability.slots);
+    const bookedSlots = await this._bookingRepository.findBookedSlots(trainerId, isoDate);
+
+    const bookedSet = new Set(bookedSlots);
+    const availableSlots = allPossibleSlots.filter(slot => !bookedSet.has(slot));
+
+    return {
+      status: SCHEDULE_STATUS.AVAILABLE,
+      slots: availableSlots,
+      message: availableSlots.length > 0
+        ? SUCCESS_MESSAGES.SLOT.SLOT_FETCHED_SUCCESSFULLY
+        : SUCCESS_MESSAGES.SLOT.SLOT_FULLY_BOOKED
+    };
+  }
+}

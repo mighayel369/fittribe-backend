@@ -3,7 +3,6 @@ import { I_TRAINER_DASHBOARD_TOKEN, ITrainerDashBoard } from "application/interf
 import { Request, Response, NextFunction } from 'express';
 import { HttpStatus } from "utils/HttpStatus";
 import { ITrainerDashBoardAppointments, I_TRAINER_DASHBOARD_APPOINTMENTS_TOKEN } from "application/interfaces/dashboard/i-trainer-dashboard-appointment.usecase";
-import { TrainerDashboardAppointmentResponseDTO, TrainerDashboardResponseDTO } from "application/dto/dashboard/trainer-dashboard.dto";
 import { SUCCESS_MESSAGES } from "utils/SuccessMessages";
 import { AppError } from "domain/errors/AppError";
 import { ERROR_MESSAGES } from "utils/ErrorMessage";
@@ -24,8 +23,7 @@ export class TrainerDashboardController {
             if (!trainerId) {
                 throw new AppError(ERROR_MESSAGES.UNAUTHORIZED, HttpStatus.UNAUTHORIZED);
             }
-            const performanceMetrics: TrainerDashboardResponseDTO =
-                await this._getPerformanceMetricsUseCase.execute(trainerId);
+            const performanceMetrics = await this._getPerformanceMetricsUseCase.execute(trainerId);
 
             res.status(HttpStatus.OK).json({
                 success: true,
@@ -51,8 +49,7 @@ export class TrainerDashboardController {
             }
             const targetDate: Date = date ? new Date(date) : new Date();
 
-            const dailyAgenda: TrainerDashboardAppointmentResponseDTO =
-                await this._getDailyAgendaUseCase.execute(trainerId, targetDate);
+            const dailyAgenda = await this._getDailyAgendaUseCase.execute(trainerId, targetDate);
 
             res.status(HttpStatus.OK).json({
                 success: true,

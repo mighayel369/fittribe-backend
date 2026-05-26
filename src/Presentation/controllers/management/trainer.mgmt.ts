@@ -4,26 +4,24 @@ import { ERROR_MESSAGES } from 'utils/ErrorMessage';
 import { HttpStatus } from 'utils/HttpStatus';
 import { AppError } from 'domain/errors/AppError';
 import { I_UPDATE_STATUS_TOKEN, IUpdateStatus } from 'application/interfaces/common/i-update-status.usecase';
-import { UpdateStatusRequestDTO } from 'application/dto/common/update-status.dto';
-import { TrainerApprovalRequestDTO } from 'application/dto/trainer/trainer-approval.dto';
 import { I_HANDLE_TRAINER_APPROVAL_TOKEN, IHandleTrainerApproval } from 'application/interfaces/trainer/i-handle-trainer-approval.usecase';
 import { I_FETCH_ALL_PENDING_TRAINERS_TOKEN, I_FETCH_ALL_TRAINERS_TOKEN, IFetchAllTrainersUseCase } from 'application/interfaces/trainer/i-fetch-all-trainers.usecase';
-import { FetchAllPendingTrainersResponseDTO, FetchAllTrainersRequestDTO, FetchAllTrainersResponseDTO } from 'application/dto/trainer/fetch-all-trainers.dto';
 import { I_FETCH_TRAINER_DETAILS_ADMIN_TOKEN, IFetchTrainerDetails } from 'application/interfaces/trainer/i-fetch-trainer-details.usecase';
-import { PAGINATION } from 'utils/Constants';
 import { TRAINER_STATUS } from 'domain/constants/trainer-status';
-import { trainerParams } from 'Presentation/interfaces/request.params';
-import { AdminTrainerDetails } from 'application/dto/trainer/fetch-trainer-details.dto';
-import { GENDER } from 'domain/constants/gender';
 import { SUCCESS_MESSAGES } from 'utils/SuccessMessages';
+import { FetchAllTrainersResponseDTO } from 'application/dto/management/trainer-management/all-trainers.dto';
+import { FetchAllPendingTrainersResponseDTO } from 'application/dto/management/trainer-management/pending-trainers.dto';
+import { FetchAllTrainersRequestDTO } from 'application/dto/discovery/fetch-all-trainer.request.dto';
+import { AdminTrainerDetailsDTO } from 'application/dto/management/trainer-management/trainer-details.dto';
+import { UpdateTrainerStatusRequestDTO } from 'application/dto/management/trainer-management/update-trainer-status.dto';
 @injectable()
 export class TrainerManagementController {
     constructor(
         @inject(I_UPDATE_STATUS_TOKEN)
-        private readonly _updateStatusUseCase: IUpdateStatus,
+        private readonly _updateStatusUseCase: IUpdateStatus<UpdateTrainerStatusRequestDTO>,
 
         @inject(I_FETCH_TRAINER_DETAILS_ADMIN_TOKEN)
-        private readonly _getTrainerDetailsUseCase: IFetchTrainerDetails<AdminTrainerDetails>,
+        private readonly _getTrainerDetailsUseCase: IFetchTrainerDetails<AdminTrainerDetailsDTO>,
 
         @inject(I_FETCH_ALL_TRAINERS_TOKEN)
         private readonly _fetchVerifiedTrainersUseCase: IFetchAllTrainersUseCase<FetchAllTrainersResponseDTO>,
@@ -35,64 +33,23 @@ export class TrainerManagementController {
         private readonly _handleApprovalUseCase: IHandleTrainerApproval,
     ) { }
 
-    private isTrainerStatus = (value: unknown): value is TRAINER_STATUS => {
-        return Object.values(TRAINER_STATUS).includes(value as TRAINER_STATUS);
-    };
 
-    private _getPagination = (req: Request) => {
-        const { limit, pageNo } = req.query;
-
-        const parsedLimit = typeof limit === 'string' ? parseInt(limit, 10) : PAGINATION.DEFAULT_LIMIT;
-        const safeLimit = (isNaN(parsedLimit) || parsedLimit <= 0) ? PAGINATION.DEFAULT_LIMIT : parsedLimit;
-
-        const parsedPage = typeof pageNo === 'string' ? parseInt(pageNo, 10) : 1;
-        const currentPage = (isNaN(parsedPage) || parsedPage <= 0) ? 1 : parsedPage;
-
-        return { limit: safeLimit, currentPage };
-    };
-
-    private isGender = (value: unknown): value is GENDER => {
-        return typeof value === 'string' && Object.values(GENDER).includes(value as GENDER);
-    };
-
-
-    private _getAdminQueryParams = (req: Request): FetchAllTrainersRequestDTO => {
-        const { status, gender, search } = req.query;
-        const { limit, currentPage } = this._getPagination(req);
-        const trainerStatus = this.isTrainerStatus(status) ? status : undefined;
-        return {
-            limit,
-            currentPage,
-            filter: {
-                status: trainerStatus,
-                gender: this.isGender(gender) ? gender : undefined,
-                search: typeof search === 'string' ? search : ""
-            }
-        };
-    };
-
-    private _getPendingQueryParams = (req: Request): FetchAllTrainersRequestDTO => {
-        const { search } = req.query;
-        const { limit, currentPage } = this._getPagination(req);
-
-        return {
-            limit,
-            currentPage,
-            filter: {
-                search: typeof search === 'string' ? search : ""
-            }
-        };
-    };
 
     getVerifiedTrainers = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const result = await this._fetchVerifiedTrainersUseCase.execute(
-                this._getAdminQueryParams(req)
-            );
+            const { currentPage, limit, filter } = req.query as unknown as FetchAllTrainersRequestDTO
+            const trainersResult = await this._fetchVerifiedTrainersUseCase.execute({
+                currentPage,
+                limit,
+                filter: {
+                    ...filter,
+                    status: TRAINER_STATUS.ACCEPTED
+                }
+            });
 
             res.status(HttpStatus.OK).json({
                 success: true,
-                ...result
+                ...trainersResult
             });
         } catch (error) {
             next(error);
@@ -101,20 +58,26 @@ export class TrainerManagementController {
 
     getPendingTrainers = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const result = await this._fetchPendingTrainersUseCase.execute(
-                this._getPendingQueryParams(req)
-            );
+            const { currentPage, limit, filter } = req.query as unknown as FetchAllTrainersRequestDTO
+            const trainersResult = await this._fetchPendingTrainersUseCase.execute({
+                currentPage,
+                limit,
+                filter: {
+                    ...filter,
+                    status: TRAINER_STATUS.PENDING
+                }
+            });
 
             res.status(HttpStatus.OK).json({
                 success: true,
-                ...result
+                ...trainersResult
             });
         } catch (error) {
             next(error);
         }
     };
 
-    getTrainerDetails = async (req: Request<trainerParams>, res: Response, next: NextFunction) => {
+    getTrainerDetails = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { trainerId } = req.params;
 
@@ -122,7 +85,7 @@ export class TrainerManagementController {
                 throw new AppError(ERROR_MESSAGES.MISSING_REQUIRED_DATA, HttpStatus.BAD_REQUEST);
             }
 
-            const trainerDetails: AdminTrainerDetails = await this._getTrainerDetailsUseCase.execute(trainerId);
+            const trainerDetails = await this._getTrainerDetailsUseCase.execute(trainerId);
 
             res.status(HttpStatus.OK).json({
                 success: true,
@@ -135,12 +98,9 @@ export class TrainerManagementController {
 
     updateAccountStatus = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const statusPayload: UpdateStatusRequestDTO = {
-                id: req.body.trainerId,
-                isActive: req.body.status
-            };
+            const { isActive, trainerId }: UpdateTrainerStatusRequestDTO = req.body
 
-            await this._updateStatusUseCase.execute(statusPayload);
+            await this._updateStatusUseCase.execute({ isActive, trainerId });
 
             res.status(HttpStatus.OK).json({
                 message: "Account Status Updated",
@@ -153,12 +113,7 @@ export class TrainerManagementController {
 
     approveOrRejectTrainer = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const approvalPayload: TrainerApprovalRequestDTO = {
-                trainerId: req.body.trainerId,
-                action: req.body.action,
-                reason: req.body.reason
-            };
-
+            const approvalPayload = req.body
             await this._handleApprovalUseCase.execute(approvalPayload);
 
             res.status(HttpStatus.OK).json({

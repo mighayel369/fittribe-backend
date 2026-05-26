@@ -3,16 +3,19 @@ import { Server, Socket } from "socket.io";
 import { inject, singleton } from "tsyringe";
 import { ISocketService } from "../../../domain/services/i-socket-service";
 import { ChatHandler } from "./chat/chat-handler";
-import logger from "../../../utils/logger";
+import logger from "logger";
 import config from "config";
+import { VideoCallHandler } from "./video-call/video-call-handler";
 
 @singleton()
 export class SocketService implements ISocketService {
+  private logger = logger;
   private _io: Server | null = null;
   private onlineUsers = new Map<string, string>();
 
   constructor(
-    @inject(ChatHandler) private _chatHandler: ChatHandler
+    @inject(ChatHandler) private _chatHandler: ChatHandler,
+    @inject(VideoCallHandler) private _videoHandler: VideoCallHandler
   ) { }
 
   public init(server: HttpServer): void {
@@ -28,18 +31,17 @@ export class SocketService implements ISocketService {
 
       if (userId && userId !== "undefined") {
         this.onlineUsers.set(userId, socket.id);
-        socket.join(userId);
 
         this._chatHandler.registerEvents(socket, userId);
+        this._videoHandler.registerEvents(socket, userId);
 
-
-        logger.info(`✅ Connection established for user: ${userId}`);
+        this.logger.info(`✅ Connection established for user: ${userId}`);
       }
 
       socket.on("disconnect", () => {
         if (userId) {
           this.onlineUsers.delete(userId);
-          logger.info(`❌ User disconnected: ${userId}`);
+          this.logger.info(`❌ User disconnected: ${userId}`);
         }
       });
     });
@@ -47,7 +49,7 @@ export class SocketService implements ISocketService {
 
   public emitToRoom(room: string, event: string, payload: unknown): void {
     if (!this._io) {
-      logger.warn("Attempted to emit before Socket.io initialization.");
+      this.logger.warn("Attempted to emit before Socket.io initialization.");
       return;
     }
     this._io.to(room).emit(event, payload);

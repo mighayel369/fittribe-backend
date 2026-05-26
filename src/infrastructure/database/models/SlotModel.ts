@@ -3,40 +3,68 @@ import { SlotEntity } from "domain/entities/SlotEntity";
 
 export interface ISlot extends Document, SlotEntity { }
 
-
 const TimeRangeSchema = new Schema(
     {
-        start: { type: String, required: true },
-        end: { type: String, required: true }
-    },
-    { _id: false }
-);
-
-
-const SlotSchema = new Schema<ISlot>(
-    {
-        trainerId: {
-            type: String,
-            ref: "Trainer",
-            required: true,
-            unique: true
+        start: {
+            type: Number,
+            required: true
         },
-
-        weeklyAvailability: {
-            monday: { type: [TimeRangeSchema], default: [] },
-            tuesday: { type: [TimeRangeSchema], default: [] },
-            wednesday: { type: [TimeRangeSchema], default: [] },
-            thursday: { type: [TimeRangeSchema], default: [] },
-            friday: { type: [TimeRangeSchema], default: [] },
-            saturday: { type: [TimeRangeSchema], default: [] },
-            sunday: { type: [TimeRangeSchema], default: [] }
+        end: {
+            type: Number,
+            required: true
         }
     },
     {
-        timestamps: true
+        _id: false
     }
 );
 
-SlotSchema.loadClass(SlotEntity)
+const DayAvailabilitySchema =
+    new Schema(
+        {
+            enabled: {
+                type: Boolean,
+                required: true,
+                default: false
+            },
+            slots: {
+                type: [TimeRangeSchema],
+                default: []
+            }
+        },
+        {
+            _id: false
+        }
+    );
 
-export const SlotModel = mongoose.model<ISlot>("Slot", SlotSchema);
+const SlotSchema =
+    new Schema<ISlot>(
+        {
+            trainerId: {
+                type: String,
+                ref: "Trainer",
+                required: true,
+                unique: true
+            },
+            weeklyAvailability: {
+                monday: DayAvailabilitySchema,
+                tuesday: DayAvailabilitySchema,
+                wednesday: DayAvailabilitySchema,
+                thursday: DayAvailabilitySchema,
+                friday: DayAvailabilitySchema,
+                saturday: DayAvailabilitySchema,
+                sunday: DayAvailabilitySchema
+            }
+        },
+        {
+            timestamps: true
+        }
+    );
+
+SlotSchema.loadClass(SlotEntity);
+
+export const SlotModel =
+    mongoose.model<ISlot>(
+        "Slot",
+        SlotSchema
+    );
