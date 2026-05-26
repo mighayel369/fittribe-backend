@@ -3,7 +3,7 @@ import { Server, Socket } from "socket.io";
 import { inject, singleton } from "tsyringe";
 import { ISocketService } from "../../../domain/services/i-socket-service";
 import { ChatHandler } from "./chat/chat-handler";
-import logger from "logger";
+import logger from "../../../logger/index";
 import config from "config";
 import { VideoCallHandler } from "./video-call/video-call-handler";
 

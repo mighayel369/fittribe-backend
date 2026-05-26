@@ -5,7 +5,7 @@ import { ICloudinaryService } from "domain/services/ICloudinaryService";
 import { ERROR_MESSAGES } from "utils/ErrorMessage";
 import { AppError } from "domain/errors/AppError";
 import { HttpStatus } from "utils/HttpStatus";
-import logger from "logger";
+import logger from "../../logger/index";
 import { IMemoryUploadedFile } from "domain/services/types/upload-picture";
 
 @injectable()

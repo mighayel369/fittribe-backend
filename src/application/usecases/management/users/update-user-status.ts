@@ -4,7 +4,7 @@ import { inject, injectable } from "tsyringe";
 import { I_USER_REPO_TOKEN, IUserRepo } from "domain/repositories/IUserRepo";
 import { AppError } from "domain/errors/AppError";
 import { HttpStatus } from "utils/HttpStatus";
-import logger from "logger";
+import logger from "../../../../logger/index";
 import { ERROR_MESSAGES } from "utils/ErrorMessage";
 import { UpdateUserStatusRequestDTO } from "application/dto/management/user-management/update-user-status.dto";
 

@@ -4,7 +4,7 @@ import { inject, injectable } from "tsyringe";
 import { ITrainerRepo, I_TRAINER_REPO_TOKEN } from "domain/repositories/ITrainerRepo";
 import { AppError } from "domain/errors/AppError";
 import { HttpStatus } from "utils/HttpStatus";
-import logger from "logger";
+import logger from "../../../../logger/index";
 import { UpdateTrainerStatusRequestDTO } from "application/dto/management/trainer-management/update-trainer-status.dto";
 import { ERROR_MESSAGES } from "utils/ErrorMessage";
 

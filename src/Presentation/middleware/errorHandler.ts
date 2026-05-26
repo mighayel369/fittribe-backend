@@ -1,7 +1,7 @@
 
 import { Request, Response, NextFunction } from 'express';
 import { AppError } from '../../domain/errors/AppError';
-import logger from 'logger';
+import logger from '../../logger/index';
 import { ERROR_MESSAGES } from 'utils/ErrorMessage';
 import { HttpStatus } from 'utils/HttpStatus';
 

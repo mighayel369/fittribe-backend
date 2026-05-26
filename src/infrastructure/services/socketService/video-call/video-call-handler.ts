@@ -1,7 +1,7 @@
 
 import { Socket } from "socket.io";
 import { singleton } from "tsyringe";
-import logger from "logger";
+import logger from "../../../../logger/index";
 
 @singleton()
 export class VideoCallHandler {

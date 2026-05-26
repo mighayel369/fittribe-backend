@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import config from 'config';
 import { UserRole } from 'domain/constants/user-role';
-import logger from 'logger'
+import logger from '../../logger/index'
 import { ERROR_MESSAGES } from 'utils/ErrorMessage';
 import { HttpStatus } from 'utils/HttpStatus';
 export const authorizeRoles = (...allowedRoles: UserRole[]) => {

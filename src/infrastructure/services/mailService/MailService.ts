@@ -1,7 +1,7 @@
 import nodemailer from "nodemailer";
 import { injectable } from "tsyringe";
 import config from "config";
-import logger from "logger";
+import logger from "../../../logger/index";
 import { IMailService } from "domain/services/i-mail-service";
 import { AppError } from "domain/errors/AppError";
 import { ERROR_MESSAGES } from "utils/ErrorMessage";

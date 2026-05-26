@@ -1,6 +1,6 @@
 import "reflect-metadata"
 import 'dotenv/config';
-import logger from "logger";
+import logger from "./logger/index";
 import 'infrastructure/config/container';
 import { container } from "tsyringe";
 import { I_SOCKET_SERVICE_TOKEN, ISocketService } from 'domain/services/i-socket-service';

@@ -10,7 +10,7 @@ import trainer from './Presentation/routes/trainer.gateway';
 import admin from './Presentation/routes/admin.gateway';
 import user from './Presentation/routes/user.gateway';
 
-import logger from 'logger';
+import logger from './logger/index';
 import config from 'config';
 import { errorHandler } from 'Presentation/middleware/errorHandler';
 

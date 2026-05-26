@@ -1,7 +1,7 @@
 import { Socket } from "socket.io";
 import { inject, injectable } from "tsyringe";
 import { ISendMessage, I_SEND_MESSAGE_TOKEN } from "application/interfaces/chat/i-send-message";
-import logger from "logger";
+import logger from "../../../../logger/index";
 import { ERROR_MESSAGES } from "utils/ErrorMessage";
 import { ChatMessageRequestSchema } from "application/dto/chat/shared/chat-message.request.dto";
 

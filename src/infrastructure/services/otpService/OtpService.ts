@@ -2,7 +2,7 @@ import { IOtpService } from "domain/services/IOtpService";
 import { OtpModel } from "infrastructure/database/models/OtpModel";
 import { OtpEntity } from "domain/entities/OtpEntity";
 import { injectable, inject } from "tsyringe";
-import logger from "logger";
+import logger from "../../../logger/index";
 import { IMailService, I_EMAIL_SERVICE_TOKEN } from "domain/services/i-mail-service";
 import { UserRole } from "domain/constants/user-role";
 

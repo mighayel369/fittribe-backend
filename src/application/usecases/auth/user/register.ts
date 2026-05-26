@@ -12,7 +12,7 @@ import { AppError } from "domain/errors/AppError";
 import { HttpStatus } from "utils/HttpStatus";
 import { UserRole } from "domain/constants/user-role";
 import { ERROR_MESSAGES } from "utils/ErrorMessage";
-import logger from "logger";
+import logger from "../../../../logger/index";
 
 @injectable()
 export class UserRegisterUseCase implements IRegisterUseCase<UserRegisterRequestDTO> {
