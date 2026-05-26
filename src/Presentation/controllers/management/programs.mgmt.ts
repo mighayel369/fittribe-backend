@@ -9,12 +9,13 @@ import { I_FETCH_PROGRAM_INVENTORY_TOKEN, IFetchProgramInventory } from 'applica
 import { I_MODIFY_PROGRAM_SPECS_TOKEN, IModifyProgramSpecs } from 'application/interfaces/program/i-modify-program-specs';
 import { I_ARCHIVE_PROGRAM_TOKEN, IArchiveProgram } from 'application/interfaces/program/i-archive-program';
 import { I_TOGGLE_PROGRAM_VISIBILITY_TOKEN, IToggleProgramVisibility } from 'application/interfaces/program/i-toggle-program-visibility';
-import { ToggleProgramVisibilityRequestDTO } from 'application/dto/management/programs-management/toggle-program-visibility.dto';
+import { ToggleProgramVisibilityBodyDTO, ToggleProgramVisibilityRequestDTO } from 'application/dto/management/programs-management/toggle-program-visibility.dto';
 import { ProgramDetailsResponseDTO } from 'application/dto/management/programs-management/program-details.dto';
 import { I_FETCH_PROGRAM_DETAILS_TOKEN, IFetchProgramDetails } from 'application/interfaces/program/i-program-details';
-import { ProgramPictureFileDTO } from 'application/dto/management/programs-management/onboard-new-program.dto';
+import { OnboardProgramBodyDTO, ProgramPictureFileDTO } from 'application/dto/management/programs-management/onboard-new-program.dto';
 import { FetchProgramInventoryResponseDTO } from 'application/dto/management/programs-management/program-summary.dto';
 import { FetchProgramsQueryDTO } from 'application/dto/management/programs-management/fetch-all-programs.request.dto';
+import { ModifyProgramBodyDTO } from 'application/dto/management/programs-management/modify-program-sepcs.dto';
 @injectable()
 export class ProgramsManagementController {
     constructor(
@@ -39,7 +40,7 @@ export class ProgramsManagementController {
 
     onboardNewProgram = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const bodyData = req.body
+            const bodyData = req.body as OnboardProgramBodyDTO
             const fileData = req.file as ProgramPictureFileDTO
 
             await this._onboardProgramUseCase.execute(
@@ -77,7 +78,7 @@ export class ProgramsManagementController {
 
     modifyProgramSpecifications = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const bodyData = req.body
+            const bodyData = req.body as ModifyProgramBodyDTO
             const fileData = req.file as | ProgramPictureFileDTO | undefined;
 
             await this._modifyProgramUseCase.execute(bodyData, fileData);
@@ -93,7 +94,7 @@ export class ProgramsManagementController {
 
     archiveProgram = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const { programId } = req.params;
+            const programId = req.params.programId as string;
             if (!programId) {
                 throw new AppError(ERROR_MESSAGES.MISSING_REQUIRED_DATA, HttpStatus.BAD_REQUEST);
             }
@@ -112,7 +113,7 @@ export class ProgramsManagementController {
     toggleProgramVisibility = async (req: Request, res: Response, next: NextFunction) => {
         try {
 
-            const { status, programId } = req.body
+            const { status, programId } = req.body as ToggleProgramVisibilityBodyDTO
 
             const visibilityPayload: ToggleProgramVisibilityRequestDTO = {
                 programId,
@@ -133,7 +134,7 @@ export class ProgramsManagementController {
 
     getProgramFullDetails = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const { programId } = req.params
+            const programId  = req.params.programId as string
 
             if (!programId) {
                 throw new AppError(ERROR_MESSAGES.MISSING_REQUIRED_DATA, HttpStatus.BAD_REQUEST);

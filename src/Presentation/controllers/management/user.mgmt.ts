@@ -53,7 +53,7 @@ export class UserManagementController {
 
     getUserDetails = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const { userId } = req.params;
+            const userId = req.params.userId as string
 
             if (!userId) throw new AppError(ERROR_MESSAGES.MISSING_REQUIRED_DATA, HttpStatus.BAD_REQUEST)
 
@@ -71,7 +71,7 @@ export class UserManagementController {
 
     toggleUserStatus = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const { userId, isActive }: UpdateUserStatusRequestDTO = req.body;
+            const { userId, isActive } = req.body as UpdateUserStatusRequestDTO
 
             if (!userId) {
                 throw new AppError(ERROR_MESSAGES.MISSING_REQUIRED_DATA, HttpStatus.BAD_REQUEST);

@@ -96,7 +96,7 @@ export class LeaveController {
 
     withdrawLeaveRequest = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const { leaveId } = req.params;
+            const  leaveId  = req.params.leaveid as string;
 
             if (!leaveId) {
                 throw new AppError(ERROR_MESSAGES.LEAVEID_MISSING, HttpStatus.BAD_REQUEST);

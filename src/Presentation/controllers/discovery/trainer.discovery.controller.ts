@@ -49,14 +49,14 @@ export class TrainerDiscoveryController {
             });
 
         } catch (error) {
-    
+
             next(error);
         }
     };
 
     getTrainerDetails = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const { trainerId } = req.params;
+            const trainerId = req.params.trainerId as string;
 
             if (!trainerId) {
                 throw new AppError(ERROR_MESSAGES.MISSING_REQUIRED_DATA, HttpStatus.BAD_REQUEST);
@@ -92,7 +92,7 @@ export class TrainerDiscoveryController {
 
     getReviewList = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const { trainerId } = req.params;
+            const  trainerId  = req.params.trainerId as string;
 
             if (!trainerId) {
                 throw new AppError(ERROR_MESSAGES.MISSING_REQUIRED_DATA, HttpStatus.BAD_REQUEST);

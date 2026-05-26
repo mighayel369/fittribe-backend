@@ -11,6 +11,8 @@ import { I_FETCH_USER_PROFILE_TOKEN, IFetchUserProfileUseCase } from 'applicatio
 import { IChangePasswordUseCase, I_CLIENT_CHANGE_PASSWORD_USECASE_TOKEN } from 'application/interfaces/auth/i-change-password.usecase';
 import { ClientSessionResponseDTO } from 'application/dto/account/user/verify-session.dto';
 import { UserProfileResponseDTO } from 'application/dto/account/user/user-details.dto';
+import { ChangePasswordRequestDTO } from 'application/dto/account/shared/update-password.dto';
+import { UpdateUserProfileRequestDTO } from 'application/dto/account/user/update-user-profile.dto';
 
 
 @injectable()
@@ -61,7 +63,9 @@ export class UserAccountController {
                 throw new AppError(ERROR_MESSAGES.UNAUTHORIZED, HttpStatus.UNAUTHORIZED);
             }
 
-            await this._changePasswordUseCase.execute(userId, req.body);
+            let input = req.body as ChangePasswordRequestDTO
+
+            await this._changePasswordUseCase.execute(userId, input);
 
             res.status(HttpStatus.OK).json({
                 success: true,
@@ -79,8 +83,8 @@ export class UserAccountController {
                 throw new AppError(ERROR_MESSAGES.UNAUTHORIZED, HttpStatus.UNAUTHORIZED)
             }
 
-
-            await this._updateUserProfileUseCase.execute(userId, req.body);
+            let profilePayload = req.body as UpdateUserProfileRequestDTO
+            await this._updateUserProfileUseCase.execute(userId, profilePayload);
 
             res.status(HttpStatus.OK).json({
                 success: true,

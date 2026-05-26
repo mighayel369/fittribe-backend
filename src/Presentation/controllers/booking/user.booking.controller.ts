@@ -90,7 +90,7 @@ export class UserBookingController {
     cancelSession = async (req: Request, res: Response, next: NextFunction) => {
         try {
 
-            const { bookingId } = req.params;
+            const bookingId = req.params.bookingId as string
 
             if (!bookingId) {
                 throw new AppError(ERROR_MESSAGES.BOOKING_NOT_FOUND, HttpStatus.NOT_FOUND);
@@ -137,7 +137,7 @@ export class UserBookingController {
 
     getBookingDetails = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const { bookingId } = req.params;
+            const bookingId = req.params.bookingId as string
             const bookingDetails = await this._getBookingDetailsUseCase.execute(
                 bookingId
             );
@@ -160,7 +160,7 @@ export class UserBookingController {
                 throw new AppError(ERROR_MESSAGES.UNAUTHORIZED, HttpStatus.UNAUTHORIZED);
             }
 
-            const { bookingId } = req.params;
+            const bookingId = req.params.bookingId as string
 
 
             if (!bookingId) {
@@ -189,7 +189,7 @@ export class UserBookingController {
                 throw new AppError(ERROR_MESSAGES.UNAUTHORIZED, HttpStatus.UNAUTHORIZED);
             }
 
-            const { bookingId } = req.params;
+            const bookingId = req.params.bookingId as string
 
             if (!bookingId) {
                 throw new AppError(ERROR_MESSAGES.MISSING_REQUIRED_DATA, HttpStatus.BAD_REQUEST);

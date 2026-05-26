@@ -42,7 +42,7 @@ export class NotificationController {
 
     markAsRead = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const { notificationId } = req.params;
+            const  notificationId = req.params.notificationId as string;
 
             if (!notificationId) {
                 throw new AppError(ERROR_MESSAGES.MISSING_REQUIRED_DATA, HttpStatus.BAD_REQUEST);

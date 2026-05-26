@@ -14,6 +14,7 @@ import { FetchAllPendingTrainersResponseDTO } from 'application/dto/management/t
 import { FetchAllTrainersRequestDTO } from 'application/dto/discovery/fetch-all-trainer.request.dto';
 import { AdminTrainerDetailsDTO } from 'application/dto/management/trainer-management/trainer-details.dto';
 import { UpdateTrainerStatusRequestDTO } from 'application/dto/management/trainer-management/update-trainer-status.dto';
+import { TrainerApprovalRequestDTO } from 'application/dto/management/trainer-management/trainer-approval.dto';
 @injectable()
 export class TrainerManagementController {
     constructor(
@@ -79,7 +80,7 @@ export class TrainerManagementController {
 
     getTrainerDetails = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const { trainerId } = req.params;
+            const trainerId = req.params.trainerId as string;
 
             if (!trainerId) {
                 throw new AppError(ERROR_MESSAGES.MISSING_REQUIRED_DATA, HttpStatus.BAD_REQUEST);
@@ -98,7 +99,7 @@ export class TrainerManagementController {
 
     updateAccountStatus = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const { isActive, trainerId }: UpdateTrainerStatusRequestDTO = req.body
+            const { isActive, trainerId } = req.body as UpdateTrainerStatusRequestDTO
 
             await this._updateStatusUseCase.execute({ isActive, trainerId });
 
@@ -113,7 +114,7 @@ export class TrainerManagementController {
 
     approveOrRejectTrainer = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const approvalPayload = req.body
+            const approvalPayload = req.body as TrainerApprovalRequestDTO
             await this._handleApprovalUseCase.execute(approvalPayload);
 
             res.status(HttpStatus.OK).json({

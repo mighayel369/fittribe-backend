@@ -33,7 +33,7 @@ export class SharedChatController {
                 throw new AppError(ERROR_MESSAGES.UNAUTHORIZED, HttpStatus.UNAUTHORIZED);
             }
 
-            const { receiverId } = req.params;
+            const receiverId = req.params.receiverId as string
 
             if (!receiverId) throw new AppError(ERROR_MESSAGES.MISSING_REQUIRED_DATA, HttpStatus.BAD_REQUEST)
 
@@ -82,7 +82,7 @@ export class SharedChatController {
             if (!userId) {
                 throw new AppError(ERROR_MESSAGES.UNAUTHORIZED, HttpStatus.UNAUTHORIZED)
             }
-            const { chatId } = req.params;
+            const chatId = req.params.chatId as string;
 
             if (!chatId) {
                 throw new AppError(ERROR_MESSAGES.CHATID_INVALID, HttpStatus.BAD_REQUEST);

@@ -15,7 +15,7 @@ export class UserReviewController {
 
     addReview = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const { rating, comment, trainerId, bookingId } = req.body;
+            const { rating, comment, trainerId, bookingId } = req.body as AddReviewDTO
             const userId = req.user?.user.id;
 
             if (!userId) {

@@ -42,7 +42,7 @@ export class UserAuthController {
     login = async (req: Request, res: Response, next: NextFunction) => {
         try {
 
-            const loginCredentials: LoginRequestDTO = req.body
+            const loginCredentials = req.body as LoginRequestDTO
             const authResult = await this._loginUserUseCase.execute(loginCredentials);
 
             res.cookie(
@@ -66,7 +66,7 @@ export class UserAuthController {
     register = async (req: Request, res: Response, next: NextFunction) => {
         try {
 
-            const registrationDetails: UserRegisterRequestDTO = req.body
+            const registrationDetails = req.body as UserRegisterRequestDTO
             const registrationResult: RegisterResponseDTO = await this._registerUserUseCase.execute(registrationDetails);
 
             res.status(HttpStatus.CREATED).json({
@@ -82,7 +82,7 @@ export class UserAuthController {
     forgotPassword = async (req: Request, res: Response, next: NextFunction) => {
         try {
 
-            const { email }: ForgotPasswordRequestDTO = req.body;
+            const { email } = req.body as ForgotPasswordRequestDTO
 
             await this._sendResetMailUseCase.execute(email);
 
@@ -99,7 +99,7 @@ export class UserAuthController {
     resetPassword = async (req: Request, res: Response, next: NextFunction) => {
         try {
 
-            const resetPasswordPayload: ResetPasswordRequestDTO = req.body;
+            const resetPasswordPayload = req.body as ResetPasswordRequestDTO
 
             await this._resetPasswordUseCase.execute(resetPasswordPayload);
 
@@ -116,7 +116,7 @@ export class UserAuthController {
     verifyOtp = async (req: Request, res: Response, next: NextFunction) => {
         try {
 
-            const verificationRequest: VerifyAccountRequestDTO = req.body;
+            const verificationRequest = req.body as VerifyAccountRequestDTO
 
             await this._verifyAccountUseCase.execute(
                 verificationRequest

@@ -10,6 +10,7 @@ import { FILE_CONSTANTS } from 'utils/Constants';
 import { FileResponseHelper } from 'utils/file.constants';
 import { FetchAdminLeaveResponseDTO } from 'application/dto/leave/admin/leave-list.dto';
 import { fetchAllLeaveQueryDTO } from 'application/dto/leave/shared/leave-requests.dto';
+import { UpdateLeaveStatusRequestDTO } from 'application/dto/leave/admin/update-status.dto';
 
 @injectable()
 export class AdminLeaveManagementController {
@@ -59,7 +60,7 @@ export class AdminLeaveManagementController {
 
     updateLeaveStatus = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const statusPayload = req.body
+            const statusPayload = req.body as UpdateLeaveStatusRequestDTO
 
             await this._updateLeaveStatusUseCase.execute(statusPayload);
 

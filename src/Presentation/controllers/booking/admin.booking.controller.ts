@@ -30,14 +30,14 @@ export class AdminBookingController {
             const query = req.query as unknown as fetchAllBookingQueryDTO
 
             const bookings = await this._fetchAllBookingsUseCase.execute(query);
-      
+
             res.status(HttpStatus.OK).json({
                 success: true,
                 ...bookings
             });
 
         } catch (error) {
-    
+
             next(error);
         }
     };
@@ -61,7 +61,7 @@ export class AdminBookingController {
 
     getBookingDetails = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const { bookingId } = req.params;
+            const bookingId = req.params.bookingId as string;
 
             const booking = await this._fetchBookingDetailsUseCase.execute(bookingId);
 

@@ -18,6 +18,7 @@ import { FetchAllTrainerRescheduleBookingsResponseDTO } from 'application/dto/bo
 import { FetchAllTrainerBookingsResponseDTO } from 'application/dto/booking/trainer/fetch-trainer-bookings.dto';
 import { fetchAllBookingQueryDTO } from 'application/dto/booking/shared/fetch-all-bookings.request.dto';
 import { BOOKING_STATUS } from 'domain/constants/booking-status';
+import { RescheduleRequestDTO } from 'application/dto/booking/shared/reschedule-request.dto';
 @injectable()
 export class TrainerBookingController {
     constructor(
@@ -55,7 +56,7 @@ export class TrainerBookingController {
 
     acceptBooking = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const { bookingId } = req.params
+            const bookingId = req.params.bookingId as string;
             await this._confirmBookingUseCase.execute(bookingId);
 
             res.status(HttpStatus.OK).json({
@@ -70,7 +71,7 @@ export class TrainerBookingController {
 
     rejectBooking = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const { bookingId } = req.params
+            const bookingId = req.params.bookingId as string;
             const { reason } = req.body;
 
             await this._declineBookingUseCase.execute(
@@ -88,7 +89,7 @@ export class TrainerBookingController {
 
     approveReschedule = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const { bookingId } = req.params
+            const bookingId = req.params.bookingId as string;
             const performedBy = req.user?.user.role;
 
             if (!performedBy) {
@@ -115,7 +116,8 @@ export class TrainerBookingController {
 
     rejectReschedule = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const { bookingId, reason } = req.body;
+            const bookingId = req.params.bookingId as string
+            const reason = req.body as string
             const performedBy = req.user?.user.role;
 
             if (!performedBy) {
@@ -259,7 +261,7 @@ export class TrainerBookingController {
 
     getBookingDetails = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const { bookingId } = req.params
+            const bookingId = req.params.bookingId as string
 
             const bookingDetails = await this._fetchBookingDetailsUseCase.execute(bookingId);
 
@@ -278,7 +280,7 @@ export class TrainerBookingController {
 
     markAsComplete = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const { bookingId } = req.params;
+             const bookingId = req.params.bookingId as string
 
             if (!bookingId) {
                 throw new AppError(ERROR_MESSAGES.BOOKING_NOT_FOUND, HttpStatus.BAD_REQUEST);

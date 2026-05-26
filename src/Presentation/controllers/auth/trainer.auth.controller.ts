@@ -11,6 +11,7 @@ import { COOKIE_CONFIG } from 'utils/authConfig';
 import { TrainerRegisterRequestDTO } from 'application/dto/auth/trainer/trainer.register.dto';
 import { LoginResponseDTO } from 'application/dto/auth/shared/login.response.dto';
 import { RegisterResponseDTO } from 'application/dto/auth/shared/register.response.dto';
+import { LoginRequestDTO } from 'application/dto/auth/shared/login.request.dto';
 
 @injectable()
 export class TrainerAuthController {
@@ -27,8 +28,8 @@ export class TrainerAuthController {
 
     register = async (req: Request, res: Response, next: NextFunction) => {
         try {
-
-            const registrationResult: RegisterResponseDTO = await this._registerTrainerUseCase.execute(req.body, req.file);
+            let registerPayload=req.body as TrainerRegisterRequestDTO
+            const registrationResult: RegisterResponseDTO = await this._registerTrainerUseCase.execute(registerPayload, req.file);
 
             res.status(HttpStatus.CREATED).json({
                 success: true,
@@ -42,7 +43,7 @@ export class TrainerAuthController {
 
     login = async (req: Request, res: Response, next: NextFunction) => {
         try {
-
+            const loginPayload=req.body as LoginRequestDTO
             const authResult: LoginResponseDTO = await this._loginTrainerUseCase.execute(req.body);
 
             res.cookie(
@@ -65,7 +66,7 @@ export class TrainerAuthController {
 
     verifyOtp = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const verificationPayload: VerifyAccountRequestDTO = req.body;
+            const verificationPayload = req.body as VerifyAccountRequestDTO
             await this._verifyAccountUseCase.execute(
                 verificationPayload
             );

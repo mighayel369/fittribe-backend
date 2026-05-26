@@ -35,7 +35,7 @@ export class AdminReviewController {
 
     flagReview = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const { reviewId } = req.params;
+            const  reviewId  = req.params.reviewId as string;
 
             if (!reviewId) {
                 throw new AppError(ERROR_MESSAGES.MISSING_REQUIRED_DATA, HttpStatus.BAD_REQUEST);

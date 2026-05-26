@@ -8,6 +8,7 @@ import { I_RESEND_OTP_TOKEN, IResendOtpUseCase } from "application/interfaces/au
 import { I_REFRESH_ACCESS_TOKEN_TOKEN, IRefreshAccessTokenUseCase } from "application/interfaces/auth/i-refresh-access-token.usecase";
 import { AUTH_CONSTANTS } from 'utils/Constants';
 import { COOKIE_CONFIG } from 'utils/authConfig';
+import { ResendOtpRequestDTO } from 'application/dto/auth/shared/resend-otp.dto';
 @injectable()
 export class SessionController {
     constructor(
@@ -20,7 +21,8 @@ export class SessionController {
 
     resendOtp = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            await this._resendOtpUseCase.execute(req.body);
+            const resendOtpPaylod=req.body as ResendOtpRequestDTO
+            await this._resendOtpUseCase.execute(resendOtpPaylod);
             res.status(HttpStatus.OK).json({
                 success: true,
                 message: SUCCESS_MESSAGES.AUTH.OTP_SENDED
@@ -32,7 +34,7 @@ export class SessionController {
 
     refreshAccessToken = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const refreshToken = req.cookies[AUTH_CONSTANTS.REFRESH_TOKEN_COOKIE];
+            const refreshToken = req.cookies[AUTH_CONSTANTS.REFRESH_TOKEN_COOKIE] as string
 
             if (!refreshToken) {
                 throw new AppError(ERROR_MESSAGES.REFRESH_TOKEN_MISSING, HttpStatus.BAD_REQUEST)
