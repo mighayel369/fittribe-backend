@@ -31,7 +31,7 @@ export class SocketService implements ISocketService {
 
       if (userId && userId !== "undefined") {
         this.onlineUsers.set(userId, socket.id);
-
+        socket.join(userId);
         this._chatHandler.registerEvents(socket, userId);
         this._videoHandler.registerEvents(socket, userId);
 

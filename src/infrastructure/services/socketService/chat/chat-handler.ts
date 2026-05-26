@@ -16,7 +16,6 @@ export class ChatHandler {
 
     socket.on("send_message", async (rawData: unknown) => {
       try {
-        socket.join(userId);
         const validatedData = ChatMessageRequestSchema.parse({
           ...rawData as object,
           senderId: userId
