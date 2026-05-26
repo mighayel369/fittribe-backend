@@ -1,3 +1,4 @@
+import 'module-alias/register';
 import "reflect-metadata"
 import 'dotenv/config';
 import logger from "./logger/index";
