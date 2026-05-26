@@ -55,7 +55,7 @@ export class SharedChatController {
 
     getMessages = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const { chatId } = req.params;
+            const chatId = req.params.chatId as string
 
             if (!chatId) {
                 throw new AppError(ERROR_MESSAGES.CHATID_INVALID, HttpStatus.BAD_REQUEST);
