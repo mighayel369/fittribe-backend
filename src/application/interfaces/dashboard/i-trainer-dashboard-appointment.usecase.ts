@@ -1,4 +1,4 @@
-import { TrainerDashboardAppointmentResponseDTO } from "application/dto/dashboard/trainer/trainer-dashboard.dto";
+import { TrainerDashboardAppointmentResponseDTO } from "application/dto/dashboard/trainer/trainer.upcoming-appointments.dto";
 
 export const I_TRAINER_DASHBOARD_APPOINTMENTS_TOKEN = Symbol("I_TRAINER_DASHBOARD_APPOINTMENTS_TOKEN");
 

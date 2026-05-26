@@ -1,6 +1,6 @@
 import { inject, injectable } from "tsyringe";
 import { ISendMessage } from "application/interfaces/chat/i-send-message";
-import { ChatMessageRequestDTO } from "application/dto/chat/message-dto";
+import { ChatMessageRequestDTO } from "application/dto/chat/shared/chat-message.request.dto";
 import { I_MESSAGE_REPO_TOKEN, IMessageRepo } from "domain/repositories/IMessageRepo";
 import { IChatRepo, I_CHAT_REPO_TOKEN } from "domain/repositories/IChatRepo";
 import { EventEmitterService } from "domain/services/i-event-emitter";
