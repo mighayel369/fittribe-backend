@@ -1,7 +1,7 @@
 import express from "express";
 import { container } from "tsyringe";
-import { TrainerBookingController } from "Presentation/controllers/booking/trainer.booking.controller";
-import { validateRequest } from "Presentation/middleware/validate.middleware";
+import { TrainerBookingController } from "presentation/controllers/booking/trainer.booking.controller";
+import { validateRequest } from "presentation/middleware/validate.middleware";
 import { BookingParamsSchema, RejectBookingBodySchema } from "application/dto/booking/shared/fetch-booking-detaiils.request.dto";
 import { RescheduleRequestSchema } from "application/dto/booking/shared/reschedule-request.dto";
 import { FetchAllBookingQuerySchema } from "application/dto/booking/shared/fetch-all-bookings.request.dto";

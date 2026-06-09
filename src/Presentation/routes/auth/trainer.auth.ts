@@ -1,8 +1,8 @@
 import express from "express";
 import { container } from "tsyringe";
-import { validateRequest } from "Presentation/middleware/validate.middleware";
-import { TrainerAuthController } from "Presentation/controllers/auth/trainer.auth.controller";
-import { upload } from "Presentation/middleware/upload";
+import { validateRequest } from "presentation/middleware/validate.middleware";
+import { TrainerAuthController } from "presentation/controllers/auth/trainer.auth.controller";
+import { upload } from "presentation/middleware/upload";
 import { CertificateFileSchema } from "application/dto/auth/trainer/certificate-file.schema";
 import { TrainerRegisterBodySchema } from "application/dto/auth/trainer/trainer.register.dto";
 import { LoginRequestSchema } from "application/dto/auth/shared/login.request.dto";

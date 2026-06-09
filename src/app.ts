@@ -6,13 +6,13 @@ import cookieParser from 'cookie-parser';
 import passport from "passport";
 import morgan from 'morgan';
 
-import trainer from './Presentation/routes/trainer.gateway';
-import admin from './Presentation/routes/admin.gateway';
-import user from './Presentation/routes/user.gateway';
+import trainer from './presentation/routes/trainer.gateway';
+import admin from './presentation/routes/admin.gateway';
+import user from './presentation/routes/user.gateway';
 
 import logger from './logger/index';
 import config from 'config';
-import { errorHandler } from 'Presentation/middleware/errorHandler';
+import { errorHandler } from 'presentation/middleware/errorHandler';
 
 const app = express();
 const server = http.createServer(app);

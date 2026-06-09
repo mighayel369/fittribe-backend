@@ -1,7 +1,7 @@
-import { UserReviewController } from "Presentation/controllers/review/user.review.controller";
+import { UserReviewController } from "presentation/controllers/review/user.review.controller";
 import express from "express";
 import { container } from "tsyringe";
-import { validateRequest } from "Presentation/middleware/validate.middleware";
+import { validateRequest } from "presentation/middleware/validate.middleware";
 import { AddReviewSchema } from "application/dto/review/user/add-review.dto";
 const router=express.Router()
 const ctrl=container.resolve(UserReviewController)

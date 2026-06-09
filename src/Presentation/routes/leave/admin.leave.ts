@@ -1,7 +1,7 @@
 import express from "express";
 import { container } from "tsyringe";
-import { AdminLeaveManagementController } from "Presentation/controllers/leave/admin.leave.controller";
-import { validateRequest } from "Presentation/middleware/validate.middleware";
+import { AdminLeaveManagementController } from "presentation/controllers/leave/admin.leave.controller";
+import { validateRequest } from "presentation/middleware/validate.middleware";
 import { UpdateLeaveStatusRequestSchema } from "application/dto/leave/admin/update-status.dto";
 import { FetchAllLeaveQuerySchema } from "application/dto/leave/shared/leave-requests.dto";
 

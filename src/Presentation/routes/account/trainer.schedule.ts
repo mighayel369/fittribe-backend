@@ -1,7 +1,7 @@
 import express from "express";
 import { container } from "tsyringe";
-import { TrainerScheduleController } from "Presentation/controllers/account/trainer.schedule.controller";
-import { validateRequest } from "Presentation/middleware/validate.middleware";
+import { TrainerScheduleController } from "presentation/controllers/account/trainer.schedule.controller";
+import { validateRequest } from "presentation/middleware/validate.middleware";
 import { SyncWeeklyAvailabilityRequestSchema } from "application/dto/schedules/update-slot-config";
 const router = express.Router();
 const ctrl = container.resolve(TrainerScheduleController);

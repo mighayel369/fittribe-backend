@@ -1,8 +1,8 @@
 import express from "express";
 import { container } from "tsyringe";
-import { UserAuthController } from "Presentation/controllers/auth/user.auth.controller";
+import { UserAuthController } from "presentation/controllers/auth/user.auth.controller";
 import passport from 'passport';
-import { validateRequest } from "Presentation/middleware/validate.middleware";
+import { validateRequest } from "presentation/middleware/validate.middleware";
 import { LoginRequestSchema } from "application/dto/auth/shared/login.request.dto";
 import { ForgotPasswordSchema } from "application/dto/auth/shared/forgot-password.dto";
 import { ResetPasswordRequestSchema } from "application/dto/auth/shared/reset-password.dto";

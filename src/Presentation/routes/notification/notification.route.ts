@@ -1,7 +1,7 @@
 import express from "express";
 import { container } from "tsyringe";
-import { NotificationController } from "Presentation/controllers/notification/notification-controller";
-import { validateRequest } from "Presentation/middleware/validate.middleware";
+import { NotificationController } from "presentation/controllers/notification/notification-controller";
+import { validateRequest } from "presentation/middleware/validate.middleware";
 import { NotificationIdParamSchema } from "application/dto/notification/notification.param.schema";
 const router = express.Router();
 const ctrl = container.resolve(NotificationController);

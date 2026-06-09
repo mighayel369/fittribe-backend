@@ -1,8 +1,8 @@
 import express from "express";
 import { container } from "tsyringe";
-import { UserAccountController } from "Presentation/controllers/account/user.account.controller";
-import { upload } from "Presentation/middleware/upload";
-import { validateRequest } from "Presentation/middleware/validate.middleware";
+import { UserAccountController } from "presentation/controllers/account/user.account.controller";
+import { upload } from "presentation/middleware/upload";
+import { validateRequest } from "presentation/middleware/validate.middleware";
 import { ProfilePictureFileSchema } from "application/dto/account/shared/update-avatar.dto";
 import { ChangePasswordRequestSchema } from "application/dto/account/shared/update-password.dto";
 import { UpdateUserProfileRequestSchema } from "application/dto/account/user/update-user-profile.dto";

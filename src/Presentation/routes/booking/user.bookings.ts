@@ -1,7 +1,7 @@
 import express from "express";
 import { container } from "tsyringe";
-import { UserBookingController } from "Presentation/controllers/booking/user.booking.controller";
-import { validateRequest } from "Presentation/middleware/validate.middleware";
+import { UserBookingController } from "presentation/controllers/booking/user.booking.controller";
+import { validateRequest } from "presentation/middleware/validate.middleware";
 import { OnlineBookingRequestSchema } from "application/dto/booking/shared/book-trainer.request.dto";
 import { BookingParamsSchema } from "application/dto/booking/shared/fetch-booking-detaiils.request.dto";
 import { FetchAllBookingQuerySchema } from "application/dto/booking/shared/fetch-all-bookings.request.dto";

@@ -1,7 +1,7 @@
 import express from "express";
-import { UserManagementController } from "Presentation/controllers/management/user.mgmt";
+import { UserManagementController } from "presentation/controllers/management/user.mgmt";
 import { container } from "tsyringe";
-import { validateRequest } from "Presentation/middleware/validate.middleware";
+import { validateRequest } from "presentation/middleware/validate.middleware";
 import { FetchAllUsersQuerySchema } from "application/dto/management/user-management/all-users.dto";
 import { UserIdParamSchema } from "application/dto/management/user-management/user-param.dto";
 import { UpdateUserStatusRequestSchema } from "application/dto/management/user-management/update-user-status.dto";

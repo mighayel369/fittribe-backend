@@ -79,6 +79,12 @@
     "typescript-eslint": "^8.58.2"
   },
   "_moduleAliases": {
-    "*": "dist"
+    "config": "dist/config.js",
+    "infrastructure": "dist/infrastructure",
+    "application": "dist/application",
+    "domain": "dist/domain",
+    "presentation": "dist/presentation",
+    "logger":"dist/logger",
+    "utils":"dist/utils"
   }
 }

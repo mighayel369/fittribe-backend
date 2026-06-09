@@ -1,8 +1,8 @@
 import express from "express";
 import { container } from "tsyringe";
-import { TrainerAccountController } from "Presentation/controllers/account/trainer.account.controller";
-import { upload } from "Presentation/middleware/upload";
-import { validateRequest } from "Presentation/middleware/validate.middleware";
+import { TrainerAccountController } from "presentation/controllers/account/trainer.account.controller";
+import { upload } from "presentation/middleware/upload";
+import { validateRequest } from "presentation/middleware/validate.middleware";
 import { updateProfileSchema } from "application/dto/account/trainer/update-profile.dto";
 import { reapplyTrainerSchema } from "application/dto/auth/trainer/reapply-trainer.dto";
 

@@ -1,6 +1,6 @@
 import express from 'express';
 import { UserRole } from 'domain/constants/user-role';
-import { authorizeRoles } from 'Presentation/middleware/authMiddleware';
+import { authorizeRoles } from 'presentation/middleware/authMiddleware';
 import notification from './notification/notification.route'
 
 import trainerAuth from './auth/trainer.auth';

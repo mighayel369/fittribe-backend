@@ -1,7 +1,7 @@
 import express from "express";
 import { container } from "tsyringe";
-import { TrainerDiscoveryController } from "Presentation/controllers/discovery/trainer.discovery.controller";
-import { validateRequest } from "Presentation/middleware/validate.middleware";
+import { TrainerDiscoveryController } from "presentation/controllers/discovery/trainer.discovery.controller";
+import { validateRequest } from "presentation/middleware/validate.middleware";
 import { trainerIdParamSchema } from "application/dto/discovery/trainer-id-param.dto";
 import { TrainerAvailabilityQuerySchema } from "application/dto/discovery/trainer-slots.dto";
 import { FetchAllTrainersRequestSchema } from "application/dto/discovery/fetch-all-trainer.request.dto";

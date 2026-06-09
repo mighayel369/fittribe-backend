@@ -1,7 +1,7 @@
 import express from "express";
 import { container } from "tsyringe";
-import { SessionController } from "Presentation/controllers/auth/session.controller";
-import { validateRequest } from "Presentation/middleware/validate.middleware";
+import { SessionController } from "presentation/controllers/auth/session.controller";
+import { validateRequest } from "presentation/middleware/validate.middleware";
 import { ResendOtpRequestSchema } from "application/dto/auth/shared/resend-otp.dto";
 const router = express.Router();
 const ctrl = container.resolve(SessionController);

@@ -1,8 +1,8 @@
 import express from "express";
 import { container } from "tsyringe";
-import { SharedChatController } from "Presentation/controllers/chat/shared.chat.controller";
-import { validateRequest } from "Presentation/middleware/validate.middleware";
-import { upload } from "Presentation/middleware/upload";
+import { SharedChatController } from "presentation/controllers/chat/shared.chat.controller";
+import { validateRequest } from "presentation/middleware/validate.middleware";
+import { upload } from "presentation/middleware/upload";
 import { ReceiverParamsSchema } from "application/dto/chat/shared/receiver-param-schema";
 import { ChatIdParamsSchema } from "application/dto/chat/shared/chat-id-param.schema";
 const router = express.Router();

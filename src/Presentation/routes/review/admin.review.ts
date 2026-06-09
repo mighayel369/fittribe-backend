@@ -1,5 +1,5 @@
-import { AdminReviewController } from "Presentation/controllers/review/admin.review.controller";
-import { validateRequest } from "Presentation/middleware/validate.middleware";
+import { AdminReviewController } from "presentation/controllers/review/admin.review.controller";
+import { validateRequest } from "presentation/middleware/validate.middleware";
 import { ReviewIdParamSchema } from "application/dto/review/shared/review-id-param.dto";
 import express from "express";
 import { container } from "tsyringe";

@@ -1,4 +1,4 @@
-import { TrainerReviewController } from "Presentation/controllers/review/trainer.review.controller";
+import { TrainerReviewController } from "presentation/controllers/review/trainer.review.controller";
 import express from "express";
 import { container } from "tsyringe";
 

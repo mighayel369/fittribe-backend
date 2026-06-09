@@ -1,7 +1,7 @@
 import express from "express";
-import { UserPaymentController } from "Presentation/controllers/payment/user.payment.controller";
+import { UserPaymentController } from "presentation/controllers/payment/user.payment.controller";
 import { container } from "tsyringe";
-import { validateRequest } from "Presentation/middleware/validate.middleware";
+import { validateRequest } from "presentation/middleware/validate.middleware";
 import { CreateOnlinePaymentSchema } from "application/dto/payment/create-online-payment.dto";
 import { VerifyPaymentRequestSchema } from "application/dto/payment/online-payment.dto";
 const router = express.Router();

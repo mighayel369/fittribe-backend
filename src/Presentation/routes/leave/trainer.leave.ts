@@ -1,8 +1,8 @@
 import express from "express";
 import { container } from "tsyringe";
-import { LeaveController } from "Presentation/controllers/leave/trainer.leave.controller";
-import { upload } from "Presentation/middleware/upload";
-import { validateRequest } from "Presentation/middleware/validate.middleware";
+import { LeaveController } from "presentation/controllers/leave/trainer.leave.controller";
+import { upload } from "presentation/middleware/upload";
+import { validateRequest } from "presentation/middleware/validate.middleware";
 import { LeaveDocumentFileSchema } from "application/dto/leave/shared/leave-document-file.dto";
 import { RequestLeaveSchema } from "application/dto/leave/trainer/request.leave.dto";
 import { LeaveParamsSchema } from "application/dto/leave/shared/leave-params.dto";

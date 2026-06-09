@@ -1,8 +1,8 @@
 import express from "express";
 import { container } from "tsyringe";
-import { ProgramsManagementController } from "Presentation/controllers/management/programs.mgmt";
-import { upload } from "Presentation/middleware/upload";
-import { validateRequest } from "Presentation/middleware/validate.middleware";
+import { ProgramsManagementController } from "presentation/controllers/management/programs.mgmt";
+import { upload } from "presentation/middleware/upload";
+import { validateRequest } from "presentation/middleware/validate.middleware";
 import { OnboardProgramBodySchema, ProgramPictureFileSchema } from "application/dto/management/programs-management/onboard-new-program.dto";
 import { ModifyProgramBodySchema } from "application/dto/management/programs-management/modify-program-sepcs.dto";
 import { ProgramIdSchema } from "application/dto/management/programs-management/program-id-param.dto";
