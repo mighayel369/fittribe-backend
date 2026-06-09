@@ -23,8 +23,6 @@ interface Env {
   ADMIN: string;
   SESSION_DURATION: number;
   GOOGLE_CALLBACK: string;
-  MEETING_URL: string
-
   LOG_LEVEL: string;
   LOG_MAX_SIZE: string;
   LOG_COMBINED_RETENTION: string;
@@ -63,7 +61,6 @@ const getConfig = (): Env => {
     ADMIN: ensureEnv("ADMIN"),
     SESSION_DURATION: Number(ensureEnv("SESSION_DURATION")),
     GOOGLE_CALLBACK: ensureEnv("GOOGLE_CALLBACK"),
-    MEETING_URL: ensureEnv("MEETING_URL"),
     LOG_LEVEL: process.env.LOG_LEVEL || 'info',
     LOG_MAX_SIZE: process.env.LOG_MAX_SIZE || '20m',
     LOG_COMBINED_RETENTION: process.env.LOG_COMBINED_RETENTION || '14d',
