@@ -28,7 +28,7 @@ export class TrainerAuthController {
 
     register = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            let registerPayload=req.body as TrainerRegisterRequestDTO
+            const registerPayload = req.body as TrainerRegisterRequestDTO
             const registrationResult: RegisterResponseDTO = await this._registerTrainerUseCase.execute(registerPayload, req.file);
 
             res.status(HttpStatus.CREATED).json({
@@ -43,8 +43,8 @@ export class TrainerAuthController {
 
     login = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const loginPayload=req.body as LoginRequestDTO
-            const authResult: LoginResponseDTO = await this._loginTrainerUseCase.execute(req.body);
+            const loginPayload = req.body as LoginRequestDTO
+            const authResult: LoginResponseDTO = await this._loginTrainerUseCase.execute(loginPayload);
 
             res.cookie(
                 AUTH_CONSTANTS.REFRESH_TOKEN_COOKIE,

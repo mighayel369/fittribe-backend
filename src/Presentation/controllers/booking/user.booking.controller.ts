@@ -74,7 +74,7 @@ export class UserBookingController {
                 throw new AppError(ERROR_MESSAGES.UNAUTHORIZED, HttpStatus.UNAUTHORIZED);
             }
             const reschedulePayload: RescheduleRequestDTO = req.body;
-            console.log(reschedulePayload)
+    
             await this._requestRescheduleUseCase.execute(reschedulePayload, userId);
 
             res.status(HttpStatus.OK).json({
@@ -82,7 +82,6 @@ export class UserBookingController {
                 message: SUCCESS_MESSAGES.BOOKING.RESCHEDULE_REQUEST_INITIATED,
             });
         } catch (error: unknown) {
-            console.log(error)
             next(error);
         }
     }

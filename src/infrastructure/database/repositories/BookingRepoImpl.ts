@@ -12,6 +12,11 @@ import { AppError } from "domain/errors/AppError";
 import { ERROR_MESSAGES } from "utils/ErrorMessage";
 import { HttpStatus } from "utils/HttpStatus";
 
+type SortField = {
+    year: 1 | -1;
+    month: 1 | -1;
+    day?: 1 | -1;
+};
 
 
 @injectable()
@@ -70,6 +75,66 @@ export class BookingRepoImpl
         }
 
         return query;
+    }
+
+    private buildDashboardRange(
+        range: string
+    ): {
+        startDate: Date;
+        dateFormat: string;
+        sortField: SortField;
+    } {
+
+        const startDate = new Date();
+
+        const rangeConfig: Record<string, {
+            dateFormat: string;
+            sortField: SortField;
+            apply: (date: Date) => void;
+        }> = {
+
+            "7d": {
+                dateFormat: "%d %b",
+                sortField: { year: 1, month: 1, day: 1 },
+                apply: (date) =>
+                    date.setDate(date.getDate() - 7)
+            },
+
+            "30d": {
+                dateFormat: "%d %b",
+                sortField: { year: 1, month: 1, day: 1 },
+                apply: (date) =>
+                    date.setDate(date.getDate() - 30)
+            },
+
+            "1y": {
+                dateFormat: "%b",
+                sortField: { year: 1, month: 1 },
+                apply: (date) =>
+                    date.setFullYear(date.getFullYear() - 1)
+            },
+
+            "6m": {
+                dateFormat: "%b",
+                sortField: { year: 1, month: 1 },
+                apply: (date) => {
+                    date.setMonth(date.getMonth() - 6);
+                    date.setDate(1);
+                }
+            }
+        };
+
+        const config =
+            rangeConfig[range] ??
+            rangeConfig["6m"];
+
+        config.apply(startDate);
+
+        return {
+            startDate,
+            dateFormat: config.dateFormat,
+            sortField: config.sortField
+        };
     }
 
 
@@ -522,41 +587,14 @@ export class BookingRepoImpl
 
 
     async getAdminDashboardStats(
-        range: string = "6m"
+        range: string
     ): Promise<AdminDashboardStats> {
 
-        const startDate = new Date();
-
-        let dateFormat = "%b";
-        let sortField: any = { year: 1, month: 1 };
-
-        switch (range) {
-            case "7d":
-                startDate.setDate(startDate.getDate() - 7);
-                dateFormat = "%d %b";
-                sortField = { year: 1, month: 1, day: 1 };
-                break;
-
-            case "30d":
-                startDate.setDate(startDate.getDate() - 30);
-                dateFormat = "%d %b";
-                sortField = { year: 1, month: 1, day: 1 };
-                break;
-
-            case "1y":
-                startDate.setFullYear(startDate.getFullYear() - 1);
-                dateFormat = "%b";
-                sortField = { year: 1, month: 1 };
-                break;
-
-            case "6m":
-            default:
-                startDate.setMonth(startDate.getMonth() - 6);
-                startDate.setDate(1);
-                dateFormat = "%b";
-                sortField = { year: 1, month: 1 };
-                break;
-        }
+        const {
+            startDate,
+            dateFormat,
+            sortField
+        } = this.buildDashboardRange(range);
 
         const data = await this.model.aggregate([
             {

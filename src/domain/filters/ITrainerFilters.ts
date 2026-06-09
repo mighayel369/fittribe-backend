@@ -16,8 +16,8 @@ export const TrainerFiltersSchema =
         availability: z.string().optional(),
         language: z.enum(LANGUAGE).optional(),
         sort: z.enum(TrainerSortOptions).optional(),
-        startPrice: z.coerce.number().optional().default(0),
-        endPrice: z.coerce.number().optional().default(config.TRAINER_MAX_SESSION_RATE)
+        startPrice: z.coerce.number().optional(),
+        endPrice: z.coerce.number().optional(),
     });
 
 export type ITrainerFilters = z.infer<typeof TrainerFiltersSchema>;

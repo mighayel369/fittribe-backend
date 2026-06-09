@@ -18,7 +18,6 @@ import { FetchAllTrainerRescheduleBookingsResponseDTO } from 'application/dto/bo
 import { FetchAllTrainerBookingsResponseDTO } from 'application/dto/booking/trainer/fetch-trainer-bookings.dto';
 import { fetchAllBookingQueryDTO } from 'application/dto/booking/shared/fetch-all-bookings.request.dto';
 import { BOOKING_STATUS } from 'domain/constants/booking-status';
-import { RescheduleRequestDTO } from 'application/dto/booking/shared/reschedule-request.dto';
 @injectable()
 export class TrainerBookingController {
     constructor(

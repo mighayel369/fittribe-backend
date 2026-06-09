@@ -63,7 +63,7 @@ export class UserAccountController {
                 throw new AppError(ERROR_MESSAGES.UNAUTHORIZED, HttpStatus.UNAUTHORIZED);
             }
 
-            let input = req.body as ChangePasswordRequestDTO
+            const input = req.body as ChangePasswordRequestDTO
 
             await this._changePasswordUseCase.execute(userId, input);
 
@@ -83,7 +83,7 @@ export class UserAccountController {
                 throw new AppError(ERROR_MESSAGES.UNAUTHORIZED, HttpStatus.UNAUTHORIZED)
             }
 
-            let profilePayload = req.body as UpdateUserProfileRequestDTO
+            const profilePayload = req.body as UpdateUserProfileRequestDTO
             await this._updateUserProfileUseCase.execute(userId, profilePayload);
 
             res.status(HttpStatus.OK).json({

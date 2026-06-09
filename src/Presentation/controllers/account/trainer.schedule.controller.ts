@@ -7,7 +7,7 @@ import { ERROR_MESSAGES } from 'utils/ErrorMessage';
 
 import { IGetTrainerWeeklyAvailabilityUseCase, I_GET_TRAINER_WEEKLY_AVAILABILITY_TOKEN } from 'application/interfaces/slot/i-get-trainer-weekly-availability.usecase';
 import { IUpdateTrainerWeeklyAvailabilityUseCase, I_UPDATE_TRAINER_WEEKLY_AVAILABILITY_TOKEN } from "application/interfaces/slot/i-update-trainer-weekly-availability.usecase";
-import { SyncWeeklyAvailabilityRequestDTO, WeeklyAvailabilityDTO } from 'application/dto/schedules/update-slot-config';
+import { SyncWeeklyAvailabilityRequestDTO } from 'application/dto/schedules/update-slot-config';
 @injectable()
 export class TrainerScheduleController {
     constructor(

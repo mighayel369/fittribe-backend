@@ -13,6 +13,7 @@ import { AppError } from "domain/errors/AppError";
 import { ERROR_MESSAGES } from "utils/ErrorMessage";
 import { HttpStatus } from "utils/HttpStatus";
 import { TrainerSortOptions } from "utils/Constants";
+import config from "config";
 @injectable()
 
 
@@ -21,7 +22,7 @@ export class TrainerRepoImpl extends BaseRepository<ITrainer> implements ITraine
 
 
     private buildTrainerMatchQuery(filter: ITrainerFilters): FilterQuery<ITrainer> {
-        console.log(filter)
+
         const query: FilterQuery<ITrainer> = {
             role: UserRole.TRAINER,
             verified: filter.status
@@ -44,12 +45,11 @@ export class TrainerRepoImpl extends BaseRepository<ITrainer> implements ITraine
                 filter.programId;
         }
 
-        if (filter.startPrice !== undefined && filter.endPrice !== undefined) {
-            query.pricePerSession = {
-                $gte: Number(filter.startPrice),
-                $lte: Number(filter.endPrice)
-            };
-        }
+        query.pricePerSession = {
+            $gte: filter.startPrice ?? 0,
+            $lte: filter.endPrice ?? config.TRAINER_MAX_SESSION_RATE
+        };
+
 
         return query;
     }
@@ -207,7 +207,7 @@ export class TrainerRepoImpl extends BaseRepository<ITrainer> implements ITraine
 
 
         const totalRowCount = result[0]?.totalCount?.[0]?.total || 0;
-        console.log('filtered trainer', result[0]?.docs)
+
         return {
             data: result[0]?.docs || [],
             totalCount: totalRowCount

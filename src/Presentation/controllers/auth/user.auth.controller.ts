@@ -59,7 +59,7 @@ export class UserAuthController {
                 user: authResult.user
             });
         } catch (error) {
-            console.log(error)
+
             next(error);
         }
     };

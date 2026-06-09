@@ -17,7 +17,7 @@ export class AdminAuthController {
 
     login = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            let loginPayload=req.body as LoginRequestDTO
+            const loginPayload=req.body as LoginRequestDTO
             const authResult = await this._adminLoginUseCase.execute(loginPayload)
 
             res.cookie(AUTH_CONSTANTS.REFRESH_TOKEN_COOKIE, authResult.refreshToken, COOKIE_CONFIG);
