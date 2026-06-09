@@ -103,7 +103,24 @@ export const ERROR_MESSAGES = {
   UPLOAD_LEAVE_DOCUMENT_FAILED: "Failed to upload leave documents",
   UPLOAD_CHAT_ATTACHMENT_FAILED: "Failed to upload chat attachment",
 
-  GOOGLE_DATA_FETCHING_ERROR:"No data provided by Google",
-  PDF_GENERATION_FAILED:"Failed to generate PDF report",
-   ACCESS_DENIED:"Access Denied. No token provided."
+  GOOGLE_DATA_FETCHING_ERROR: "No data provided by Google",
+  PDF_GENERATION_FAILED: "Failed to generate PDF report",
+  ACCESS_DENIED: "Access Denied. No token provided.",
+
+  CANCELLATION_DENIED: "Cancellation not allowed",
+  VALID_REASON_REQUIRED: "Valid decline reason required",
+
+  BOOKING_CONFIRMATION_DECLINED: (status: string) => `Cannot confirm booking with status ${status}`,
+
+  RESCHEDULE_BOOKING_TIME_EXCEED: "Must reschedule 24hrs before",
+
+  LIMIT_REACHED: "Limit reached",
+
+  RESCHEDULE_REQUEST_FAILED: "No active reschedule request found",
+
+  LEAVE_UPDATION_FAILED: (status: string) => `Cannot update leave status that is already ${status}`,
+  REASON_REQUIRED: "A reason is required to reject a leave request.",
+
+  PROGRAM_LENGTH_INVALID:"Program name must be at least 3 characters long.",
+  DESCRIPT_TOO_SHORT:"Description is too short to be helpful for users."
 }

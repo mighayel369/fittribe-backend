@@ -3,5 +3,5 @@ import { AdminDashbardResponseDTO } from "application/dto/dashboard/admin/admin-
 export const I_ADMIN_DASHBOARD_TOKEN = Symbol("I_ADMIN_DASHBOARD_TOKEN");
 
 export interface IAdminDashboard {
-    execute(): Promise<AdminDashbardResponseDTO>
+    execute(range:string): Promise<AdminDashbardResponseDTO>
 }

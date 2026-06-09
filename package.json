@@ -10,12 +10,14 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "type-check": "tsc --noEmit",
-    "clean": "rimraf dist"
+    "clean": "rimraf dist",
+    "seed": "tsx src/seed/index.ts"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@faker-js/faker": "^8.4.1",
     "bcryptjs": "^3.0.2",
     "body-parser": "^2.2.0",
     "cloudinary": "^1.41.3",
@@ -45,6 +47,7 @@
     "reflect-metadata": "^0.2.2",
     "socket.io": "^4.8.3",
     "streamifier": "^0.1.1",
+    "tsx": "^4.22.4",
     "tsyringe": "^4.10.0",
     "winston": "^3.17.0",
     "winston-daily-rotate-file": "^5.0.0",
@@ -75,7 +78,6 @@
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.58.2"
   },
-
   "_moduleAliases": {
     "*": "dist"
   }

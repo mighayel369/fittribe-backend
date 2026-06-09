@@ -58,4 +58,8 @@ export class SocketService implements ISocketService {
   public isUserOnline(userId: string): boolean {
     return this.onlineUsers.has(userId);
   }
+
+  public getUserSocketId(userId: string): string | undefined {
+    return this.onlineUsers.get(userId);
+  }
 }

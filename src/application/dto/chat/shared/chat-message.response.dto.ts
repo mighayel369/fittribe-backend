@@ -9,16 +9,19 @@ export const ChatFileSchema = z.object({
 });
 
 export const ChatMessageResponseSchema = z.object({
-    sender: z.string(),
-    date: z.string(),
+    messageId: z.string(),
     chatId: z.string(),
+    senderId: z.string(),
+    receiverId: z.string().nullable(),
     type: z.enum(MessageType),
     content: z.string().optional(),
+    isRead: z.boolean().optional(),
+    isActive: z.boolean().optional(),
+    createdAt: z.string(),
     file: ChatFileSchema.nullable().optional()
 });
 
-export const ChatMessagesResponseSchema =
-    z.array(ChatMessageResponseSchema);
 
-export type ChatMessageResponseDTO =
-    z.infer<typeof ChatMessageResponseSchema>;
+export const ChatMessagesResponseSchema = z.array(ChatMessageResponseSchema);
+
+export type ChatMessageResponseDTO = z.infer<typeof ChatMessageResponseSchema>;

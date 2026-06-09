@@ -30,6 +30,7 @@ interface Env {
   LOG_COMBINED_RETENTION: string;
   LOG_ERROR_RETENTION: string;
   LOG_DATE_PATTERN: string;
+  TRAINER_MAX_SESSION_RATE:number
 }
 
 const ensureEnv = (key: string): string => {
@@ -67,7 +68,8 @@ const getConfig = (): Env => {
     LOG_MAX_SIZE: process.env.LOG_MAX_SIZE || '20m',
     LOG_COMBINED_RETENTION: process.env.LOG_COMBINED_RETENTION || '14d',
     LOG_ERROR_RETENTION: process.env.LOG_ERROR_RETENTION || '30d',
-    LOG_DATE_PATTERN: process.env.LOG_DATE_PATTERN || 'YYYY-MM-DD'
+    LOG_DATE_PATTERN: process.env.LOG_DATE_PATTERN || 'YYYY-MM-DD',
+    TRAINER_MAX_SESSION_RATE:Number(process.env.TRAINER_MAX_SESSION_RATE)
   };
 };
 

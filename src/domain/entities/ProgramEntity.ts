@@ -1,4 +1,5 @@
 import { AppError } from "domain/errors/AppError";
+import { ERROR_MESSAGES } from "utils/ErrorMessage";
 export class ProgramEntity {
   constructor(
     public programId: string,
@@ -11,10 +12,10 @@ export class ProgramEntity {
 
   public validateProgram(): void {
     if (!this.name || this.name.trim().length < 3) {
-      throw new AppError("Program name must be at least 3 characters long.");
+      throw new AppError(ERROR_MESSAGES.PROGRAM_LENGTH_INVALID);
     }
     if (!this.description || this.description.length < 10) {
-      throw new AppError("Description is too short to be helpful for users.");
+      throw new AppError(ERROR_MESSAGES.DESCRIPT_TOO_SHORT);
     }
   }
 

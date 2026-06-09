@@ -22,7 +22,7 @@ import { BookingResponseDTO } from "application/dto/booking/user/fetch-user-book
 
 export class BookingMapper {
 
-  static toBookingEntity(data: CheckoutBookingDTO, userId: string): BookingEntity {
+  static toBookingEntity(data: CheckoutBookingDTO, userId: string, paymentId: string): BookingEntity {
     const totalAmount = data.price;
     const adminPercent = config.ADMIN_PERCENT || 0.1;
     const adminCommission = totalAmount * adminPercent;
@@ -42,7 +42,8 @@ export class BookingMapper {
       BOOKING_STATUS.PENDING,
       {
         method: PAYMENT_METHOD.ONLINE,
-        status: PAYMENT_STATUS.PAID
+        status: PAYMENT_STATUS.PAID,
+        paymentId
       }
     );
   }
@@ -97,14 +98,16 @@ export class BookingMapper {
         baseRate: data.totalAmount - data.adminCommission,
         platformFee: data.adminCommission,
         totalAmount: data.totalAmount,
-        paymentType: data.payment.method
+        paymentType: data.payment.method,
+        paymentId: data.payment.paymentId,
+        status: data.payment.status
       },
 
       client: {
         name: data.user.name,
         email: data.user.email,
         clientId: data.user.userId,
-        totalSessions: 0,
+        totalSessions: data.totalSessions,
         joinedOn: data.user.createdAt?.toISOString() ?? "",
         profilePic: data.user.profilePic ?? ""
       },
@@ -197,8 +200,10 @@ export class BookingMapper {
       bookingStatus: data.status,
       totalAmount: data.totalAmount,
       trainerEarning: data.trainerEarning,
+      adminCommission: data.adminCommission,
       paymentStatus: data.payment.status,
       paymentMethod: data.payment.method,
+      paymentId: data.payment.paymentId,
       rescheduleRequest:
         data.rescheduleRequest?.newDate &&
           data.rescheduleRequest?.createdAt
@@ -254,10 +259,12 @@ export class BookingMapper {
   }
 
   static toUserBookingDetailsResponse(
-    data: BookingAggregate
+    data: BookingAggregate,
+    chatId: string | null
   ): UserBookingDetailsResponseDTO {
 
     const mappedData = {
+      chatId,
       bookingId: data.bookingId,
       bookedProgram: data.program,
       bookedDate: new Date(data.date).toISOString(),
@@ -272,7 +279,8 @@ export class BookingMapper {
       totalAmount: data.totalAmount,
       payment: {
         method: data.payment.method,
-        status: data.payment.status
+        status: data.payment.status,
+        paymentId: data.payment.paymentId
       },
       rescheduleRequest:
         data.rescheduleRequest &&

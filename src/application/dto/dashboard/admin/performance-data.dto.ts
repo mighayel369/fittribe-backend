@@ -1,8 +1,10 @@
-import z from 'zod'
+import { z } from "zod";
+
 export const PerformanceDataSchema = z.object({
-    month: z.string(),
+    period: z.string(),
     revenue: z.number(),
-    users: z.number()
+    users: z.number(),
+    bookings: z.number()
 });
 
 export type PerformanceDataDTO =

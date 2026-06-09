@@ -80,7 +80,7 @@ export const TrainerMapper = {
             rating: trainer.rating || 0,
             experience: trainer.experience || 0,
             address: trainer.address || null,
-            programs: trainer.programs.map(p => p.name)
+            programs: trainer.programs.map(p=>p.name)
         });
     },
 

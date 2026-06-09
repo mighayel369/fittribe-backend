@@ -10,9 +10,14 @@ export class SocketChatService {
     this.initializeListeners();
   }
 
+
   private initializeListeners(): void {
-    this._eventEmitter.on("MESSAGE_SENT", ({ receiverId, payload }) => {
+    this._eventEmitter.on("MESSAGE_SENT", ({ senderId, receiverId, payload }) => {
+
       this._socketService.emitToRoom(receiverId, 'message_received', payload);
+      console.log(senderId)
+      this._socketService.emitToRoom(senderId, 'message_received', payload);
+
     });
   }
 }

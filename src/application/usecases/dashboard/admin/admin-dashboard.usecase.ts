@@ -19,7 +19,7 @@ export class AdminDashboardUsecase implements IAdminDashboard {
       ITrainerRepo
   ) { }
 
-  async execute():
+  async execute(range:string):
     Promise<AdminDashbardResponseDTO> {
 
     const [
@@ -29,7 +29,7 @@ export class AdminDashboardUsecase implements IAdminDashboard {
       rententionRate
     ] = await Promise.all([
       this._bookingRepository
-        .getAdminDashboardStats(),
+        .getAdminDashboardStats(range),
       this._trainerRepository
         .countActiveTrainers(),
       this._bookingRepository

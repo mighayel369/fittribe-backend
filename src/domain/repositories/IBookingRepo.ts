@@ -23,7 +23,7 @@ export interface IBookingRepo {
   getUpcomingAppointmentsByDate(trainerId: string, date: Date): Promise<BookingAggregate[]>;
   getPerformanceData(trainerId: string): Promise<{ month: string; sessionCount: number }[]>;
   findUpcomingBookingCount(trainerId: string): Promise<number>
-  getAdminDashboardStats(): Promise<AdminDashboardStats>;
+  getAdminDashboardStats(range:string): Promise<AdminDashboardStats>;
   getTrainerPerformanceAnalytics(): Promise<TrainerPerformanceAnalytics[]>;
   calculateUserRetention(): Promise<string>;
   getAdminDashboardMetrics(range?: '7days' | '6months'): Promise<AdminDashboardMetricsAggregate>;

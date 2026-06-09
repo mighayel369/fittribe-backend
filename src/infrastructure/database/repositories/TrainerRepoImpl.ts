@@ -21,17 +21,17 @@ export class TrainerRepoImpl extends BaseRepository<ITrainer> implements ITraine
 
 
     private buildTrainerMatchQuery(filter: ITrainerFilters): FilterQuery<ITrainer> {
-
+        console.log(filter)
         const query: FilterQuery<ITrainer> = {
             role: UserRole.TRAINER,
             verified: filter.status
         };
 
         if (filter.search) {
-            query.name = {
-                $regex: filter.search,
-                $options: "i"
-            };
+            query.$or = [
+                { name: { $regex: filter.search, $options: "i" } },
+                { "programs.name": { $regex: filter.search, $options: "i" } }
+            ]
         }
 
         if (filter.gender) {
@@ -42,6 +42,13 @@ export class TrainerRepoImpl extends BaseRepository<ITrainer> implements ITraine
         if (filter.programId) {
             query.programs =
                 filter.programId;
+        }
+
+        if (filter.startPrice !== undefined && filter.endPrice !== undefined) {
+            query.pricePerSession = {
+                $gte: Number(filter.startPrice),
+                $lte: Number(filter.endPrice)
+            };
         }
 
         return query;
@@ -158,73 +165,49 @@ export class TrainerRepoImpl extends BaseRepository<ITrainer> implements ITraine
         data: TrainerProfileAggregate[];
         totalCount: number;
     }> {
-        const skip =
-            (page - 1) * limit;
-        const matchQuery =
-            this.buildTrainerMatchQuery(
-                filter
-            );
-        const sortOrder =
-            this.getSortOrder(
-                filter.sort
-            );
-        const pipeline:
-            PipelineStage[] = [
-                {
-                    $match:
-                        matchQuery
-                },
-                {
-                    $sort:
-                        sortOrder
-                },
-                {
-                    $facet: {
-                        totalCount: [
-                            {
-                                $count: "total"
-                            }
-                        ],
-                        docs: [
-                            {
-                                $skip: skip
-                            },
-                            {
-                                $limit: limit
-                            },
-                            {
-                                $lookup: {
-                                    from: "programs",
-                                    localField: "programs",
-                                    foreignField: "programId",
-                                    as: "programs"
-                                }
-                            },
+        const skip = (page - 1) * limit;
+        const matchQuery = this.buildTrainerMatchQuery(filter);
+        const sortOrder = this.getSortOrder(filter.sort);
 
-                            {
-                                $project: {
-                                    _id: 0,
-                                }
-                            }
-                        ]
-                    }
-                }
-            ];
-
-        const result = await this.model.aggregate<
+        const pipeline: PipelineStage[] = [
+            { $match: matchQuery },
             {
-                totalCount: {
-                    total: number;
-                }[];
-                docs: TrainerProfileAggregate[];
+                $lookup: {
+                    from: "programs",
+                    localField: "programs",
+                    foreignField: "programId",
+                    as: "programs"
+                }
+            },
+
+            { $sort: sortOrder },
+
+            {
+                $facet: {
+                    totalCount: [
+                        { $count: "total" }
+                    ],
+                    docs: [
+                        { $skip: skip },
+                        { $limit: limit },
+                        {
+                            $project: {
+                                _id: 0,
+                            }
+                        }
+                    ]
+                }
             }
-        >(pipeline);
+        ];
 
-        const totalRowCount =
-            result[0]
-                ?.totalCount?.[0]
-                ?.total || 0;
+        const result = await this.model.aggregate<{
+            totalCount: { total: number }[];
+            docs: TrainerProfileAggregate[];
+        }>(pipeline);
 
+
+        const totalRowCount = result[0]?.totalCount?.[0]?.total || 0;
+        console.log('filtered trainer', result[0]?.docs)
         return {
             data: result[0]?.docs || [],
             totalCount: totalRowCount

@@ -2,6 +2,7 @@ import { UserRole } from "domain/constants/user-role";
 import { GENDER } from 'domain/constants/gender'
 import { TRAINER_STATUS } from "domain/constants/trainer-status";
 import { LANGUAGE } from "domain/constants/language-type";
+import config from "config";
 export class TrainerEntity {
   constructor(
     public trainerId: string,
@@ -29,6 +30,10 @@ export class TrainerEntity {
 
   public isBlocked(): boolean {
     return !this.status;
+  }
+
+  public checkSessionRate(): boolean {
+    return this.pricePerSession > config.TRAINER_MAX_SESSION_RATE ? true : false
   }
 
   update(fields: Partial<TrainerEntity>): TrainerEntity {

@@ -6,4 +6,5 @@ import { TrainerEntity } from "domain/entities/TrainerEntity";
 export interface BookingAggregate extends Omit<BookingEntity, 'userId' | 'trainerId'> {
     user: UserEntity;
     trainer: TrainerEntity;
+    totalSessions:number;
 };

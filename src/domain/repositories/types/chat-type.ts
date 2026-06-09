@@ -4,12 +4,11 @@ import { TrainerEntity } from "domain/entities/TrainerEntity";
 import { UserEntity } from "domain/entities/UserEntity";
 
 
-export interface TrainerChatListType {
-    chat: Omit<ChatEntity, "lastmessageId" | "participants">
-    user: UserEntity
-    message: MessageEntity
+export interface TrainerChatListAggregate
+    extends Omit<ChatEntity, "lastmessageId" | "participants"> {
+    user: UserEntity;
+    message: MessageEntity;
 }
-
 export interface ClientChatListType {
     chat: Omit<ChatEntity, "lastmessageId" | "participants">
     trainer: TrainerEntity

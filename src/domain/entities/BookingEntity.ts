@@ -3,6 +3,7 @@ import { BOOKING_STATUS } from "domain/constants/booking-status";
 import { PAYMENT_METHOD, PAYMENT_STATUS } from "domain/constants/payment-status";
 import { AppError } from "domain/errors/AppError";
 import { HttpStatus } from "utils/HttpStatus";
+import { ERROR_MESSAGES } from "utils/ErrorMessage";
 
 export class BookingEntity {
   constructor(
@@ -20,6 +21,7 @@ export class BookingEntity {
     public payment: {
       method: PAYMENT_METHOD;
       status: PAYMENT_STATUS;
+      paymentId: string;
     },
     public rescheduleRequest?: {
       newDate: Date;
@@ -50,7 +52,7 @@ export class BookingEntity {
 
   public approveReschedule(performedBy: UserRole): void {
     if (!this.rescheduleRequest) {
-      throw new AppError("No active reschedule request", HttpStatus.BAD_REQUEST);
+      throw new AppError(ERROR_MESSAGES.RESCHEDULE_REQUEST_FAILED, HttpStatus.BAD_REQUEST);
     }
 
     if (this.rescheduleRequest.requestedBy === performedBy) {
@@ -75,7 +77,7 @@ export class BookingEntity {
     wasPendingBefore = false
   ): void {
     if (!this.rescheduleRequest) {
-      throw new AppError("No active reschedule request", HttpStatus.BAD_REQUEST);
+      throw new AppError(ERROR_MESSAGES.RESCHEDULE_REQUEST_FAILED, HttpStatus.BAD_REQUEST);
     }
 
     if (this.rescheduleRequest.requestedBy === performedBy) {
@@ -87,7 +89,7 @@ export class BookingEntity {
       : BOOKING_STATUS.CONFIRMED;
 
     this.rescheduleRequest = undefined;
-    this.rejectReason = reason || "Rejected without reason";
+    this.rejectReason = reason
   }
 
   public requestReschedule(
@@ -98,14 +100,14 @@ export class BookingEntity {
   ): void {
 
     if (![BOOKING_STATUS.PENDING, BOOKING_STATUS.CONFIRMED].includes(this.status)) {
-      throw new AppError(`Cannot reschedule ${this.status}`, HttpStatus.BAD_REQUEST);
+      throw new AppError(ERROR_MESSAGES.BOOKING_CONFIRMATION_DECLINED(this.status), HttpStatus.BAD_REQUEST);
     }
     if (requestedBy === UserRole.USER && this.rescheduleCount >= this.MAX_RESCHEDULE_LIMIT) {
-      throw new AppError("Limit reached", HttpStatus.BAD_REQUEST);
+      throw new AppError(ERROR_MESSAGES.LIMIT_REACHED, HttpStatus.BAD_REQUEST);
     }
 
     if (this.hoursUntilSession() < 24) {
-      throw new AppError("Must reschedule 24hrs before", HttpStatus.BAD_REQUEST);
+      throw new AppError(ERROR_MESSAGES.RESCHEDULE_BOOKING_TIME_EXCEED, HttpStatus.BAD_REQUEST);
     }
 
     this.rescheduleRequest = {
@@ -141,7 +143,7 @@ export class BookingEntity {
   public confirm(): void {
     if (!this.canBeConfirmed()) {
       throw new AppError(
-        `Cannot confirm booking with status ${this.status}`,
+        ERROR_MESSAGES.BOOKING_CONFIRMATION_DECLINED(this.status),
         HttpStatus.BAD_REQUEST
       );
     }
@@ -166,7 +168,7 @@ export class BookingEntity {
     }
 
     if (!reason || reason.trim().length < 3) {
-      throw new AppError("Valid decline reason required", HttpStatus.BAD_REQUEST);
+      throw new AppError(ERROR_MESSAGES.VALID_REASON_REQUIRED, HttpStatus.BAD_REQUEST);
     }
 
     this.status = BOOKING_STATUS.REJECTED;
@@ -176,7 +178,7 @@ export class BookingEntity {
 
   public cancel(): void {
     if (!this.canCancel()) {
-      throw new AppError("Cancellation not allowed", HttpStatus.BAD_REQUEST);
+      throw new AppError(ERROR_MESSAGES.CANCELLATION_DENIED, HttpStatus.BAD_REQUEST);
     }
 
     this.status = BOOKING_STATUS.CANCELED;

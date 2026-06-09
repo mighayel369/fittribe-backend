@@ -29,9 +29,10 @@ export interface AdminDashboardMetricsAggregate {
 }
 
 export interface MonthlyPerformance {
-    month: string;
+    period: string;
     revenue: number;
     users: number;
+    bookings: number;
 }
 
 export interface BookingStatusCount {

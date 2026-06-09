@@ -2,6 +2,7 @@ import mongoose, { Schema, Document } from "mongoose";
 import { BOOKING_STATUS } from "domain/constants/booking-status";
 import { UserRole } from "domain/constants/user-role";
 import { BookingEntity } from "domain/entities/BookingEntity";
+import { PAYMENT_METHOD, PAYMENT_STATUS } from "domain/constants/payment-status";
 
 export interface IBooking extends Document, BookingEntity { }
 
@@ -27,8 +28,17 @@ const BookingSchema = new Schema<IBooking>({
 
 
   payment: {
-    method: String,
-    status: String
+    method: {
+      type: String,
+      enum: Object.values(PAYMENT_METHOD),
+      required: true
+    },
+    status: {
+      type: String,
+      enum: Object.values(PAYMENT_STATUS),
+      required: true
+    },
+    paymentId: { type: String, required: true }
   },
   rescheduleRequest: {
     newDate: Date,

@@ -22,21 +22,25 @@ export class SendMessage implements ISendMessage {
   ) { }
 
   async execute(messageRequest: ChatMessageRequestDTO): Promise<void> {
-    const { receiverId } = messageRequest;
+    const { receiverId, senderId, isRead } = messageRequest;
     let { chatId } = messageRequest;
-
     if (!chatId) {
-      const chatEntity = ChatMapper.toChatEntity(messageRequest);
+      const existingChat = await this._chatRepository.findChatRoom(senderId, receiverId);
 
-      const createdChat = await this._chatRepository.establishChat(chatEntity);
-
-      chatId = createdChat.chatId;
+      if (existingChat) {
+        chatId = existingChat.chatId;
+      } else {
+        const chatEntity = ChatMapper.toChatEntity(messageRequest);
+        const createdChat = await this._chatRepository.establishChat(chatEntity);
+        chatId = createdChat.chatId;
+      }
     }
 
 
     const messageEntity = ChatMapper.toMessageEntity({
       ...messageRequest,
-      chatId
+      chatId,
+      isRead: !!isRead
     });
 
     const savedMessage = await this._messageRepository.saveMessage(messageEntity);
@@ -47,8 +51,13 @@ export class SendMessage implements ISendMessage {
       throw new AppError(ERROR_MESSAGES.CHAT_ROOM_NOT_FOUND, HttpStatus.NOT_FOUND);
     }
 
-    const currentUnread = chatRoom.unreadCount.get(receiverId) || 0;
-    chatRoom.unreadCount.set(receiverId, currentUnread + 1);
+    if (!isRead) {
+      const currentUnread = chatRoom.unreadCount.get(receiverId) || 0;
+      chatRoom.unreadCount.set(receiverId, currentUnread + 1);
+    } else {
+      chatRoom.unreadCount.set(receiverId, 0);
+    }
+
 
     chatRoom.lastMessageId = savedMessage.messageId;
 
@@ -56,7 +65,8 @@ export class SendMessage implements ISendMessage {
 
     this._eventEmitter.emit("MESSAGE_SENT", {
       receiverId,
-      payload: ChatMapper.toMessageReceiverDTO(savedMessage)
+      senderId,
+      payload: ChatMapper.toMessageReceiverDTO(savedMessage, receiverId)
     });
   }
 }

@@ -17,12 +17,12 @@ export class GetMessage implements IgetMessages {
   ): Promise<ChatMessageResponseDTO[]> {
 
     const messageEntities = await this._messageRepository.getChatHistory(
-        chatId
-      );
+      chatId
+    );
 
 
     const mappedMessages = messageEntities.map((message) =>
-      ChatMapper.toMessageReceiverDTO(message)
+      ChatMapper.toMessageReceiverDTO(message, null)
     );
 
 

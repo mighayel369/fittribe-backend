@@ -1,5 +1,6 @@
 import { LEAVE_STATUS, LEAVE_TYPES } from "domain/constants/leave-status";
 import { AppError } from "domain/errors/AppError";
+import { ERROR_MESSAGES } from "utils/ErrorMessage";
 
 export class LeaveEntity {
   constructor(
@@ -18,13 +19,11 @@ export class LeaveEntity {
 
   public updateStatus(newStatus: LEAVE_STATUS, comment?: string): void {
     if (this.status !== LEAVE_STATUS.PENDING) {
-      throw new AppError(
-        `Cannot update leave that is already ${this.status.toLowerCase()}`
-      );
+      throw new AppError(ERROR_MESSAGES.LEAVE_UPDATION_FAILED(this.status));
     }
 
     if (newStatus === LEAVE_STATUS.REJECTED && (!comment || comment.trim() === "")) {
-      throw new AppError("A reason is required to reject a leave request.");
+      throw new AppError(ERROR_MESSAGES.REASON_REQUIRED);
     }
 
     this.status = newStatus;
@@ -34,7 +33,7 @@ export class LeaveEntity {
   public withdraw(): void {
     if (this.status !== LEAVE_STATUS.PENDING) {
       throw new AppError(
-        `Cannot withdraw a leave request that is already ${this.status}`
+        ERROR_MESSAGES.SOMETHING_WENT_WRONG
       );
     }
 

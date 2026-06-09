@@ -20,18 +20,20 @@ export const UserBookingDetailsResponseSchema = z.object({
   trainerGender: z.string(),
   totalAmount: z.number(),
   payment: z.object({
-    method: z.nativeEnum(PAYMENT_METHOD),
-    status: z.nativeEnum(PAYMENT_STATUS)
+    method: z.enum(PAYMENT_METHOD),
+    status: z.enum(PAYMENT_STATUS),
+    paymentId: z.string()
   }),
 
   rescheduleRequest: z.object({
     newDate: z.string(),
     newTimeSlot: z.number(),
-    requestedBy: z.nativeEnum(UserRole),
+    requestedBy: z.enum(UserRole),
     status: z.string()
   }).optional(),
   rejectReason: z.string().optional(),
-  isReviewed: z.boolean().optional()
+  isReviewed: z.boolean().optional(),
+  chatId: z.string().nullable()
 });
 
 export type UserBookingDetailsResponseDTO =

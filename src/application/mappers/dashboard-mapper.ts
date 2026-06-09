@@ -67,9 +67,10 @@ export class DashboardMapper {
       performanceData:
         stats.performanceData.map(
           (item) => ({
-            month: item.month,
+            period: item.period,
             revenue: item.revenue,
-            users: item.users
+            users: item.users,
+            bookings: item.bookings
           })
         ),
 

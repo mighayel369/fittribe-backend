@@ -76,7 +76,8 @@ export class OnlineBookingUseCase
         const bookingEntity =
             BookingMapper.toBookingEntity(
                 bookingData,
-                userId
+                userId,
+                razorpay_payment_id
             );
 
         await this._bookingRepository

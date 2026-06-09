@@ -4,7 +4,7 @@ import { BaseRepository } from "./BaseRepository";
 import { ChatDocument, ChatModel } from "../models/ChatModel";
 import { ChatEntity } from "domain/entities/ChatEntity";
 import { Model, PipelineStage } from "mongoose";
-import { ClientChatListType, TrainerChatListType } from "domain/repositories/types/chat-type";
+import { ClientChatListType, TrainerChatListAggregate } from "domain/repositories/types/chat-type";
 
 
 
@@ -17,7 +17,7 @@ export class ChatRepoImpl extends BaseRepository<ChatDocument> implements IChatR
         return doc
     }
 
-    async getChatListForTrainer(trainerId: string, searchQuery = ""): Promise<TrainerChatListType[]> {
+    async getChatListForTrainer(trainerId: string, searchQuery = ""): Promise<TrainerChatListAggregate[]> {
         const pipeline: PipelineStage[] = [
             { $match: { participants: trainerId, isActive: true } },
 
@@ -66,13 +66,13 @@ export class ChatRepoImpl extends BaseRepository<ChatDocument> implements IChatR
             {
                 $project: {
                     _id: 0,
-                    chat: {
-                        chatId: "$chatId",
-                        isActive: "$isActive",
-                        unreadCount: "$unreadCount",
-                        createdAt: "$createdAt",
-                        updatedAt: "$updatedAt",
-                    },
+                    chatId: "$chatId",
+                    isActive: "$isActive",
+                    unreadCount: "$unreadCount",
+                    createdAt: "$createdAt",
+                    updatedAt: "$updatedAt",
+                    lastMessageId: "$lastMessageId",
+
                     user: {
                         name: "$clientDetails.name",
                         email: "$clientDetails.email",
@@ -81,12 +81,25 @@ export class ChatRepoImpl extends BaseRepository<ChatDocument> implements IChatR
                         status: "$clientDetails.status",
                         profilePic: "$clientDetails.profilePic",
                     },
-                    message: "$lastMsg"
+                    message: {
+                        messageId: "$lastMsg.messageId",
+                        chatId: "$lastMsg.chatId",
+                        senderId: "$lastMsg.senderId",
+                        type: "$lastMsg.type",
+                        isRead: "$lastMsg.isRead",
+                        isActive: "$lastMsg.isActive",
+                        content: "$lastMsg.content",
+                        file: "$lastMsg.file",
+                        createdAt: "$lastMsg.createdAt",
+                        updatedAt: "$lastMsg.updatedAt"
+                    }
                 }
-            }
+            },
+
+            { $sort: { "message.createdAt": -1 } }
         ];
 
-        const results = await this.model.aggregate<TrainerChatListType>(pipeline);
+        const results = await this.model.aggregate<TrainerChatListAggregate>(pipeline);
         return results;
     }
 

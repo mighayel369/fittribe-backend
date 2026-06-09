@@ -28,9 +28,8 @@ export class AdminBookingController {
         try {
 
             const query = req.query as unknown as fetchAllBookingQueryDTO
-
             const bookings = await this._fetchAllBookingsUseCase.execute(query);
-
+          
             res.status(HttpStatus.OK).json({
                 success: true,
                 ...bookings

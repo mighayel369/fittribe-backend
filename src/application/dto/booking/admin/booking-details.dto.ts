@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { BOOKING_STATUS } from "domain/constants/booking-status";
-import { PAYMENT_METHOD } from "domain/constants/payment-status";
+import { PAYMENT_METHOD,PAYMENT_STATUS } from "domain/constants/payment-status";
 
 export const AdminBookingDetailsResponseSchema = z.object({
     bookingId: z.string(),
@@ -15,7 +15,9 @@ export const AdminBookingDetailsResponseSchema = z.object({
         baseRate: z.number(),
         platformFee: z.number(),
         totalAmount: z.number(),
-        paymentType: z.enum(PAYMENT_METHOD)
+        paymentType: z.enum(PAYMENT_METHOD),
+        paymentId: z.string(),
+        status: z.enum(PAYMENT_STATUS),
     }),
 
     client: z.object({

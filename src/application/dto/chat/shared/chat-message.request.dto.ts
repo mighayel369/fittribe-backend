@@ -13,7 +13,7 @@ export type ChatFileDTO = z.infer<typeof ChatFileSchema>;
 
 
 export const ChatMessageRequestSchema = z.object({
-
+    isRead: z.boolean(),
     senderId: z
         .string()
         .trim()

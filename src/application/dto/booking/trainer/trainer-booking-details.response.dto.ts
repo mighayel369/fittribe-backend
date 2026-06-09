@@ -9,7 +9,7 @@ export const TrainerBookingDetailsResponseSchema = z.object({
   chatId: z.string().nullable(),
   clientId: z.string(),
   clientName: z.string(),
-  clientEmail: z.string().email(),
+  clientEmail: z.email(),
   clientPhone: z.string().optional(),
   clientProfilePic: z.string().optional(),
 
@@ -22,10 +22,11 @@ export const TrainerBookingDetailsResponseSchema = z.object({
 
   totalAmount: z.number(),
   trainerEarning: z.number(),
+  adminCommission: z.number(),
 
   paymentStatus: z.enum(PAYMENT_STATUS),
   paymentMethod: z.enum(PAYMENT_METHOD),
-
+  paymentId: z.string(),
   rescheduleRequest: z.object({
     newDate: z.string(),
     newTimeSlot: z.number(),

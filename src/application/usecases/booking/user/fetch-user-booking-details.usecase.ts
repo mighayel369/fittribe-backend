@@ -6,7 +6,7 @@ import { BookingMapper } from "application/mappers/booking-mapper";
 import { AppError } from "domain/errors/AppError";
 import { ERROR_MESSAGES } from "utils/ErrorMessage";
 import { HttpStatus } from "utils/HttpStatus";
-
+import { IChatRepo, I_CHAT_REPO_TOKEN } from "domain/repositories/IChatRepo";
 
 @injectable()
 export class FetchBookingDetailsForClient
@@ -15,7 +15,10 @@ export class FetchBookingDetailsForClient
 
   constructor(
     @inject(I_BOOKING_REPO_TOKEN)
-    private readonly _bookingRepository: IBookingRepo
+    private readonly _bookingRepository: IBookingRepo,
+
+    @inject(I_CHAT_REPO_TOKEN)
+    private readonly _chatRepository: IChatRepo
   ) { }
 
   async execute(
@@ -41,8 +44,17 @@ export class FetchBookingDetailsForClient
       );
     }
 
+
+    const chatRoom = await this._chatRepository.findChatRoom(
+      bookingRecord.user.userId,
+      bookingRecord.trainer.trainerId
+    );
+
+    const chatId = chatRoom?.chatId || null;
+
     return BookingMapper.toUserBookingDetailsResponse(
-      bookingRecord
+      bookingRecord,
+      chatId
     );
   }
 }

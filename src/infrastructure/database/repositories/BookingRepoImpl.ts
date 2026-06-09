@@ -64,7 +64,8 @@ export class BookingRepoImpl
         if (filters.search) {
             query.$or = [
                 { program: { $regex: filters.search, $options: 'i' } },
-                { "userInfo.name": { $regex: filters.search, $options: 'i' } }
+                { "user.name": { $regex: filters.search, $options: 'i' } },
+                { "trainer.name": { $regex: filters.search, $options: 'i' } }
             ];
         }
 
@@ -99,9 +100,6 @@ export class BookingRepoImpl
 
         const aggregationResult = await this.model.aggregate([
             {
-                $match: matchQuery
-            },
-            {
                 $lookup: {
                     from: "trainers",
                     localField: "trainerId",
@@ -130,6 +128,9 @@ export class BookingRepoImpl
                 }
             },
             {
+                $match: matchQuery
+            },
+            {
                 $facet: {
                     metadata: [
                         {
@@ -139,8 +140,8 @@ export class BookingRepoImpl
                     data: [
                         {
                             $sort: {
-                                date: 1,
-                                timeSlot: 1
+                                date: -1,
+                                timeSlot: -1
                             }
                         },
                         {
@@ -189,13 +190,11 @@ export class BookingRepoImpl
     ): Promise<BookingAggregate | null> {
 
         const aggregationResult = await this.model.aggregate([
-
             {
                 $match: {
                     bookingId
                 }
             },
-
             {
                 $lookup: {
                     from: "users",
@@ -204,14 +203,12 @@ export class BookingRepoImpl
                     as: "user"
                 }
             },
-
             {
                 $unwind: {
                     path: "$user",
                     preserveNullAndEmptyArrays: true
                 }
             },
-
             {
                 $lookup: {
                     from: "trainers",
@@ -220,14 +217,27 @@ export class BookingRepoImpl
                     as: "trainer"
                 }
             },
-
             {
                 $unwind: {
                     path: "$trainer",
                     preserveNullAndEmptyArrays: true
                 }
             },
-
+            {
+                $lookup: {
+                    from: "bookings",
+                    localField: "userId",
+                    foreignField: "userId",
+                    as: "userBookings"
+                }
+            },
+            {
+                $addFields: {
+                    totalSessions: {
+                        $size: "$userBookings"
+                    }
+                }
+            },
             {
                 $project: {
                     userId: 0,
@@ -511,42 +521,152 @@ export class BookingRepoImpl
     }
 
 
-    async getAdminDashboardStats(): Promise<AdminDashboardStats> {
-        const sixMonthsAgo = new Date();
-        sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
-        sixMonthsAgo.setDate(1);
+    async getAdminDashboardStats(
+        range: string = "6m"
+    ): Promise<AdminDashboardStats> {
+
+        const startDate = new Date();
+
+        let dateFormat = "%b";
+        let sortField: any = { year: 1, month: 1 };
+
+        switch (range) {
+            case "7d":
+                startDate.setDate(startDate.getDate() - 7);
+                dateFormat = "%d %b";
+                sortField = { year: 1, month: 1, day: 1 };
+                break;
+
+            case "30d":
+                startDate.setDate(startDate.getDate() - 30);
+                dateFormat = "%d %b";
+                sortField = { year: 1, month: 1, day: 1 };
+                break;
+
+            case "1y":
+                startDate.setFullYear(startDate.getFullYear() - 1);
+                dateFormat = "%b";
+                sortField = { year: 1, month: 1 };
+                break;
+
+            case "6m":
+            default:
+                startDate.setMonth(startDate.getMonth() - 6);
+                startDate.setDate(1);
+                dateFormat = "%b";
+                sortField = { year: 1, month: 1 };
+                break;
+        }
 
         const data = await this.model.aggregate([
             {
                 $facet: {
                     metrics: [
-                        { $group: { _id: null, totalRevenue: { $sum: { $cond: [{ $eq: ["$status", BOOKING_STATUS.COMPLETED] }, "$adminCommission", 0] } }, totalBookings: { $sum: 1 } } }
-                    ],
-                    performanceData: [
-                        { $match: { createdAt: { $gte: sixMonthsAgo } } },
                         {
                             $group: {
-                                _id: { $dateToString: { format: "%b", date: "$createdAt" } },
-                                revenue: { $sum: "$adminCommission" },
-                                users: { $addToSet: "$userId" },
-                                monthIndex: { $first: { $month: "$createdAt" } }
+                                _id: null,
+                                totalRevenue: {
+                                    $sum: {
+                                        $cond: [
+                                            { $eq: ["$status", BOOKING_STATUS.COMPLETED] },
+                                            "$adminCommission",
+                                            0
+                                        ]
+                                    }
+                                },
+                                totalBookings: { $sum: 1 }
+                            }
+                        }
+                    ],
+
+                    performanceData: [
+                        {
+                            $match: {
+                                createdAt: { $gte: startDate }
                             }
                         },
-                        { $sort: { monthIndex: 1 } },
-                        { $project: { month: "$_id", revenue: 1, users: { $size: "$users" } } }
+
+                        {
+                            $group: {
+                                _id: {
+                                    label: {
+                                        $dateToString: {
+                                            format: dateFormat,
+                                            date: "$createdAt"
+                                        }
+                                    },
+                                    year: { $year: "$createdAt" },
+                                    month: { $month: "$createdAt" },
+                                    day: { $dayOfMonth: "$createdAt" }
+                                },
+
+                                revenue: {
+                                    $sum: {
+                                        $cond: [
+                                            { $eq: ["$status", BOOKING_STATUS.COMPLETED] },
+                                            "$adminCommission",
+                                            0
+                                        ]
+                                    }
+                                },
+
+                                users: {
+                                    $addToSet: "$userId"
+                                },
+
+                                bookings: {
+                                    $sum: 1
+                                }
+                            }
+                        },
+
+                        {
+                            $sort: sortField
+                        },
+
+                        {
+                            $project: {
+                                _id: 0,
+                                period: "$_id.label",
+                                revenue: 1,
+                                users: { $size: "$users" },
+                                bookings: 1
+                            }
+                        }
                     ],
+
                     bookingStatus: [
-                        { $group: { _id: "$status", count: { $sum: 1 } } },
-                        { $project: { label: "$_id", count: 1, _id: 0 } }
+                        {
+                            $group: {
+                                _id: "$status",
+                                count: { $sum: 1 }
+                            }
+                        },
+                        {
+                            $project: {
+                                _id: 0,
+                                label: "$_id",
+                                count: 1
+                            }
+                        }
                     ],
+
                     peakHoursData: [
                         {
                             $group: {
-                                _id: "$timeSlot", count: { $sum: 1 }
+                                _id: "$timeSlot",
+                                count: { $sum: 1 }
                             }
                         },
-                        { $sort: { count: -1 } },
-                        { $limit: 4 }, {
+                        {
+                            $sort: {
+                                count: -1
+                            }
+                        },
+                        {
+                            $limit: 4
+                        },
+                        {
                             $project: {
                                 _id: 0,
                                 time: "$_id",
@@ -558,8 +678,12 @@ export class BookingRepoImpl
             }
         ]);
 
+
         return {
-            metrics: data[0].metrics[0] || { totalRevenue: 0, totalBookings: 0 },
+            metrics: data[0].metrics[0] || {
+                totalRevenue: 0,
+                totalBookings: 0
+            },
             performanceData: data[0].performanceData,
             bookingStatus: data[0].bookingStatus,
             peakHoursData: data[0].peakHoursData

@@ -11,9 +11,10 @@ export class AdminDashboardController {
         private readonly _getAdminDashboardUseCase: IAdminDashboard,
     ) { }
 
-    getPlatformInsights = async (_req: Request, res: Response, next: NextFunction) => {
+    getPlatformInsights = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const dashboardData = await this._getAdminDashboardUseCase.execute();
+            const range = req.query.range as string ?? "6m";
+            const dashboardData = await this._getAdminDashboardUseCase.execute(range);
             res.status(HttpStatus.OK).json({
                 success: true,
                 message: SUCCESS_MESSAGES.DASHBOARD.DASHBOARD_DATA_FETCHED,

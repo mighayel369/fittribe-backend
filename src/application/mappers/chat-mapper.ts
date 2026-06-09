@@ -4,7 +4,7 @@ import { ChatEntity } from "domain/entities/ChatEntity";
 import { ChatMessageResponseDTO } from "application/dto/chat/shared/chat-message.response.dto";
 import { AppError } from "domain/errors/AppError";
 import { ERROR_MESSAGES } from "utils/ErrorMessage";
-import { ClientChatListType, TrainerChatListType } from "domain/repositories/types/chat-type";
+import { ClientChatListType, TrainerChatListAggregate } from "domain/repositories/types/chat-type";
 import { UserEntity } from "domain/entities/UserEntity";
 import { ChatListResponseDTO } from "application/dto/chat/shared/chat-list-response.dto";
 import { NonEstablishedChatListResponseDTO } from "application/dto/chat/trainer/client-list.dto";
@@ -28,7 +28,7 @@ export const ChatMapper = {
             data.chatId,
             data.senderId,
             data.type,
-            false,
+            data.isRead,
             true,
             data.content,
             data.file ? {
@@ -40,14 +40,18 @@ export const ChatMapper = {
         );
     },
 
-    toMessageReceiverDTO(entity: MessageEntity): ChatMessageResponseDTO {
 
+    toMessageReceiverDTO(entity: MessageEntity, receiverId: string | null): ChatMessageResponseDTO {
         return {
-            sender: entity.senderId,
-            date: entity.createdAt ? entity.createdAt.toISOString() : new Date().toISOString(),
+            messageId: entity.messageId,
             chatId: entity.chatId,
+            senderId: entity.senderId,
+            receiverId: receiverId,
             type: entity.type,
-            content: entity.content,
+            content: entity.content || "",
+            isRead: entity.isRead,
+            isActive: entity.isActive,
+            createdAt: entity.createdAt ? entity.createdAt.toISOString() : new Date().toISOString(),
             file: entity.file?.url
                 ? {
                     url: entity.file.url,
@@ -59,17 +63,17 @@ export const ChatMapper = {
         };
     },
 
-    toTrainerChatListDTO(data: TrainerChatListType, trainerId: string): ChatListResponseDTO {
+    toTrainerChatListDTO(data: TrainerChatListAggregate, trainerId: string): ChatListResponseDTO {
         return {
             id: data.user.userId,
             name: data.user.name,
             profilePic: data.user.profilePic || "",
-            chatId: data.chat.chatId,
-            unReadCount: data.chat.unreadCount instanceof Map
-                ? (data.chat.unreadCount.get(trainerId) || 0)
-                : (data.chat.unreadCount?.[trainerId] || 0),
+            chatId: data.chatId,
+            unReadCount: data.unreadCount instanceof Map
+                ? (data.unreadCount.get(trainerId) || 0)
+                : (data.unreadCount?.[trainerId] || 0),
 
-            lastMessage: this.toMessageReceiverDTO(data.message),
+            lastMessage: this.toMessageReceiverDTO(data.message, data.user.userId),
 
             lastMessageTime: data.message?.createdAt
                 ? new Date(data.message.createdAt).toISOString()
@@ -86,7 +90,7 @@ export const ChatMapper = {
             unReadCount: data.chat.unreadCount instanceof Map
                 ? (data.chat.unreadCount.get(userId) || 0)
                 : (data.chat.unreadCount?.[userId] || 0),
-            lastMessage: this.toMessageReceiverDTO(data.message),
+            lastMessage: this.toMessageReceiverDTO(data.message, data.trainer.trainerId),
             lastMessageTime: data.message?.createdAt
                 ? new Date(data.message.createdAt).toISOString()
                 : "No Time available"
