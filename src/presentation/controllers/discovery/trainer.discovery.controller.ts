@@ -16,6 +16,7 @@ import { TRAINER_STATUS } from 'domain/constants/trainer-status';
 import { TrainerAvailabilityQueryDTO } from 'application/dto/discovery/trainer-slots.dto';
 import { FetchAllTrainersRequestDTO } from 'application/dto/discovery/fetch-all-trainer.request.dto';
 
+
 @injectable()
 export class TrainerDiscoveryController {
     constructor(
@@ -35,6 +36,7 @@ export class TrainerDiscoveryController {
 
     exploreTrainers = async (req: Request, res: Response, next: NextFunction) => {
         try {
+
             const query = req.query as unknown as FetchAllTrainersRequestDTO
             query.filter = {
                 ...query.filter,
@@ -57,7 +59,6 @@ export class TrainerDiscoveryController {
     getTrainerDetails = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const trainerId = req.params.trainerId as string;
-
             if (!trainerId) {
                 throw new AppError(ERROR_MESSAGES.MISSING_REQUIRED_DATA, HttpStatus.BAD_REQUEST);
             }
@@ -92,7 +93,7 @@ export class TrainerDiscoveryController {
 
     getReviewList = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const  trainerId  = req.params.trainerId as string;
+            const trainerId = req.params.trainerId as string;
 
             if (!trainerId) {
                 throw new AppError(ERROR_MESSAGES.MISSING_REQUIRED_DATA, HttpStatus.BAD_REQUEST);

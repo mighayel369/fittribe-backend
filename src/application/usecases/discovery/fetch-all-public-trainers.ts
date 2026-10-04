@@ -38,6 +38,8 @@ export class FetchAllClientTrainersUseCase implements IFetchAllTrainersUseCase<F
       status: TRAINER_STATUS.ACCEPTED
     };
 
+    console.log(updatedFilter)
+
     const trainerResult = await this._trainerRepository.findAllTrainers(
       currentPage,
       limit,

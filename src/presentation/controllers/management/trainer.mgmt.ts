@@ -38,6 +38,7 @@ export class TrainerManagementController {
 
     getVerifiedTrainers = async (req: Request, res: Response, next: NextFunction) => {
         try {
+            console.log('Explore trainers controller called');
             const { currentPage, limit, filter } = req.query as unknown as FetchAllTrainersRequestDTO
             const trainersResult = await this._fetchVerifiedTrainersUseCase.execute({
                 currentPage,

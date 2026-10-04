@@ -2,8 +2,12 @@ import { format, createLogger, transports } from 'winston';
 import config from 'config';
 const { combine, timestamp, label, printf, errors } = format;
 
-const myFormat = printf(({ level, message, label, timestamp, stack }) => {
-    return `${timestamp} ${label} [${level}]: ${stack || message}`;
+const myFormat = printf(({ level, message, label, timestamp, stack, ...meta }) => {
+    const metadata = Object.keys(meta).length
+        ? JSON.stringify(meta)
+        : '';
+
+    return `${timestamp} ${label} [${level}]: ${stack || message} ${metadata}`;
 });
 
 export const devLogger = () => {

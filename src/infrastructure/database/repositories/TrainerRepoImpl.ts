@@ -14,6 +14,7 @@ import { ERROR_MESSAGES } from "utils/ErrorMessage";
 import { HttpStatus } from "utils/HttpStatus";
 import { TrainerSortOptions } from "utils/Constants";
 import config from "config";
+import logger from "logger";
 @injectable()
 
 
@@ -49,6 +50,8 @@ export class TrainerRepoImpl extends BaseRepository<ITrainer> implements ITraine
             $gte: filter.startPrice ?? 0,
             $lte: filter.endPrice ?? config.TRAINER_MAX_SESSION_RATE
         };
+
+        logger.info(query)
 
 
         return query;
@@ -168,9 +171,8 @@ export class TrainerRepoImpl extends BaseRepository<ITrainer> implements ITraine
         const skip = (page - 1) * limit;
         const matchQuery = this.buildTrainerMatchQuery(filter);
         const sortOrder = this.getSortOrder(filter.sort);
-
+        logger.info(matchQuery)
         const pipeline: PipelineStage[] = [
-            { $match: matchQuery },
             {
                 $lookup: {
                     from: "programs",
@@ -179,6 +181,8 @@ export class TrainerRepoImpl extends BaseRepository<ITrainer> implements ITraine
                     as: "programs"
                 }
             },
+
+            { $match: matchQuery },
 
             { $sort: sortOrder },
 

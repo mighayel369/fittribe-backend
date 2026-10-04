@@ -7,7 +7,7 @@ import userAuth from './auth/user.auth';
 import sessionAuth from './auth/session.auth';
 import wallet from './payment/wallet';
 import userAccount from './account/user.account';
-import userPayment from './payment/user.payment'; 
+import userPayment from './payment/user.payment';
 import userBookings from './booking/user.bookings';
 
 import sharedChat from './chat/shared.chat'
@@ -19,7 +19,6 @@ import publicPrograms from './public/public.programs';
 import publicTrainers from './public/public.trainers';
 
 const userRouter = express.Router();
-
 userRouter.use('/discovery', publicPrograms);
 userRouter.use('/discovery/trainers', publicTrainers);
 userRouter.use('/auth', userAuth);
@@ -30,12 +29,12 @@ userRouter.use(authorizeRoles(UserRole.USER));
 
 userRouter.use('/account', userAccount);
 userRouter.use('/bookings', userBookings);
-userRouter.use('/payments', userPayment); 
+userRouter.use('/payments', userPayment);
 userRouter.use('/wallet', wallet);
-userRouter.use('/notification',notification)
-userRouter.use('/chats',sharedChat);
-userRouter.use('/chats',userChat);
+userRouter.use('/notification', notification)
+userRouter.use('/chats', sharedChat);
+userRouter.use('/chats', userChat);
 
-userRouter.use('/review',userReview);
+userRouter.use('/review', userReview);
 
 export default userRouter;

@@ -1,4 +1,4 @@
-import config from "config";
+import config from './../config'
 import { ProductionLogger } from "./productionLogger";
 import { devLogger } from "./devLogger";
 import { Logger } from "winston";
