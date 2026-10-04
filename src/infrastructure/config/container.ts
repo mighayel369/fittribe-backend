@@ -198,7 +198,7 @@ import { VerifyOnlinePaymentUsecase } from "application/usecases/payment/verify-
 
 import { FetchTrainerAvailableSlotsUseCase } from "application/usecases/discovery/fetch-all-available-slots";
 import { UpdateTrainerWeeklyAvailabilityUseCase } from "application/usecases/schedule/update-trainer-weekly-availability.usecase";
-import { GetTrainerWeeklyAvailabilityUseCase } from "application/usecases/schedule/get-trainer-slot-configuration.usecase.ts";
+import { GetTrainerWeeklyAvailabilityUseCase } from "application/usecases/schedule/get-trainer-slot-configuration.usecase";
 
 import { GetWalletUseCase } from "application/usecases/wallet/get-wallet";
 
