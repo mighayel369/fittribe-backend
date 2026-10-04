@@ -87,3 +87,8 @@ export enum ACTIONS {
     REJECT = "reject",
 }
 
+export enum NODE_ENV {
+    DEVELOPMENT = "dev",
+        PRODUCTION = "prod",
+}
+

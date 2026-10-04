@@ -2,6 +2,7 @@ import { createLogger, format } from 'winston';
 import DailyRotateFile from 'winston-daily-rotate-file';
 import path from 'path';
 import config from 'config';
+import { NODE_ENV } from 'utils/Constants';
 
 const { combine, timestamp, label, printf, errors } = format;
 
@@ -13,7 +14,7 @@ export const ProductionLogger = () => {
     return createLogger({
         level: config.LOG_LEVEL,
         format: combine(
-            label({ label: 'prod' }),
+            label({ label: NODE_ENV.PRODUCTION }),
             errors({ stack: true }),
             timestamp({ format: 'YYYY-MM-DD HH:mm:ss' })
         ),

@@ -1,7 +1,8 @@
 import config from "config";
+import { NODE_ENV } from "./Constants";
 export const COOKIE_CONFIG = {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: config.NODE_ENV === NODE_ENV.PRODUCTION,
     sameSite: "strict" as const,
-    maxAge: config.COOKIE_MAX_AGE 
+    maxAge: config.COOKIE_MAX_AGE
 };
