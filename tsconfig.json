@@ -9,20 +9,38 @@
       "config": [
         "./src/config.ts"
       ],
+      "infrastructure": [
+        "./src/infrastructure/index.ts"
+      ],
       "infrastructure/*": [
         "./src/infrastructure/*"
+      ],
+      "application": [
+        "./src/application/index.ts"
       ],
       "application/*": [
         "./src/application/*"
       ],
+      "domain": [
+        "./src/domain/index.ts"
+      ],
       "domain/*": [
         "./src/domain/*"
+      ],
+      "presentation": [
+        "./src/presentation/index.ts"
       ],
       "presentation/*": [
         "./src/presentation/*"
       ],
+      "logger": [
+        "./src/logger/index.ts"
+      ],
       "logger/*": [
         "./src/logger/*"
+      ],
+      "utils": [
+        "./src/utils/index.ts"
       ],
       "utils/*": [
         "./src/utils/*"
