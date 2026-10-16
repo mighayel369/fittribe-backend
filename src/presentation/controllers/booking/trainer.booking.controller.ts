@@ -69,10 +69,11 @@ export class TrainerBookingController {
     };
 
     rejectBooking = async (req: Request, res: Response, next: NextFunction) => {
+        
         try {
             const bookingId = req.params.bookingId as string;
             const { reason } = req.body;
-
+            console.log(reason)
             await this._declineBookingUseCase.execute(
                 bookingId,
                 reason
@@ -82,6 +83,7 @@ export class TrainerBookingController {
                 message: SUCCESS_MESSAGES.BOOKING.TRAINER_DECLINED_BOOKING
             });
         } catch (error) {
+            console.log(error)
             next(error);
         }
     };

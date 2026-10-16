@@ -17,7 +17,7 @@ router.get('/pending', validateRequest(FetchAllBookingQuerySchema, "query"), ctr
 router.patch('/reschedule/approve/:bookingId', validateRequest(BookingParamsSchema, 'params'), ctrl.approveReschedule);
 router.patch('/reschedule/reject/bookingId', validateRequest(BookingParamsSchema, 'params'), validateRequest(RejectBookingBodySchema), ctrl.rejectReschedule);
 router.patch('/accept/:bookingId', validateRequest(BookingParamsSchema, 'params'), ctrl.acceptBooking);
-router.patch('/reject:bookingId', validateRequest(BookingParamsSchema, 'params'), validateRequest(RejectBookingBodySchema), ctrl.rejectBooking);
+router.patch('/reject/:bookingId', validateRequest(BookingParamsSchema, 'params'), validateRequest(RejectBookingBodySchema), ctrl.rejectBooking);
 
 router.put('/reschedule', validateRequest(RescheduleRequestSchema), ctrl.rescheduleByTrainer);
 

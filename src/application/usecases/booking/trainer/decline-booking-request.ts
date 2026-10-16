@@ -34,12 +34,10 @@ export class DeclineBookingUseCase implements IDeclineBookingUseCase {
     if (!bookingRecord.canBeDeclined()) {
       throw new AppError(ERROR_MESSAGES.DECLINE_BOOKING_ERROR, HttpStatus.BAD_REQUEST);
     }
-
-
+    const originalPaymentStatus = bookingRecord.payment.status;
     bookingRecord.decline(reason);
 
-
-    if (bookingRecord.payment.status === PAYMENT_STATUS.HOLD) {
+    if (originalPaymentStatus === PAYMENT_STATUS.PAID) {
 
       await this._walletRepository.releaseHoldWithoutBalance(
         bookingRecord.trainerId,
@@ -50,6 +48,7 @@ export class DeclineBookingUseCase implements IDeclineBookingUseCase {
         config.ADMIN,
         bookingId
       );
+
 
       await this._walletRepository.credit(
         bookingRecord.userId,
